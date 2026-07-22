@@ -119,8 +119,25 @@
     .wrap{max-width:100%; padding:0;}
     .card{box-shadow:none; border:1px solid #ccc;}
     .print-only{display:block !important;}
+    /* 내 기록 리포트 인쇄 모드: 나머지 숨기고 리포트만 */
+    body.report-print .wrap, body.report-print .overlay{display:none !important;}
+    body.report-print #printReport{display:block !important;}
   }
   .print-only{display:none;}
+  /* 내 기록 PDF 리포트 (평소 숨김, 인쇄 시만 노출) */
+  #printReport{display:none;}
+  #printReport .rp{color:#1a1a1a; font-family:system-ui,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; padding:6px 4px;}
+  #printReport h1{font-size:22px; margin:0 0 2px;}
+  #printReport .gen{font-size:12px; color:#666; margin-bottom:12px;}
+  #printReport .sum{display:flex; flex-wrap:wrap; gap:16px; font-size:13px; font-weight:600; border-top:1px solid #bbb; border-bottom:1px solid #bbb; padding:8px 0; margin-bottom:14px;}
+  #printReport .sess{padding:9px 0; border-bottom:1px solid #eaeaea; page-break-inside:avoid;}
+  #printReport .sd{font-size:12px; color:#555;}
+  #printReport .cands{margin-top:5px; display:flex; flex-wrap:wrap; gap:14px;}
+  #printReport .cand{font-size:15px;}
+  #printReport .cand b{font-variant-numeric:tabular-nums;}
+  #printReport .meta{font-size:12px; color:#555; margin-top:3px;}
+  #printReport .safe{font-size:13px; color:#888; margin-top:4px;}
+  #printReport .foot{margin-top:18px; font-size:11px; color:#777; border-top:1px solid #bbb; padding-top:8px; line-height:1.6;}
 </style>
 </head>
 <body>
@@ -157,12 +174,16 @@
     <h2>내 기록 · 연구용 데이터</h2>
     <p class="caption">모든 응답은 이 기기(브라우저)에만 저장됩니다. 외부로 자동 전송되지 않아요. 언제든 내보내거나 전체 삭제할 수 있습니다.</p>
     <div id="logStats"></div>
+    <button class="btn small primary" id="exportPdf">📄 PDF로 저장 (내 기록 전체)</button>
     <button class="btn small" id="exportJson">JSON으로 내보내기</button>
-    <button class="btn small" id="exportCsv">CSV로 내보내기 (분석용)</button>
+    <button class="btn small" id="exportCsv">CSV로 내보내기 (연구 동의분·분석용)</button>
     <button class="btn small ghost" id="deleteAll" style="color:var(--danger);border-color:var(--danger);">전체 기록 삭제</button>
     <button class="btn ghost small" id="logClose" style="margin-top:8px;">닫기</button>
   </div>
 </div>
+
+<!-- 내 기록 PDF 리포트 (인쇄 시만 노출) -->
+<div id="printReport"></div>
 
 <script>
 "use strict";
@@ -591,6 +612,56 @@ function exportCSV(){
   download('gamjeong_logs_'+Date.now()+'.csv', [head.join(','),...rows].join('\n'),'text/csv');
 }
 
+/* 내 기록 PDF (인쇄→PDF 저장). 내 기기의 전체 세션을 사람이 읽을 리포트로. */
+function fmtDate(iso){ try{ return new Date(iso).toLocaleString('ko-KR',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){ return iso||''; } }
+function emName(id){ return (EMAP[id] && EMAP[id].name) || id || '-'; }
+function buildReportHTML(logs){
+  if(!logs.length) return '<div class="rp"><h1>🔍 감정 탐정 · 내 기록</h1><p>아직 저장된 기록이 없어요.</p></div>';
+  const sorted=[...logs].sort((a,b)=> new Date(b.startedAt||0) - new Date(a.startedAt||0));
+  const total=logs.length;
+  const avgQ=(logs.reduce((a,s)=>a+(s.questionCount||0),0)/total).toFixed(1);
+  const t1=logs.filter(s=>s.userConfirmMatch==='top1').length;
+  const confirmed=logs.filter(s=>s.userConfirmMatch).length;
+  const items=sorted.map(s=>{
+    if(s.crisis){
+      return `<div class="sess"><div class="sd">${fmtDate(s.startedAt)}</div><div class="safe">안전 확인으로 마친 세션 — 감정 탐색은 진행하지 않았습니다.</div></div>`;
+    }
+    const cands=(s.posteriorFinal||[]).slice(0,3).map(c=>`<span class="cand">${emName(c.emotion)} <b>${Math.round(c.p*100)}%</b></span>`).join('');
+    const parts=[`${s.questionCount||0}문`];
+    if(s.confidence) parts.push('확신도 '+s.confidence);
+    if(s.intensity!=null) parts.push('강도 '+s.intensity+'/4');
+    const picked=s.userConfirmed?`<div class="meta">내가 고른 감정: ${emName(s.userConfirmed)}${s.openWord?' ('+s.openWord+')':''}</div>`:'';
+    return `<div class="sess">
+      <div class="sd">${fmtDate(s.startedAt)} · ${parts.join(' · ')}</div>
+      <div class="cands">${cands||'-'}</div>
+      ${picked}
+    </div>`;
+  }).join('');
+  return `<div class="rp">
+    <h1>🔍 감정 탐정 · 내 기록</h1>
+    <div class="gen">생성일 ${fmtDate(new Date().toISOString())}</div>
+    <div class="sum"><span>전체 ${total}회</span><span>평균 ${avgQ}문</span><span>결과 일치(top-1) ${t1}/${confirmed}</span></div>
+    ${items}
+    <div class="foot">이 기록은 감정 이해·자기기록을 돕는 참고용이며, 의료적 진단·치료를 대신하지 않습니다.<br>도움 연결(24시간): 109 · 1577-0199 · 1388 · 119</div>
+  </div>`;
+}
+let _reportOldTitle=null;
+function endReportPrint(){
+  document.body.classList.remove('report-print');
+  if(_reportOldTitle!=null){ document.title=_reportOldTitle; _reportOldTitle=null; }
+}
+function exportRecordsPDF(){
+  const logs=loadLogs();
+  document.getElementById('printReport').innerHTML=buildReportHTML(logs);
+  _reportOldTitle=document.title;
+  document.title='감정탐정_내기록_'+new Date().toISOString().slice(0,10);
+  document.body.classList.add('report-print');
+  setTimeout(()=>{ window.print(); }, 80);
+  // afterprint가 안 뜨는 브라우저 대비 이중 정리
+  setTimeout(endReportPrint, 3000);
+}
+window.addEventListener('afterprint', endReportPrint);
+
 /* =========================== 오버레이 =========================== */
 const helpOverlay=document.getElementById('helpOverlay');
 const logOverlay=document.getElementById('logOverlay');
@@ -614,6 +685,7 @@ function openLogModal(){
 }
 document.getElementById('logClose').onclick=()=>logOverlay.classList.remove('on');
 logOverlay.onclick=(e)=>{if(e.target===logOverlay)logOverlay.classList.remove('on');};
+document.getElementById('exportPdf').onclick=exportRecordsPDF;
 document.getElementById('exportJson').onclick=exportJSON;
 document.getElementById('exportCsv').onclick=exportCSV;
 document.getElementById('deleteAll').onclick=()=>{
