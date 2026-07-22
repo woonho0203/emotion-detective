@@ -122,19 +122,28 @@
     .rpwrap{box-shadow:none; padding:0;}
   }
   .print-only{display:none;}
-  /* 내 기록 리포트: 흰 종이 카드(화면·인쇄 동일하게 검은 글자/흰 배경) */
-  .rpwrap{background:#fff; color:#1a1a1a; border-radius:var(--radius); box-shadow:var(--shadow); padding:24px 22px;}
-  .rpwrap .rp h1{font-size:22px; margin:0 0 2px;}
-  .rpwrap .gen{font-size:12px; color:#666; margin-bottom:12px;}
-  .rpwrap .sum{display:flex; flex-wrap:wrap; gap:16px; font-size:13px; font-weight:600; border-top:1px solid #bbb; border-bottom:1px solid #bbb; padding:8px 0; margin-bottom:14px;}
-  .rpwrap .sess{padding:9px 0; border-bottom:1px solid #eaeaea; page-break-inside:avoid;}
-  .rpwrap .sd{font-size:12px; color:#555;}
-  .rpwrap .cands{margin-top:5px; display:flex; flex-wrap:wrap; gap:14px;}
-  .rpwrap .cand{font-size:15px;}
-  .rpwrap .cand b{font-variant-numeric:tabular-nums;}
-  .rpwrap .meta{font-size:12px; color:#555; margin-top:3px;}
-  .rpwrap .safe{font-size:13px; color:#888; margin-top:4px;}
-  .rpwrap .foot{margin-top:18px; font-size:11px; color:#777; border-top:1px solid #bbb; padding-top:8px; line-height:1.6;}
+  /* 내 기록 리포트: 흰 종이 카드(화면·인쇄 동일), 모바일에서 한눈에 */
+  .rpwrap{background:#fff; color:#1a1a1a; border-radius:var(--radius); box-shadow:var(--shadow); padding:22px 18px;}
+  .rpwrap .rp h1{font-size:21px; margin:0 0 2px;}
+  .rpwrap .gen{font-size:12px; color:#777; margin-bottom:14px;}
+  .rpwrap .rsum{display:flex; gap:10px; margin-bottom:16px;}
+  .rpwrap .rsum > div{flex:1; background:#F3F1EC; border-radius:14px; padding:10px 6px; text-align:center;}
+  .rpwrap .rsum b{display:block; font-size:19px; font-variant-numeric:tabular-nums;}
+  .rpwrap .rsum span{font-size:11px; color:#777;}
+  .rpwrap .rcard{border:1px solid #ece9e3; border-radius:14px; padding:13px 14px; margin-bottom:10px; page-break-inside:avoid;}
+  .rpwrap .rc-date{font-size:12px; color:#8a8a8a; margin-bottom:7px;}
+  .rpwrap .rc-head{display:flex; align-items:center; gap:9px;}
+  .rpwrap .rc-dot{width:13px; height:13px; border-radius:50%; flex:none;}
+  .rpwrap .rc-emo{font-size:19px; font-weight:800; letter-spacing:-.2px;}
+  .rpwrap .rc-pct{margin-left:auto; font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; color:#555;}
+  .rpwrap .rc-bar{display:flex; height:9px; border-radius:999px; overflow:hidden; margin:9px 0 7px; background:#eee;}
+  .rpwrap .rc-bar span{display:block; height:100%;}
+  .rpwrap .rc-others{font-size:12px; color:#999; margin-bottom:4px;}
+  .rpwrap .rc-need{font-size:14px; color:#333;}
+  .rpwrap .rc-sub{font-size:12px; color:#7a7a7a; margin-top:6px;}
+  .rpwrap .rc-safe{font-size:14px; color:#9a9a9a;}
+  .rpwrap .rp-empty{color:#777;}
+  .rpwrap .foot{margin-top:16px; font-size:11px; color:#888; border-top:1px solid #ddd; padding-top:10px; line-height:1.6;}
   .rpbtns{display:flex; gap:10px; margin-top:18px;}
 </style>
 </head>
@@ -214,32 +223,30 @@ const IDS = EMOTIONS.map(e=>e.id);
 const POS = EMOTIONS.filter(e=>e.v>0).map(e=>e.id);
 const NEG = EMOTIONS.filter(e=>e.v<0).map(e=>e.id);
 
-/* ---- 문항뱅크 ---- */
-const SAFETY = {id:'q_safety', text:'무엇보다 먼저 확인할게요. 지금 당장 나 자신을 해치거나, 죽고 싶다는 생각이 드나요?'};
-
+/* ---- 문항뱅크 (더 구체적인 문구) ---- */
 const FIXED = [
-  {id:'q_valence', text:'지금 느낌은 편안함보다, 불편함(불쾌)에 더 가깝나요?', boost:NEG, suppress:POS},
-  {id:'q_arousal', text:'몸과 마음의 에너지가 높게 — 긴장되거나 각성된 느낌으로 — 올라와 있나요?', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
-  {id:'q_cause', text:'이 감정이 특정 사건이나 사람 때문에 방금 생겼다고 느끼나요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
+  {id:'q_valence', text:'지금 기분이 “좋다·편하다”보다 “안 좋다·불편하다·답답하다” 쪽에 더 가깝나요?', boost:NEG, suppress:POS},
+  {id:'q_arousal', text:'몸이 긴장되거나 두근거리고, 가만히 있기 힘들 만큼 에너지가 올라와 있나요? (차분하거나 나른한 상태가 아니라)', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
+  {id:'q_cause', text:'이 기분이 방금 있었던 특정 사건이나, 누군가의 말·행동 때문에 생겼나요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
 ];
 
 const DYNAMIC = [
-  {id:'q_relation', text:'누군가와의 관계나 주고받은 말 때문에 생긴 감정인가요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
-  {id:'q_warm', text:'따뜻함·고마움·가까움 같은 좋은 느낌이 드나요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
-  {id:'q_avoid', text:'혼자 있고 싶거나, 그 상황을 피하고 싶은 마음이 크나요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
-  {id:'q_confront', text:'따지거나 말하고 싶고, 바로잡고 싶은 마음이 크나요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
-  {id:'q_social', text:'억울함·서운함·수치심처럼 “사람 사이”의 느낌이 섞여 있나요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
-  {id:'q_threat', text:'무언가 나빠질 것 같아, 걱정되고 긴장되나요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
-  {id:'q_loss', text:'무언가를 잃었거나, 포기한 느낌이 있나요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
-  {id:'q_block', text:'원하는 것이 막히거나 방해받은 느낌이 있나요?', boost:['anger','resentment'], suppress:['calm']},
-  {id:'q_selfeval', text:'스스로가 부족하거나, 잘못했다고 느끼나요?', boost:['shame','sadness'], suppress:['anger','pride']},
-  {id:'q_bodyhigh', text:'가슴 답답함·심장 두근거림·안절부절이 두드러지나요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
-  {id:'q_bodylow', text:'힘이 빠지고, 움직이기 싫은 쪽에 더 가깝나요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
-  {id:'q_empty', text:'허무하거나, 텅 빈 느낌이 있나요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
-  {id:'q_disgust', text:'무언가가 불쾌하고 거슬리며, 밀어내고 싶은가요?', boost:['disgust','anger'], suppress:['calm']},
-  {id:'q_achieve', text:'뿌듯하거나, 해냈다는 느낌이 있나요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
-  {id:'q_clarity', text:'이 감정이 뭔지 한 단어로 말하기 어렵고, 막막한가요?', boost:['confusion'], suppress:['pride','joy']},
-  {id:'q_hide', text:'지금 이 감정을, 남에게 들키고 싶지 않나요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
+  {id:'q_relation', text:'가족·친구·연인·동료처럼 누군가와의 관계나 주고받은 말 때문에 생긴 기분인가요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
+  {id:'q_warm', text:'고마움·애틋함·가까움처럼, 마음이 따뜻해지는 느낌이 드나요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
+  {id:'q_avoid', text:'지금은 아무도 만나기 싫고, 혼자 있거나 그 상황을 피하고 싶은가요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
+  {id:'q_confront', text:'누군가에게 따지거나 항의하고 싶고, 잘못된 것을 바로잡고 싶은 마음이 드나요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
+  {id:'q_social', text:'“나만 손해 본 것 같다·서운하다·부끄럽다”처럼, 다른 사람과 얽힌 감정이 섞여 있나요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
+  {id:'q_threat', text:'앞으로 나쁜 일이 생길까 봐 걱정되고, 마음이 조마조마한가요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
+  {id:'q_loss', text:'소중한 것(사람·기회·물건 등)을 잃었거나, 포기한 것 같은 느낌이 있나요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
+  {id:'q_block', text:'하고 싶은 일이나 원하는 것이, 가로막히거나 방해받은 느낌인가요?', boost:['anger','resentment'], suppress:['calm']},
+  {id:'q_selfeval', text:'“내가 부족하다·내가 잘못했다”처럼, 스스로를 탓하는 마음이 드나요?', boost:['shame','sadness'], suppress:['anger','pride']},
+  {id:'q_bodyhigh', text:'가슴이 답답하거나 심장이 빨리 뛰고, 안절부절못하는 느낌이 있나요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
+  {id:'q_bodylow', text:'몸에 힘이 빠지고, 아무것도 하기 싫고 축 처지는 느낌인가요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
+  {id:'q_empty', text:'마음이 텅 빈 것 같고, 무엇을 해도 허무한 느낌이 드나요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
+  {id:'q_disgust', text:'무언가가 역겹거나 거슬려서, 멀리하고 밀어내고 싶은가요?', boost:['disgust','anger'], suppress:['calm']},
+  {id:'q_achieve', text:'무언가를 잘 해냈거나 목표를 이뤄서, 뿌듯하고 자랑스러운가요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
+  {id:'q_clarity', text:'이 기분이 정확히 뭔지 한 단어로 말하기 어렵고, 머릿속이 뿌옇고 막막한가요?', boost:['confusion'], suppress:['pride','joy']},
+  {id:'q_hide', text:'이 기분을 남들에게는 들키고 싶지 않고, 숨기고 싶은가요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
 ];
 const DMAP = Object.fromEntries(DYNAMIC.map(q=>[q.id,q]));
 
@@ -308,7 +315,8 @@ function resetState(){
     answers:[], askedDynamic:new Set(), stepsForStop:0,
     intensity:null, consent:false, minor:false,
     startedAt:null, qStart:0, openWord:null,
-    userConfirmed:null, userConfirmMatch:null, sessionId:uuid()
+    userConfirmed:null, userConfirmMatch:null, sessionId:uuid(),
+    excluded:new Set(), hardCap:HARD_CAP, requeries:0
   };
 }
 function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
@@ -342,48 +350,9 @@ function renderIntro(){
     S.consent = document.getElementById('cbConsent').checked;
     S.minor = document.getElementById('cbMinor').checked;
     S.startedAt = new Date().toISOString();
-    renderSafety();
+    startEmotionFlow();
   };
   document.getElementById('openLog').onclick = openLogModal;
-}
-
-/* ---------- 렌더: 안전 스크리닝 ---------- */
-function renderSafety(){
-  S.phase='safety'; S.qStart=performance.now();
-  app.innerHTML = `
-  <section class="card">
-    <div class="clue-count no-print">안전 확인</div>
-    <h2>${SAFETY.text}</h2>
-    <p class="caption">가장 중요한 것부터 확인하기 위한 질문이에요.</p>
-    <div class="yesno">
-      <button class="btn" data-a="yes">네, 있어요</button>
-      <button class="btn" data-a="no">아니요</button>
-    </div>
-  </section>`;
-  app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
-    const a=b.dataset.a;
-    S.answers.push({qid:'q_safety', answer:a, tMs:Math.round(performance.now()-S.qStart)});
-    if(a==='yes'){ saveCrisisSession(); renderCrisis(); }
-    else { startEmotionFlow(); }
-  });
-}
-
-/* ---------- 렌더: 위기 ---------- */
-function renderCrisis(){
-  S.phase='crisis';
-  app.innerHTML = `
-  <section class="card crisis">
-    <h2>지금은 안전이 먼저예요</h2>
-    <p>지금 응답에는 <b>즉각적인 안전 확인이 필요한 신호</b>가 보입니다. 이 서비스는 응급 개입을 대신할 수 없어요.
-    지금 바로 아래로 연락해 주세요. 혼자 있지 말고, 가능하면 가까운 사람에게 지금 상태를 바로 알리세요.</p>
-    <a class="hotline" href="tel:109"><span class="nm">자살예방상담전화 · 24시간</span><span class="num">109</span></a>
-    <a class="hotline" href="tel:15770199"><span class="nm">정신건강위기상담전화 · 24시간</span><span class="num">1577-0199</span></a>
-    <a class="hotline" href="tel:119"><span class="nm">응급</span><span class="num">119</span></a>
-    ${S.minor ? `<a class="hotline" href="tel:1388"><span class="nm">청소년전화 · 24시간</span><span class="num">1388</span></a>`:''}
-    <p class="caption" style="margin-top:14px;">위험한 물건이나 약물이 곁에 있다면 멀리 두고, 안전한 장소로 이동해 주세요. 이 화면에서는 더 이상 일반 감정 탐색을 진행하지 않고, 도움 연결을 우선합니다.</p>
-    <button class="btn ghost small no-print" id="toHome" style="margin-top:16px;">처음으로</button>
-  </section>`;
-  document.getElementById('toHome').onclick = ()=>{ resetState(); renderIntro(); };
 }
 
 /* ---------- 감정 탐색 흐름 ---------- */
@@ -435,14 +404,14 @@ function answerQuestion(q, a){
   const nonSafety = S.answers.filter(x=>x.qid!=='q_safety').length;
   const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id)).length;
   const earlyStop = (S.stepsForStop>=MIN_STEPS_EARLY) && conf.cls==='high';
-  const hardStop = nonSafety>=HARD_CAP || remaining===0;
+  const hardStop = nonSafety>=S.hardCap || remaining===0;
 
   if(S.phase==='dynamic' && !earlyStop && !hardStop){
     const nq = nextDynamic(post, S.askedDynamic);
     if(nq){ renderQuestion(nq); return; }
   }
-  // 강도 → 결과
-  renderIntensity();
+  // 강도(첫 회차만) → 결과. 재질문(강도 이미 입력됨)은 바로 결과로.
+  if(S.intensity!=null){ finishToResult(); } else { renderIntensity(); }
 }
 
 /* ---------- 강도 ---------- */
@@ -513,11 +482,7 @@ function renderResult(){
       <div class="caption">이 결과가 지금 느낌과 맞나요? <span style="color:var(--ink-soft)">(연구·검증에 큰 도움이 돼요)</span></div>
       <div class="confirm-opts" id="confirmOpts">
         ${top3.map(x=>`<button class="btn small" data-cid="${x.id}">${EMAP[x.id].name} — 이게 맞아요</button>`).join('')}
-        <button class="btn small ghost" data-cid="__other">셋 다 아니에요 / 다른 감정</button>
-      </div>
-      <div class="refine hidden" id="refineBox">
-        <input type="text" id="openWord" placeholder="한 단어로 적어주세요 (예: 초조)">
-        <button class="btn small" id="refineBtn" style="width:auto;padding:0 16px;">확인</button>
+        <button class="btn small ghost" id="reqOther">셋 다 아니에요 · 다른 감정 찾기</button>
       </div>
       <div id="confirmThanks" class="caption hidden" style="color:var(--calm);margin-top:8px;">기록했어요. 고마워요 🙏</div>
     </div>
@@ -531,19 +496,10 @@ function renderResult(){
 
   // 자기확인
   app.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{
-    const cid=b.dataset.cid;
-    if(cid==='__other'){ document.getElementById('refineBox').classList.remove('hidden'); return; }
-    recordConfirm(cid, r);
+    recordConfirm(b.dataset.cid, r);
     afterConfirm();
   });
-  document.getElementById('refineBtn').onclick=()=>{
-    const w=document.getElementById('openWord').value.trim();
-    S.openWord=w||null;
-    const matchId=matchWord(w);
-    recordConfirm(matchId||('자유입력:'+(w||'미입력')), r);
-    // 개방형 정제: 사전 매칭 시 소폭 가산 후 재계산은 생략(기록만) — 확신도 낮을 때 사용자 표현 우선
-    afterConfirm();
-  };
+  document.getElementById('reqOther').onclick=()=>requeryDifferent(r);
   document.getElementById('pdfBtn').onclick=()=>window.print();
   document.getElementById('againBtn').onclick=()=>{ resetState(); renderIntro(); };
   document.getElementById('openLog2').onclick=openLogModal;
@@ -564,8 +520,26 @@ function recordConfirm(cid, r){
 }
 function afterConfirm(){
   document.getElementById('confirmOpts').classList.add('hidden');
-  document.getElementById('refineBox').classList.add('hidden');
   document.getElementById('confirmThanks').classList.remove('hidden');
+}
+/* 셋 다 아니면: 현재 상위 후보를 제외하고 몇 문항 더 물어 다른 감정을 찾는다 (#6) */
+function requeryDifferent(r){
+  S.requeries=(S.requeries||0)+1;
+  r.slice(0,3).forEach(x=>{ S.excluded.add(x.id); S.logscore[x.id]=-1e9; });
+  const poolLeft = IDS.filter(id=> S.logscore[id] > -1e8);
+  if(poolLeft.length < 2 || S.requeries > 4){
+    alert('후보 감정을 거의 다 확인했어요. 처음부터 다시 해보는 게 더 정확해요.');
+    resetState(); renderIntro(); return;
+  }
+  S.phase='dynamic';
+  const answered = S.answers.filter(x=>x.qid!=='q_safety').length;
+  S.hardCap = answered + 3;   // 다른 감정을 찾도록 최대 3문 더
+  const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id));
+  if(remaining.length){
+    const nq = nextDynamic(softmax(S.logscore), S.askedDynamic);
+    if(nq){ renderQuestion(nq); return; }
+  }
+  finishToResult();
 }
 
 /* =========================== 저장/로그 =========================== */
@@ -573,21 +547,21 @@ const LKEY='gamjeong_logs';
 function loadLogs(){ try{return JSON.parse(localStorage.getItem(LKEY)||'[]');}catch(e){return [];} }
 function writeLogs(a){ try{localStorage.setItem(LKEY, JSON.stringify(a));}catch(e){} }
 function sessionRecord(){
-  const post = S.phase==='crisis'? null : softmax(S.logscore);
-  const r = post? ranked(post):[];
+  const post = softmax(S.logscore);
+  const r = ranked(post);
+  const primaryNeed = r[0] ? (EMAP[r[0].id]||{}).need : null;
   return {
     sessionId:S.sessionId, startedAt:S.startedAt, finishedAt:S.finishedAt||null,
-    consentResearch:S.consent, isMinor:S.minor, crisis:S.phase==='crisis',
-    answers:S.answers, questionCount:S.answers.filter(a=>a.qid!=='q_safety'&&a.qid!=='q_intensity').length,
+    consentResearch:S.consent, isMinor:S.minor,
+    answers:S.answers, questionCount:S.answers.filter(a=>a.qid!=='q_intensity').length,
     intensity:S.intensity,
     posteriorFinal: r.slice(0,5).map(x=>({emotion:x.id, p:Math.round(x.p*1000)/1000})),
-    top1: r[0]?r[0].id:null, top3: r.slice(0,3).map(x=>x.id),
-    confidence: post?confidenceOf(post).level:null,
+    top1: r[0]?r[0].id:null, top3: r.slice(0,3).map(x=>x.id), need: primaryNeed,
+    confidence: confidenceOf(post).level, excluded: Array.from(S.excluded||[]),
     userConfirmed:S.userConfirmed, userConfirmMatch:S.userConfirmMatch, openWord:S.openWord
   };
 }
-function saveSession(){ const a=loadLogs(); a.push(sessionRecord()); writeLogs(a); }
-function saveCrisisSession(){ S.finishedAt=new Date().toISOString(); const a=loadLogs(); a.push(sessionRecord()); writeLogs(a); }
+function saveSession(){ const a=loadLogs(); const i=a.findIndex(x=>x.sessionId===S.sessionId); if(i>=0)a[i]=sessionRecord(); else a.push(sessionRecord()); writeLogs(a); }
 function updateSession(){ const a=loadLogs(); const i=a.findIndex(x=>x.sessionId===S.sessionId); if(i>=0){ a[i]=sessionRecord(); writeLogs(a);} }
 
 /* 내보내기 */
@@ -611,32 +585,39 @@ function exportCSV(){
 function fmtDate(iso){ try{ return new Date(iso).toLocaleString('ko-KR',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){ return iso||''; } }
 function emName(id){ return (EMAP[id] && EMAP[id].name) || id || '-'; }
 function buildReportHTML(logs){
-  if(!logs.length) return '<div class="rp"><h1>🔍 감정 탐정 · 내 기록</h1><p>아직 저장된 기록이 없어요.</p></div>';
+  if(!logs.length) return '<div class="rp"><h1>🔍 감정 탐정 · 내 기록</h1><p class="rp-empty">아직 저장된 기록이 없어요. 감정 탐색을 한 번 해보면 여기에 남아요.</p></div>';
   const sorted=[...logs].sort((a,b)=> new Date(b.startedAt||0) - new Date(a.startedAt||0));
   const total=logs.length;
   const avgQ=(logs.reduce((a,s)=>a+(s.questionCount||0),0)/total).toFixed(1);
   const t1=logs.filter(s=>s.userConfirmMatch==='top1').length;
   const confirmed=logs.filter(s=>s.userConfirmMatch).length;
-  const items=sorted.map(s=>{
+  const cards=sorted.map(s=>{
     if(s.crisis){
-      return `<div class="sess"><div class="sd">${fmtDate(s.startedAt)}</div><div class="safe">안전 확인으로 마친 세션 — 감정 탐색은 진행하지 않았습니다.</div></div>`;
+      return `<div class="rcard"><div class="rc-date">${fmtDate(s.startedAt)}</div><div class="rc-safe">안전 확인으로 마친 세션</div></div>`;
     }
-    const cands=(s.posteriorFinal||[]).slice(0,3).map(c=>`<span class="cand">${emName(c.emotion)} <b>${Math.round(c.p*100)}%</b></span>`).join('');
-    const parts=[`${s.questionCount||0}문`];
-    if(s.confidence) parts.push('확신도 '+s.confidence);
-    if(s.intensity!=null) parts.push('강도 '+s.intensity+'/4');
-    const picked=s.userConfirmed?`<div class="meta">내가 고른 감정: ${emName(s.userConfirmed)}${s.openWord?' ('+s.openWord+')':''}</div>`:'';
-    return `<div class="sess">
-      <div class="sd">${fmtDate(s.startedAt)} · ${parts.join(' · ')}</div>
-      <div class="cands">${cands||'-'}</div>
-      ${picked}
+    const p3=(s.posteriorFinal||[]).slice(0,3);
+    const top=p3[0]; const topE=top?EMAP[top.emotion]:null;
+    const sumP=p3.reduce((a,c)=>a+c.p,0)||1;
+    const seg=p3.map(c=>{const e=EMAP[c.emotion]; return `<span style="width:${Math.round(c.p/sumP*100)}%;background:${e?e.color:'#c9c6c0'}"></span>`;}).join('');
+    const others=p3.slice(1).map(c=>`${emName(c.emotion)} ${Math.round(c.p*100)}%`).join(' · ');
+    const need = s.need || (topE?topE.need:null);
+    const dots = (s.intensity!=null)?('●'.repeat(s.intensity)+'○'.repeat(4-s.intensity)):'';
+    const sub=[]; if(dots) sub.push('강도 '+dots); if(s.confidence) sub.push('확신도 '+s.confidence);
+    if(s.userConfirmed && EMAP[s.userConfirmed] && (!top||s.userConfirmed!==top.emotion)) sub.push('내가 고른 감정: '+emName(s.userConfirmed));
+    return `<div class="rcard">
+      <div class="rc-date">${fmtDate(s.startedAt)}</div>
+      <div class="rc-head"><span class="rc-dot" style="background:${topE?topE.color:'#c9c6c0'}"></span><span class="rc-emo">${topE?topE.name:'-'}</span><span class="rc-pct">${top?Math.round(top.p*100):0}%</span></div>
+      <div class="rc-bar">${seg}</div>
+      ${others?`<div class="rc-others">그다음 · ${others}</div>`:''}
+      ${need?`<div class="rc-need">💛 바라는 것 · <b>${need}</b></div>`:''}
+      ${sub.length?`<div class="rc-sub">${sub.join(' · ')}</div>`:''}
     </div>`;
   }).join('');
   return `<div class="rp">
     <h1>🔍 감정 탐정 · 내 기록</h1>
     <div class="gen">생성일 ${fmtDate(new Date().toISOString())}</div>
-    <div class="sum"><span>전체 ${total}회</span><span>평균 ${avgQ}문</span><span>결과 일치(top-1) ${t1}/${confirmed}</span></div>
-    ${items}
+    <div class="rsum"><div><b>${total}</b><span>전체</span></div><div><b>${avgQ}</b><span>평균 문항</span></div><div><b>${t1}/${confirmed}</b><span>결과 일치</span></div></div>
+    ${cards}
     <div class="foot">이 기록은 감정 이해·자기기록을 돕는 참고용이며, 의료적 진단·치료를 대신하지 않습니다.<br>도움 연결(24시간): 109 · 1577-0199 · 1388 · 119</div>
   </div>`;
 }
