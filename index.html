@@ -455,7 +455,7 @@ function renderResult(){
   }).join('');
 
   const confNote = conf.cls==='low'
-    ? `<p class="caption">후보들이 서로 비슷해서 <b>아직 분명하지 않아요.</b> 아래에서 한 단어로 직접 알려주면 더 정확해집니다.</p>`
+    ? `<p class="caption">후보들이 서로 비슷해서 <b>아직 분명하지 않아요.</b> 맞는 감정이 없으면 아래 <b>“다른 감정 찾기”</b>로 더 좁혀볼 수 있어요.</p>`
     : mixed ? `<p class="caption"><b>혼합감정</b>일 수 있어요 — 위 두 감정이 함께 느껴지는 상태로 보입니다.</p>` : '';
 
   app.innerHTML=`
