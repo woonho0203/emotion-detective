@@ -119,8 +119,23 @@
     .wrap{max-width:100%; padding:0;}
     .card{box-shadow:none; border:1px solid #ccc;}
     .print-only{display:block !important;}
+    .rpwrap{box-shadow:none; padding:0;}
   }
   .print-only{display:none;}
+  /* 내 기록 리포트: 흰 종이 카드(화면·인쇄 동일하게 검은 글자/흰 배경) */
+  .rpwrap{background:#fff; color:#1a1a1a; border-radius:var(--radius); box-shadow:var(--shadow); padding:24px 22px;}
+  .rpwrap .rp h1{font-size:22px; margin:0 0 2px;}
+  .rpwrap .gen{font-size:12px; color:#666; margin-bottom:12px;}
+  .rpwrap .sum{display:flex; flex-wrap:wrap; gap:16px; font-size:13px; font-weight:600; border-top:1px solid #bbb; border-bottom:1px solid #bbb; padding:8px 0; margin-bottom:14px;}
+  .rpwrap .sess{padding:9px 0; border-bottom:1px solid #eaeaea; page-break-inside:avoid;}
+  .rpwrap .sd{font-size:12px; color:#555;}
+  .rpwrap .cands{margin-top:5px; display:flex; flex-wrap:wrap; gap:14px;}
+  .rpwrap .cand{font-size:15px;}
+  .rpwrap .cand b{font-variant-numeric:tabular-nums;}
+  .rpwrap .meta{font-size:12px; color:#555; margin-top:3px;}
+  .rpwrap .safe{font-size:13px; color:#888; margin-top:4px;}
+  .rpwrap .foot{margin-top:18px; font-size:11px; color:#777; border-top:1px solid #bbb; padding-top:8px; line-height:1.6;}
+  .rpbtns{display:flex; gap:10px; margin-top:18px;}
 </style>
 </head>
 <body>
@@ -625,39 +640,23 @@ function buildReportHTML(logs){
     <div class="foot">이 기록은 감정 이해·자기기록을 돕는 참고용이며, 의료적 진단·치료를 대신하지 않습니다.<br>도움 연결(24시간): 109 · 1577-0199 · 1388 · 119</div>
   </div>`;
 }
-const REPORT_CSS = `
-*{box-sizing:border-box;} body{margin:0 auto;max-width:720px;color:#1a1a1a;background:#fff;font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1.6;padding:20px;}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #ddd;}
-.toolbar button{background:#3E4C7A;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-size:16px;font-weight:600;cursor:pointer;}
-.toolbar .tip{font-size:12px;color:#666;flex:1;min-width:200px;}
-.rp h1{font-size:22px;margin:0 0 2px;}
-.gen{font-size:12px;color:#666;margin-bottom:12px;}
-.sum{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;font-weight:600;border-top:1px solid #bbb;border-bottom:1px solid #bbb;padding:8px 0;margin-bottom:14px;}
-.sess{padding:9px 0;border-bottom:1px solid #eaeaea;page-break-inside:avoid;}
-.sd{font-size:12px;color:#555;}
-.cands{margin-top:5px;display:flex;flex-wrap:wrap;gap:14px;}
-.cand{font-size:15px;} .cand b{font-variant-numeric:tabular-nums;}
-.meta{font-size:12px;color:#555;margin-top:3px;}
-.safe{font-size:13px;color:#888;margin-top:4px;}
-.foot{margin-top:18px;font-size:11px;color:#777;border-top:1px solid #bbb;padding-top:8px;line-height:1.6;}
-@media print{ .toolbar{display:none !important;} body{padding:0;} }
-`;
-/* 내 기록 PDF: 새 탭에 리포트를 열고 그 탭의 버튼으로 인쇄/PDF 저장.
-   iOS Safari는 사용자 제스처 안에서만 print()가 동작하므로, setTimeout 없이
-   즉시 새 탭을 열고 그 페이지의 버튼(새 제스처)으로 인쇄하는 방식이 가장 안정적. */
+/* 내 기록 PDF: 리포트를 화면에 렌더한 뒤(흰 종이 카드) 버튼에서 동기적으로 window.print().
+   결과 화면 PDF와 동일한 방식이라 iOS Safari에서도 안정적으로 동작(새 탭·setTimeout 없음). */
 function exportRecordsPDF(){
   const logs=loadLogs();
-  const dateStr=new Date().toISOString().slice(0,10);
-  const w=window.open('','_blank');
-  if(!w){ alert('새 창(탭)이 차단되어 리포트를 열 수 없어요. 브라우저 팝업을 허용한 뒤 다시 눌러 주세요.'); return; }
-  const doc='<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">'
-    +'<meta name="viewport" content="width=device-width, initial-scale=1">'
-    +'<title>감정탐정_내기록_'+dateStr+'</title><style>'+REPORT_CSS+'</style></head><body>'
-    +'<div class="toolbar"><button type="button" onclick="window.print()">📄 PDF로 저장 · 인쇄</button>'
-    +'<span class="tip">아이폰: 위 버튼 → 인쇄 미리보기에서 두 손가락으로 벌려 확대 → 공유 아이콘으로 저장. (또는 사파리 하단 공유 → 프린트)</span></div>'
-    +buildReportHTML(logs)
-    +'</body></html>';
-  w.document.open(); w.document.write(doc); w.document.close(); w.focus();
+  logOverlay.classList.remove('on');
+  app.innerHTML = `
+  <section class="rpwrap">
+    ${buildReportHTML(logs)}
+    <div class="no-print rpbtns">
+      <button class="btn primary" id="recPdf">📄 PDF로 저장 · 인쇄</button>
+      <button class="btn" id="recBack">닫기</button>
+    </div>
+    <p class="caption no-print" style="margin-top:10px;">아이폰: 위 버튼을 누르면 인쇄 미리보기가 열려요 → 두 손가락으로 벌려 확대 → 공유 아이콘으로 PDF 저장.</p>
+  </section>`;
+  document.getElementById('recPdf').onclick=()=>window.print();
+  document.getElementById('recBack').onclick=()=>{ resetState(); renderIntro(); };
+  try{ window.scrollTo(0,0); }catch(e){}
 }
 
 /* =========================== 오버레이 =========================== */
