@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>감정 탐정 · 지금 내 마음의 단서를 찾아서</title>
+<style>
+  :root{
+    --bg:#F7F4EF; --surface:#FFFFFF; --ink:#2B2A33; --ink-soft:#5C5A66;
+    --primary:#3E4C7A; --primary-soft:#E7EAF4; --accent:#D98E5A;
+    --calm:#7FBFA6; --danger:#C0453B; --danger-bg:#FBEDEB; --line:#E5E0D8;
+    --shadow:0 6px 24px rgba(43,42,51,.08);
+    --radius:20px; --radius-btn:14px; --maxw:560px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#201F26; --surface:#2A2933; --ink:#F0EEE9; --ink-soft:#B4B1BD;
+      --primary:#9DA9DA; --primary-soft:#33324062; --accent:#E7A46F;
+      --calm:#8FCFB4; --danger:#E9897F; --danger-bg:#3A2320; --line:#3A3945;
+      --shadow:0 6px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:16px 20px 40px; min-height:100vh; display:flex; flex-direction:column;}
+  header.topbar{display:flex; align-items:center; justify-content:space-between; padding:8px 0 14px;}
+  .brand{display:flex; align-items:center; gap:8px; font-weight:700; color:var(--primary); font-size:18px;}
+  .brand .glass{font-size:22px;}
+  .help-btn{
+    background:none; border:1px solid var(--line); color:var(--ink-soft);
+    border-radius:999px; padding:6px 12px; font-size:13px; cursor:pointer;
+  }
+  .help-btn:hover{border-color:var(--danger); color:var(--danger);}
+  .card{background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); padding:26px 22px; margin-top:6px;}
+  h1{font-size:26px; line-height:1.35; margin:0 0 10px;}
+  h2{font-size:22px; line-height:1.4; margin:0 0 6px; font-weight:600;}
+  p{margin:0 0 12px;}
+  .muted{color:var(--ink-soft); font-size:14px;}
+  .caption{color:var(--ink-soft); font-size:13px; line-height:1.6;}
+  .btn{
+    display:block; width:100%; min-height:52px; border-radius:var(--radius-btn);
+    border:1px solid var(--line); background:var(--surface); color:var(--ink);
+    font-size:17px; font-weight:600; cursor:pointer; padding:12px 16px; margin-top:10px;
+    transition:transform .12s ease, background .2s ease, border-color .2s ease;
+  }
+  .btn:hover{border-color:var(--primary);}
+  .btn:active{transform:scale(.99);}
+  .btn.primary{background:var(--primary); color:#fff; border-color:var(--primary);}
+  .btn.primary:hover{filter:brightness(1.05);}
+  .btn.ghost{background:transparent;}
+  .btn.small{min-height:44px; font-size:15px; font-weight:500;}
+  .btn-row{display:flex; gap:10px;}
+  .btn-row .btn{margin-top:10px;}
+  .yesno{display:flex; gap:12px; margin-top:18px;}
+  .yesno .btn{margin-top:0;}
+  .skip{margin-top:12px; text-align:center;}
+  .skip button{background:none;border:none;color:var(--ink-soft);text-decoration:underline;cursor:pointer;font-size:14px;}
+  .progress{height:8px; background:var(--primary-soft); border-radius:999px; overflow:hidden; margin:2px 0 4px;}
+  .progress > i{display:block; height:100%; background:var(--accent); width:0; transition:width .35s ease;}
+  .clue-count{font-size:13px; color:var(--accent); font-weight:600; letter-spacing:.2px;}
+  .likert{display:flex; gap:8px; margin-top:16px;}
+  .likert .btn{margin-top:0; min-height:60px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:15px;}
+  .likert .btn small{font-size:11px; color:var(--ink-soft); font-weight:400;}
+  /* result */
+  .barrow{margin:14px 0;}
+  .barrow .top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;}
+  .barrow .em{font-weight:700; font-size:19px;}
+  .barrow .pct{font-variant-numeric:tabular-nums; color:var(--ink-soft); font-weight:600;}
+  .bar{height:14px; border-radius:999px; background:var(--primary-soft); overflow:hidden;}
+  .bar > i{display:block; height:100%; border-radius:999px; transition:width .5s ease;}
+  .badge{display:inline-block; padding:4px 10px; border-radius:999px; font-size:13px; font-weight:600;}
+  .badge.high{background:#E4F1EA; color:#2f7a5b;}
+  .badge.mid{background:#FBF0DF; color:#9a6a2a;}
+  .badge.low{background:#EDEBF3; color:#5a5480;}
+  @media (prefers-color-scheme: dark){
+    .badge.high{background:#22392f;color:#8fcfb4;} .badge.mid{background:#3a3122;color:#e7a46f;} .badge.low{background:#302f3d;color:#b4b1bd;}
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 4px;}
+  .chip{background:var(--primary-soft); color:var(--primary); border-radius:999px; padding:5px 12px; font-size:13px; font-weight:600;}
+  .insight{background:var(--primary-soft); border-radius:14px; padding:14px 16px; margin:14px 0;}
+  .insight h3{margin:0 0 4px; font-size:15px; color:var(--primary);}
+  .insight p{margin:0; font-size:15px;}
+  .notice{border:1px solid var(--line); border-radius:14px; padding:12px 14px; font-size:13px; color:var(--ink-soft); margin-top:14px;}
+  .yellow-banner{background:#FBF3E4; border:1px solid #EAD9B8; color:#7a5a1f; border-radius:14px; padding:12px 14px; font-size:14px; margin:14px 0;}
+  @media (prefers-color-scheme: dark){ .yellow-banner{background:#332a1a;border-color:#5a4a2a;color:#e7c98a;} }
+  .confirm-opts{display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+  .confirm-opts .btn{margin-top:0;}
+  .refine{display:flex; gap:8px; margin-top:10px;}
+  .refine input{flex:1; min-height:48px; border:1px solid var(--line); border-radius:var(--radius-btn); padding:0 14px; font-size:16px; background:var(--surface); color:var(--ink);}
+  /* crisis */
+  .crisis{background:var(--danger-bg); border:1.5px solid var(--danger);}
+  .crisis h2{color:var(--danger);}
+  .hotline{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface); border:1px solid var(--danger); border-radius:14px;
+    padding:14px 16px; margin-top:10px; text-decoration:none; color:var(--ink);
+  }
+  .hotline .num{font-size:22px; font-weight:800; color:var(--danger); font-variant-numeric:tabular-nums;}
+  .hotline .nm{font-size:14px;}
+  footer.foot{margin-top:auto; padding-top:22px; text-align:center;}
+  footer.foot .disc{font-size:12px; color:var(--ink-soft); line-height:1.6;}
+  footer.foot a.helplink{color:var(--danger); font-weight:600; text-decoration:none; font-size:14px;}
+  /* modal */
+  .overlay{position:fixed; inset:0; background:rgba(20,19,25,.5); display:none; align-items:center; justify-content:center; padding:18px; z-index:50;}
+  .overlay.on{display:flex;}
+  .modal{background:var(--surface); border-radius:var(--radius); max-width:520px; width:100%; max-height:88vh; overflow:auto; padding:22px;}
+  .modal h2{font-size:20px;}
+  .kv{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line); font-size:15px;}
+  .hidden{display:none !important;}
+  /* print */
+  @media print{
+    body{background:#fff;}
+    .no-print{display:none !important;}
+    .wrap{max-width:100%; padding:0;}
+    .card{box-shadow:none; border:1px solid #ccc;}
+    .print-only{display:block !important;}
+  }
+  .print-only{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar no-print">
+    <div class="brand"><span class="glass">🔍</span><span>감정 탐정</span></div>
+    <button class="help-btn" id="helpBtn" aria-label="도움 연결 정보 열기">도움이 필요해요</button>
+  </header>
+
+  <main id="app"><!-- screens rendered here --></main>
+
+  <footer class="foot no-print">
+    <p class="disc">이 서비스는 감정 이해와 자기기록을 돕는 정보제공 도구이며, 의료적 진단이나 치료를 대신하지 않습니다.<br>
+    힘들 때는 언제든 <a class="helplink" id="footHelp" href="#">109 · 1577-0199 · 1388 · 119</a></p>
+  </footer>
+</div>
+
+<!-- 도움 정보 오버레이 -->
+<div class="overlay no-print" id="helpOverlay">
+  <div class="modal">
+    <h2 style="color:var(--danger)">지금 도움이 필요하다면</h2>
+    <p class="caption">이 서비스는 응급 개입을 대신할 수 없습니다. 아래로 바로 연락할 수 있어요. (24시간)</p>
+    <a class="hotline" href="tel:109"><span class="nm">자살예방상담전화</span><span class="num">109</span></a>
+    <a class="hotline" href="tel:15770199"><span class="nm">정신건강위기상담전화</span><span class="num">1577-0199</span></a>
+    <a class="hotline" href="tel:1388"><span class="nm">청소년전화</span><span class="num">1388</span></a>
+    <a class="hotline" href="tel:119"><span class="nm">응급</span><span class="num">119</span></a>
+    <button class="btn ghost small" id="helpClose" style="margin-top:16px;">닫기</button>
+  </div>
+</div>
+
+<!-- 내 기록 오버레이 -->
+<div class="overlay no-print" id="logOverlay">
+  <div class="modal">
+    <h2>내 기록 · 연구용 데이터</h2>
+    <p class="caption">모든 응답은 이 기기(브라우저)에만 저장됩니다. 외부로 자동 전송되지 않아요. 언제든 내보내거나 전체 삭제할 수 있습니다.</p>
+    <div id="logStats"></div>
+    <button class="btn small" id="exportJson">JSON으로 내보내기</button>
+    <button class="btn small" id="exportCsv">CSV로 내보내기 (분석용)</button>
+    <button class="btn small ghost" id="deleteAll" style="color:var(--danger);border-color:var(--danger);">전체 기록 삭제</button>
+    <button class="btn ghost small" id="logClose" style="margin-top:8px;">닫기</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   감정 탐정 엔진 — 지침체계 고시 구현본
+   - 고시_감정분류_한국어감정사전_v1.0  → EMOTIONS
+   - 고시_질문설계_문항뱅크_v1.0        → SAFETY/FIXED/DYNAMIC/REFINE
+   - 고시_추론엔진_가중치설정_v1.0      → PYES/softmax/정보이득/조기종료
+   - 고시_안전_안전문구와핫라인_v1.0    → 위기·고지 문구
+   ========================================================================= */
+
+/* ---- 감정 사전 (16종) ---- */
+const EMOTIONS = [
+  {id:'anxiety', name:'불안·걱정', v:-0.5, a:0.6, group:'부정', color:'#6C7BDB', need:'안전과 예측가능성', cope:'지금 통제할 수 있는 것 한 가지를 적고, 천천히 숨을 고르기'},
+  {id:'fear', name:'두려움·공포', v:-0.7, a:0.8, group:'부정', color:'#4E5FC0', need:'보호와 안전', cope:'안전한 장소를 확인하고 4-7-8 호흡 해보기'},
+  {id:'anger', name:'분노·짜증', v:-0.6, a:0.7, group:'부정', color:'#E06B5A', need:'존중·자율·공정함', cope:'몸의 긴장을 풀고, 사실과 해석을 나눠 적어보기'},
+  {id:'disgust', name:'혐오·거부감', v:-0.6, a:0.2, group:'부정', color:'#8F9B4E', need:'경계와 자기보호', cope:'무엇이 거슬리는지 이름 붙이고 거리 두기'},
+  {id:'sadness', name:'슬픔·우울', v:-0.7, a:-0.5, group:'부정', color:'#5B78A6', need:'위로·애도·연결', cope:'감정을 밀어내지 말고 허용하기, 믿는 사람에게 말하기'},
+  {id:'lethargy', name:'무기력·권태', v:-0.4, a:-0.7, group:'부정', color:'#7A8290', need:'의미·휴식·회복', cope:'아주 작은 한 걸음, 햇빛 보기·가벼운 움직임'},
+  {id:'loneliness', name:'외로움', v:-0.5, a:-0.2, group:'사회', color:'#6E86A8', need:'연결과 소속', cope:'부담 없는 가벼운 연락 한 번, 자기연민 건네기'},
+  {id:'resentment', name:'억울·서운함', v:-0.5, a:0.1, group:'사회', color:'#C77BA6', need:'이해받음과 인정', cope:'있었던 일을 사실대로 적고, 원했던 것이 무엇인지 확인하기'},
+  {id:'shame', name:'수치·죄책', v:-0.6, a:0.2, group:'사회', color:'#B07AA0', need:'자기수용과 회복', cope:'자기비난과 사실을 구분하고, 나에게 다정한 한 문장 건네기'},
+  {id:'confusion', name:'혼란·막막함', v:-0.3, a:0.1, group:'부정', color:'#9A8FB0', need:'명료함과 정리', cope:'지금 아는 것과 모르는 것을 나눠 적어보기'},
+  {id:'joy', name:'기쁨·즐거움', v:0.7, a:0.6, group:'긍정', color:'#F2B84B', need:'즐거움과 표현', cope:'이 순간을 음미하고 기록으로 남겨두기'},
+  {id:'calm', name:'평안·안도', v:0.6, a:-0.4, group:'긍정', color:'#7FBFA6', need:'안전과 평온', cope:'이 안정감이 어디서 왔는지 적어보기'},
+  {id:'affection', name:'애정·유대', v:0.7, a:0.2, group:'사회', color:'#E58BA4', need:'연결과 친밀함', cope:'마음을 상대에게 표현해보기'},
+  {id:'pride', name:'성취·자부심', v:0.6, a:0.5, group:'긍정', color:'#E0954B', need:'인정과 유능감', cope:'해낸 과정을 구체적으로 기록하기'},
+  {id:'gratitude', name:'감동·감사', v:0.7, a:0.1, group:'긍정', color:'#D9A24B', need:'의미와 연결', cope:'고마운 대상에게 감사를 전해보기'},
+  {id:'anticipation', name:'설렘·기대', v:0.5, a:0.6, group:'긍정', color:'#F0C05A', need:'기대와 설렘', cope:'무엇이 기대되는지 구체적으로 그려보기'},
+];
+const EMAP = Object.fromEntries(EMOTIONS.map(e=>[e.id,e]));
+const IDS = EMOTIONS.map(e=>e.id);
+const POS = EMOTIONS.filter(e=>e.v>0).map(e=>e.id);
+const NEG = EMOTIONS.filter(e=>e.v<0).map(e=>e.id);
+
+/* ---- 문항뱅크 ---- */
+const SAFETY = {id:'q_safety', text:'무엇보다 먼저 확인할게요. 지금 당장 나 자신을 해치거나, 죽고 싶다는 생각이 드나요?'};
+
+const FIXED = [
+  {id:'q_valence', text:'지금 느낌은 편안함보다, 불편함(불쾌)에 더 가깝나요?', boost:NEG, suppress:POS},
+  {id:'q_arousal', text:'몸과 마음의 에너지가 높게 — 긴장되거나 각성된 느낌으로 — 올라와 있나요?', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
+  {id:'q_cause', text:'이 감정이 특정 사건이나 사람 때문에 방금 생겼다고 느끼나요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
+];
+
+const DYNAMIC = [
+  {id:'q_relation', text:'누군가와의 관계나 주고받은 말 때문에 생긴 감정인가요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
+  {id:'q_warm', text:'따뜻함·고마움·가까움 같은 좋은 느낌이 드나요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
+  {id:'q_avoid', text:'혼자 있고 싶거나, 그 상황을 피하고 싶은 마음이 크나요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
+  {id:'q_confront', text:'따지거나 말하고 싶고, 바로잡고 싶은 마음이 크나요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
+  {id:'q_social', text:'억울함·서운함·수치심처럼 “사람 사이”의 느낌이 섞여 있나요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
+  {id:'q_threat', text:'무언가 나빠질 것 같아, 걱정되고 긴장되나요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
+  {id:'q_loss', text:'무언가를 잃었거나, 포기한 느낌이 있나요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
+  {id:'q_block', text:'원하는 것이 막히거나 방해받은 느낌이 있나요?', boost:['anger','resentment'], suppress:['calm']},
+  {id:'q_selfeval', text:'스스로가 부족하거나, 잘못했다고 느끼나요?', boost:['shame','sadness'], suppress:['anger','pride']},
+  {id:'q_bodyhigh', text:'가슴 답답함·심장 두근거림·안절부절이 두드러지나요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
+  {id:'q_bodylow', text:'힘이 빠지고, 움직이기 싫은 쪽에 더 가깝나요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
+  {id:'q_empty', text:'허무하거나, 텅 빈 느낌이 있나요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
+  {id:'q_disgust', text:'무언가가 불쾌하고 거슬리며, 밀어내고 싶은가요?', boost:['disgust','anger'], suppress:['calm']},
+  {id:'q_achieve', text:'뿌듯하거나, 해냈다는 느낌이 있나요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
+  {id:'q_clarity', text:'이 감정이 뭔지 한 단어로 말하기 어렵고, 막막한가요?', boost:['confusion'], suppress:['pride','joy']},
+  {id:'q_hide', text:'지금 이 감정을, 남에게 들키고 싶지 않나요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
+];
+const DMAP = Object.fromEntries(DYNAMIC.map(q=>[q.id,q]));
+
+/* 단서(clue) 라벨 — yes 응답을 사람이 읽을 수 있는 단서로 */
+const CLUE = {
+  q_valence:'불편한 느낌', q_arousal:'높은 에너지', q_cause:'뚜렷한 계기',
+  q_relation:'관계 맥락', q_warm:'따뜻한 느낌', q_avoid:'피하고 싶음', q_confront:'바로잡고 싶음',
+  q_social:'사람 사이의 감정', q_threat:'다가올 걱정', q_loss:'상실감', q_block:'방해받음',
+  q_selfeval:'자기비난', q_bodyhigh:'몸의 긴장', q_bodylow:'힘 빠짐', q_empty:'공허함',
+  q_disgust:'거부감', q_achieve:'해냄', q_clarity:'막막함', q_hide:'숨기고 싶음'
+};
+
+/* ---- 가중치·파라미터 (고시_추론엔진_가중치설정 v1.1) ---- */
+const P_BOOST=0.88, P_SUPPRESS=0.12, P_NEUTRAL=0.5;
+const CONF_HIGH_P1=0.55, CONF_HIGH_GAP=0.15, CONF_MID_P1=0.40, MIX_GAP=0.12;
+const MIN_STEPS_EARLY=5, HARD_CAP=10;
+
+function pyes(q, id){
+  if(q.boost && q.boost.includes(id)) return P_BOOST;
+  if(q.suppress && q.suppress.includes(id)) return P_SUPPRESS;
+  return P_NEUTRAL;
+}
+function softmax(logscore){
+  const vals = IDS.map(id=>logscore[id]||0);
+  const mx = Math.max(...vals);
+  const exps = vals.map(x=>Math.exp(x-mx));
+  const sum = exps.reduce((a,b)=>a+b,0);
+  const out={}; IDS.forEach((id,i)=>out[id]=exps[i]/sum); return out;
+}
+function entropy(post){
+  let h=0; for(const id of IDS){ const p=post[id]; if(p>1e-9) h -= p*Math.log(p);} return h;
+}
+function ranked(post){
+  return IDS.map(id=>({id,p:post[id]})).sort((x,y)=>y.p-x.p);
+}
+function confidenceOf(post){
+  const r = ranked(post); const p1=r[0].p, p2=r[1].p;
+  if(p1>=CONF_HIGH_P1 && (p1-p2)>=CONF_HIGH_GAP) return {level:'높음', cls:'high', p1,p2};
+  if(p1>=CONF_MID_P1) return {level:'보통', cls:'mid', p1,p2};
+  return {level:'낮음', cls:'low', p1,p2};
+}
+/* 정보이득: 남은 동적 문항 중 기대 엔트로피 감소 최대 */
+function nextDynamic(post, asked){
+  const H0 = entropy(post);
+  let best=null, bestGain=-Infinity;
+  for(const q of DYNAMIC){
+    if(asked.has(q.id)) continue;
+    let Pyes=0; for(const id of IDS) Pyes += post[id]*pyes(q,id);
+    // 가상 갱신 후 분포
+    const postYes={}, postNo={}; let sy=0,sn=0;
+    for(const id of IDS){ const py=pyes(q,id); postYes[id]=post[id]*py; postNo[id]=post[id]*(1-py); sy+=postYes[id]; sn+=postNo[id]; }
+    for(const id of IDS){ postYes[id]= sy>0?postYes[id]/sy:0; postNo[id]= sn>0?postNo[id]/sn:0; }
+    const EH = Pyes*entropy(postYes) + (1-Pyes)*entropy(postNo);
+    const gain = H0 - EH;
+    if(gain>bestGain){ bestGain=gain; best=q; }
+  }
+  return best;
+}
+
+/* =========================== 상태·흐름 =========================== */
+const app = document.getElementById('app');
+let S = null;
+function resetState(){
+  S = {
+    phase:'intro', logscore:Object.fromEntries(IDS.map(id=>[id,0])),
+    answers:[], askedDynamic:new Set(), stepsForStop:0,
+    intensity:null, consent:false, minor:false,
+    startedAt:null, qStart:0, openWord:null,
+    userConfirmed:null, userConfirmMatch:null, sessionId:uuid()
+  };
+}
+function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
+
+/* ---------- 렌더: 진입/동의 ---------- */
+function renderIntro(){
+  S.phase='intro';
+  app.innerHTML = `
+  <section class="card">
+    <h1>🔍 지금 내 마음의 <br>단서를 함께 찾아봐요</h1>
+    <p class="muted">감정 탐정은 몇 개의 짧은 질문으로, 지금 당신의 감정에 가장 가까운 <b>후보들</b>을 찾아드립니다. 하나로 단정하지 않아요 — 마음은 원래 여러 감정이 섞이니까요.</p>
+    <div class="notice">
+      이 서비스는 감정 이해와 자기기록을 돕는 <b>정보제공 도구</b>이며, 의료적 진단이나 치료를 대신하지 않습니다.
+      결과는 확정된 감정이 아니라 <b>참고용 후보</b>입니다.
+    </div>
+    <div class="notice">
+      응답은 기본적으로 <b>이 기기(브라우저)에만</b> 저장되며 외부로 자동 전송되지 않습니다. 언제든 전체 삭제·내보내기가 가능합니다.
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:10px;cursor:pointer;">
+        <input type="checkbox" id="cbConsent" style="margin-top:5px;width:20px;height:20px;">
+        <span>(선택) 익명 응답을 서비스 개선·연구에 사용하는 데 동의합니다.</span>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-top:8px;cursor:pointer;">
+        <input type="checkbox" id="cbMinor" style="margin-top:5px;width:20px;height:20px;">
+        <span>저는 청소년(만 19세 미만)입니다.</span>
+      </label>
+    </div>
+    <button class="btn primary" id="startBtn">단서 찾기 시작하기</button>
+    <button class="btn ghost small" id="openLog">내 기록·데이터 보기</button>
+  </section>`;
+  document.getElementById('startBtn').onclick = ()=>{
+    S.consent = document.getElementById('cbConsent').checked;
+    S.minor = document.getElementById('cbMinor').checked;
+    S.startedAt = new Date().toISOString();
+    renderSafety();
+  };
+  document.getElementById('openLog').onclick = openLogModal;
+}
+
+/* ---------- 렌더: 안전 스크리닝 ---------- */
+function renderSafety(){
+  S.phase='safety'; S.qStart=performance.now();
+  app.innerHTML = `
+  <section class="card">
+    <div class="clue-count no-print">안전 확인</div>
+    <h2>${SAFETY.text}</h2>
+    <p class="caption">가장 중요한 것부터 확인하기 위한 질문이에요.</p>
+    <div class="yesno">
+      <button class="btn" data-a="yes">네, 있어요</button>
+      <button class="btn" data-a="no">아니요</button>
+    </div>
+  </section>`;
+  app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
+    const a=b.dataset.a;
+    S.answers.push({qid:'q_safety', answer:a, tMs:Math.round(performance.now()-S.qStart)});
+    if(a==='yes'){ saveCrisisSession(); renderCrisis(); }
+    else { startEmotionFlow(); }
+  });
+}
+
+/* ---------- 렌더: 위기 ---------- */
+function renderCrisis(){
+  S.phase='crisis';
+  app.innerHTML = `
+  <section class="card crisis">
+    <h2>지금은 안전이 먼저예요</h2>
+    <p>지금 응답에는 <b>즉각적인 안전 확인이 필요한 신호</b>가 보입니다. 이 서비스는 응급 개입을 대신할 수 없어요.
+    지금 바로 아래로 연락해 주세요. 혼자 있지 말고, 가능하면 가까운 사람에게 지금 상태를 바로 알리세요.</p>
+    <a class="hotline" href="tel:109"><span class="nm">자살예방상담전화 · 24시간</span><span class="num">109</span></a>
+    <a class="hotline" href="tel:15770199"><span class="nm">정신건강위기상담전화 · 24시간</span><span class="num">1577-0199</span></a>
+    <a class="hotline" href="tel:119"><span class="nm">응급</span><span class="num">119</span></a>
+    ${S.minor ? `<a class="hotline" href="tel:1388"><span class="nm">청소년전화 · 24시간</span><span class="num">1388</span></a>`:''}
+    <p class="caption" style="margin-top:14px;">위험한 물건이나 약물이 곁에 있다면 멀리 두고, 안전한 장소로 이동해 주세요. 이 화면에서는 더 이상 일반 감정 탐색을 진행하지 않고, 도움 연결을 우선합니다.</p>
+    <button class="btn ghost small no-print" id="toHome" style="margin-top:16px;">처음으로</button>
+  </section>`;
+  document.getElementById('toHome').onclick = ()=>{ resetState(); renderIntro(); };
+}
+
+/* ---------- 감정 탐색 흐름 ---------- */
+function startEmotionFlow(){ S.phase='fixed'; S.fixedIdx=0; renderQuestion(FIXED[0]); }
+
+function renderQuestion(q){
+  S.qStart=performance.now();
+  const answered = S.answers.filter(a=>a.qid!=='q_safety').length;
+  const pctEst = Math.min(95, Math.round((answered/ (MIN_STEPS_EARLY+2))*100));
+  app.innerHTML = `
+  <section class="card">
+    <div class="no-print">
+      <div class="clue-count">🔍 단서 ${clueCount()}개 수집 중</div>
+      <div class="progress"><i style="width:${pctEst}%"></i></div>
+    </div>
+    <h2>${q.text}</h2>
+    <div class="yesno">
+      <button class="btn" data-a="yes">네</button>
+      <button class="btn" data-a="no">아니요</button>
+    </div>
+    <div class="skip"><button data-a="skip">잘 모르겠어요</button></div>
+  </section>`;
+  app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>answerQuestion(q, b.dataset.a));
+}
+function clueCount(){
+  return S.answers.filter(a=>a.answer==='yes' && a.qid!=='q_safety').length;
+}
+function applyAnswer(q, a){
+  if(a==='yes'){ for(const id of IDS) S.logscore[id]+=Math.log(pyes(q,id)); }
+  else if(a==='no'){ for(const id of IDS) S.logscore[id]+=Math.log(1-pyes(q,id)); }
+  // skip: 갱신 없음
+}
+function answerQuestion(q, a){
+  S.answers.push({qid:q.id, answer:a, tMs:Math.round(performance.now()-S.qStart)});
+  applyAnswer(q, a);
+  if(a!=='skip') S.stepsForStop++;
+
+  if(S.phase==='fixed'){
+    S.fixedIdx++;
+    if(S.fixedIdx < FIXED.length){ renderQuestion(FIXED[S.fixedIdx]); return; }
+    S.phase='dynamic';
+  }
+  if(S.phase==='dynamic'){
+    S.askedDynamic.add(q.id); // 방금 답한 동적 문항 기록 (fixed는 무시됨)
+  }
+  // 종료 조건 판단
+  const post = softmax(S.logscore);
+  const conf = confidenceOf(post);
+  const nonSafety = S.answers.filter(x=>x.qid!=='q_safety').length;
+  const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id)).length;
+  const earlyStop = (S.stepsForStop>=MIN_STEPS_EARLY) && conf.cls==='high';
+  const hardStop = nonSafety>=HARD_CAP || remaining===0;
+
+  if(S.phase==='dynamic' && !earlyStop && !hardStop){
+    const nq = nextDynamic(post, S.askedDynamic);
+    if(nq){ renderQuestion(nq); return; }
+  }
+  // 강도 → 결과
+  renderIntensity();
+}
+
+/* ---------- 강도 ---------- */
+function renderIntensity(){
+  S.phase='intensity'; S.qStart=performance.now();
+  const labels=[['0','거의 없음'],['1','약함'],['2','보통'],['3','강함'],['4','아주 강함']];
+  app.innerHTML=`
+  <section class="card">
+    <div class="clue-count no-print">거의 다 왔어요</div>
+    <h2>지금 이 감정의 강도는 어느 정도인가요?</h2>
+    <div class="likert">
+      ${labels.map(([v,t])=>`<button class="btn" data-v="${v}">${v}<small>${t}</small></button>`).join('')}
+    </div>
+  </section>`;
+  app.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{
+    S.intensity=parseInt(b.dataset.v,10);
+    S.answers.push({qid:'q_intensity', answer:b.dataset.v, tMs:Math.round(performance.now()-S.qStart)});
+    finishToResult();
+  });
+}
+
+/* ---------- 결과 ---------- */
+function finishToResult(){ S.phase='result'; S.finishedAt=new Date().toISOString(); saveSession(); renderResult(); }
+
+function renderResult(){
+  const post = softmax(S.logscore);
+  const r = ranked(post);
+  const conf = confidenceOf(post);
+  const top3 = r.slice(0,3);
+  const mixed = (r[0].p - r[1].p) < MIX_GAP;
+  const clues = S.answers.filter(a=>a.answer==='yes' && CLUE[a.qid]).map(a=>CLUE[a.qid]);
+  const primary = EMAP[r[0].id];
+  const showYellow = S.intensity>=3 && (primary.group==='부정' || primary.group==='사회');
+
+  const bars = top3.map(x=>{
+    const e=EMAP[x.id]; const pct=Math.round(x.p*100);
+    return `<div class="barrow">
+      <div class="top"><span class="em" style="color:${e.color}">${e.name}</span><span class="pct">${pct}%</span></div>
+      <div class="bar"><i style="width:${Math.max(4,pct)}%;background:${e.color}"></i></div>
+    </div>`;
+  }).join('');
+
+  const confNote = conf.cls==='low'
+    ? `<p class="caption">후보들이 서로 비슷해서 <b>아직 분명하지 않아요.</b> 아래에서 한 단어로 직접 알려주면 더 정확해집니다.</p>`
+    : mixed ? `<p class="caption"><b>혼합감정</b>일 수 있어요 — 위 두 감정이 함께 느껴지는 상태로 보입니다.</p>` : '';
+
+  app.innerHTML=`
+  <section class="card" id="resultCard">
+    <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 결과</div>
+    <h2>가장 가까운 감정 후보</h2>
+    <span class="badge ${conf.cls}">확신도 ${conf.level}</span>
+    ${confNote}
+    ${bars}
+    ${clues.length?`<div style="margin-top:12px"><div class="caption">모은 단서</div><div class="chips">${clues.map(c=>`<span class="chip">${c}</span>`).join('')}</div></div>`:''}
+    <div class="insight">
+      <h3>이 감정이 바라는 것 (욕구)</h3>
+      <p>${primary.name} 뒤에는 <b>${primary.need}</b>에 대한 바람이 있을 수 있어요.</p>
+    </div>
+    <div class="insight" style="background:transparent;border:1px solid var(--line)">
+      <h3 style="color:var(--accent)">지금 해볼 수 있는 것</h3>
+      <p>${primary.cope}.</p>
+    </div>
+    ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
+    <div class="notice">이 결과는 확정된 감정이 아니라 <b>참고용 후보</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
+    <div class="print-only notice">도움 연결 · 24시간 : 109(자살예방) · 1577-0199(정신건강위기) · 1388(청소년) · 119(응급)</div>
+
+    <div class="no-print" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
+      <div class="caption">이 결과가 지금 느낌과 맞나요? <span style="color:var(--ink-soft)">(연구·검증에 큰 도움이 돼요)</span></div>
+      <div class="confirm-opts" id="confirmOpts">
+        ${top3.map(x=>`<button class="btn small" data-cid="${x.id}">${EMAP[x.id].name} — 이게 맞아요</button>`).join('')}
+        <button class="btn small ghost" data-cid="__other">셋 다 아니에요 / 다른 감정</button>
+      </div>
+      <div class="refine hidden" id="refineBox">
+        <input type="text" id="openWord" placeholder="한 단어로 적어주세요 (예: 초조)">
+        <button class="btn small" id="refineBtn" style="width:auto;padding:0 16px;">확인</button>
+      </div>
+      <div id="confirmThanks" class="caption hidden" style="color:var(--calm);margin-top:8px;">기록했어요. 고마워요 🙏</div>
+    </div>
+
+    <div class="no-print btn-row" style="margin-top:18px;">
+      <button class="btn primary" id="pdfBtn">📄 PDF로 저장</button>
+      <button class="btn" id="againBtn">다시 하기</button>
+    </div>
+    <button class="btn ghost small no-print" id="openLog2">내 기록·데이터 보기</button>
+  </section>`;
+
+  // 자기확인
+  app.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{
+    const cid=b.dataset.cid;
+    if(cid==='__other'){ document.getElementById('refineBox').classList.remove('hidden'); return; }
+    recordConfirm(cid, r);
+    afterConfirm();
+  });
+  document.getElementById('refineBtn').onclick=()=>{
+    const w=document.getElementById('openWord').value.trim();
+    S.openWord=w||null;
+    const matchId=matchWord(w);
+    recordConfirm(matchId||('자유입력:'+(w||'미입력')), r);
+    // 개방형 정제: 사전 매칭 시 소폭 가산 후 재계산은 생략(기록만) — 확신도 낮을 때 사용자 표현 우선
+    afterConfirm();
+  };
+  document.getElementById('pdfBtn').onclick=()=>window.print();
+  document.getElementById('againBtn').onclick=()=>{ resetState(); renderIntro(); };
+  document.getElementById('openLog2').onclick=openLogModal;
+}
+function matchWord(w){
+  if(!w) return null;
+  for(const e of EMOTIONS){ if(e.name.includes(w) || w.includes(e.name.split('·')[0])) return e.id; }
+  const dict={'초조':'anxiety','걱정':'anxiety','짜증':'anger','화':'anger','서운':'resentment','억울':'resentment','우울':'sadness','슬픔':'sadness','외로':'loneliness','부끄':'shame','죄책':'shame','무기력':'lethargy','귀찮':'lethargy','벅참':'gratitude','고마':'gratitude','설렘':'anticipation','뿌듯':'pride'};
+  for(const k in dict){ if(w.includes(k)) return dict[k]; }
+  return null;
+}
+function recordConfirm(cid, r){
+  S.userConfirmed = cid;
+  if(r[0].id===cid) S.userConfirmMatch='top1';
+  else if(r.slice(0,3).some(x=>x.id===cid)) S.userConfirmMatch='top3';
+  else S.userConfirmMatch='miss';
+  updateSession();
+}
+function afterConfirm(){
+  document.getElementById('confirmOpts').classList.add('hidden');
+  document.getElementById('refineBox').classList.add('hidden');
+  document.getElementById('confirmThanks').classList.remove('hidden');
+}
+
+/* =========================== 저장/로그 =========================== */
+const LKEY='gamjeong_logs';
+function loadLogs(){ try{return JSON.parse(localStorage.getItem(LKEY)||'[]');}catch(e){return [];} }
+function writeLogs(a){ try{localStorage.setItem(LKEY, JSON.stringify(a));}catch(e){} }
+function sessionRecord(){
+  const post = S.phase==='crisis'? null : softmax(S.logscore);
+  const r = post? ranked(post):[];
+  return {
+    sessionId:S.sessionId, startedAt:S.startedAt, finishedAt:S.finishedAt||null,
+    consentResearch:S.consent, isMinor:S.minor, crisis:S.phase==='crisis',
+    answers:S.answers, questionCount:S.answers.filter(a=>a.qid!=='q_safety'&&a.qid!=='q_intensity').length,
+    intensity:S.intensity,
+    posteriorFinal: r.slice(0,5).map(x=>({emotion:x.id, p:Math.round(x.p*1000)/1000})),
+    top1: r[0]?r[0].id:null, top3: r.slice(0,3).map(x=>x.id),
+    confidence: post?confidenceOf(post).level:null,
+    userConfirmed:S.userConfirmed, userConfirmMatch:S.userConfirmMatch, openWord:S.openWord
+  };
+}
+function saveSession(){ const a=loadLogs(); a.push(sessionRecord()); writeLogs(a); }
+function saveCrisisSession(){ S.finishedAt=new Date().toISOString(); const a=loadLogs(); a.push(sessionRecord()); writeLogs(a); }
+function updateSession(){ const a=loadLogs(); const i=a.findIndex(x=>x.sessionId===S.sessionId); if(i>=0){ a[i]=sessionRecord(); writeLogs(a);} }
+
+/* 내보내기 */
+function download(name, text, type){
+  const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob);
+  const el=document.createElement('a'); el.href=url; el.download=name; el.click(); URL.revokeObjectURL(url);
+}
+function exportJSON(){
+  const data=loadLogs().filter(s=>s.consentResearch);
+  download('gamjeong_logs_'+Date.now()+'.json', JSON.stringify(data,null,2),'application/json');
+}
+function exportCSV(){
+  const data=loadLogs().filter(s=>s.consentResearch);
+  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
+  const rows=data.map(s=>[s.sessionId,s.startedAt,s.questionCount,s.intensity,s.top1,(s.top3||[]).join('|'),s.confidence,s.userConfirmed,s.userConfirmMatch,s.openWord,s.crisis]
+    .map(v=>`"${(v==null?'':String(v)).replace(/"/g,'""')}"`).join(','));
+  download('gamjeong_logs_'+Date.now()+'.csv', [head.join(','),...rows].join('\n'),'text/csv');
+}
+
+/* =========================== 오버레이 =========================== */
+const helpOverlay=document.getElementById('helpOverlay');
+const logOverlay=document.getElementById('logOverlay');
+document.getElementById('helpBtn').onclick=()=>helpOverlay.classList.add('on');
+document.getElementById('footHelp').onclick=(e)=>{e.preventDefault();helpOverlay.classList.add('on');};
+document.getElementById('helpClose').onclick=()=>helpOverlay.classList.remove('on');
+helpOverlay.onclick=(e)=>{if(e.target===helpOverlay)helpOverlay.classList.remove('on');};
+
+function openLogModal(){
+  const logs=loadLogs();
+  const consented=logs.filter(s=>s.consentResearch);
+  const top1Match=logs.filter(s=>s.userConfirmMatch==='top1').length;
+  const confirmed=logs.filter(s=>s.userConfirmMatch).length;
+  const avgQ = logs.length? (logs.reduce((a,s)=>a+(s.questionCount||0),0)/logs.length).toFixed(1):'0';
+  document.getElementById('logStats').innerHTML=`
+    <div class="kv"><span>전체 세션</span><b>${logs.length}건</b></div>
+    <div class="kv"><span>연구 동의 세션</span><b>${consented.length}건</b></div>
+    <div class="kv"><span>평균 질문 수</span><b>${avgQ}문</b></div>
+    <div class="kv"><span>top-1 일치</span><b>${top1Match}/${confirmed}건</b></div>`;
+  logOverlay.classList.add('on');
+}
+document.getElementById('logClose').onclick=()=>logOverlay.classList.remove('on');
+logOverlay.onclick=(e)=>{if(e.target===logOverlay)logOverlay.classList.remove('on');};
+document.getElementById('exportJson').onclick=exportJSON;
+document.getElementById('exportCsv').onclick=exportCSV;
+document.getElementById('deleteAll').onclick=()=>{
+  if(confirm('이 기기에 저장된 모든 감정 탐정 기록을 삭제할까요? 되돌릴 수 없어요.')){
+    localStorage.removeItem(LKEY); openLogModal();
+  }
+};
+
+/* =========================== 시작 =========================== */
+resetState(); renderIntro();
+</script>
+</body>
+</html>
