@@ -119,25 +119,8 @@
     .wrap{max-width:100%; padding:0;}
     .card{box-shadow:none; border:1px solid #ccc;}
     .print-only{display:block !important;}
-    /* 내 기록 리포트 인쇄 모드: 나머지 숨기고 리포트만 */
-    body.report-print .wrap, body.report-print .overlay{display:none !important;}
-    body.report-print #printReport{display:block !important;}
   }
   .print-only{display:none;}
-  /* 내 기록 PDF 리포트 (평소 숨김, 인쇄 시만 노출) */
-  #printReport{display:none;}
-  #printReport .rp{color:#1a1a1a; font-family:system-ui,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; padding:6px 4px;}
-  #printReport h1{font-size:22px; margin:0 0 2px;}
-  #printReport .gen{font-size:12px; color:#666; margin-bottom:12px;}
-  #printReport .sum{display:flex; flex-wrap:wrap; gap:16px; font-size:13px; font-weight:600; border-top:1px solid #bbb; border-bottom:1px solid #bbb; padding:8px 0; margin-bottom:14px;}
-  #printReport .sess{padding:9px 0; border-bottom:1px solid #eaeaea; page-break-inside:avoid;}
-  #printReport .sd{font-size:12px; color:#555;}
-  #printReport .cands{margin-top:5px; display:flex; flex-wrap:wrap; gap:14px;}
-  #printReport .cand{font-size:15px;}
-  #printReport .cand b{font-variant-numeric:tabular-nums;}
-  #printReport .meta{font-size:12px; color:#555; margin-top:3px;}
-  #printReport .safe{font-size:13px; color:#888; margin-top:4px;}
-  #printReport .foot{margin-top:18px; font-size:11px; color:#777; border-top:1px solid #bbb; padding-top:8px; line-height:1.6;}
 </style>
 </head>
 <body>
@@ -181,9 +164,6 @@
     <button class="btn ghost small" id="logClose" style="margin-top:8px;">닫기</button>
   </div>
 </div>
-
-<!-- 내 기록 PDF 리포트 (인쇄 시만 노출) -->
-<div id="printReport"></div>
 
 <script>
 "use strict";
@@ -645,22 +625,40 @@ function buildReportHTML(logs){
     <div class="foot">이 기록은 감정 이해·자기기록을 돕는 참고용이며, 의료적 진단·치료를 대신하지 않습니다.<br>도움 연결(24시간): 109 · 1577-0199 · 1388 · 119</div>
   </div>`;
 }
-let _reportOldTitle=null;
-function endReportPrint(){
-  document.body.classList.remove('report-print');
-  if(_reportOldTitle!=null){ document.title=_reportOldTitle; _reportOldTitle=null; }
-}
+const REPORT_CSS = `
+*{box-sizing:border-box;} body{margin:0 auto;max-width:720px;color:#1a1a1a;background:#fff;font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1.6;padding:20px;}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #ddd;}
+.toolbar button{background:#3E4C7A;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-size:16px;font-weight:600;cursor:pointer;}
+.toolbar .tip{font-size:12px;color:#666;flex:1;min-width:200px;}
+.rp h1{font-size:22px;margin:0 0 2px;}
+.gen{font-size:12px;color:#666;margin-bottom:12px;}
+.sum{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;font-weight:600;border-top:1px solid #bbb;border-bottom:1px solid #bbb;padding:8px 0;margin-bottom:14px;}
+.sess{padding:9px 0;border-bottom:1px solid #eaeaea;page-break-inside:avoid;}
+.sd{font-size:12px;color:#555;}
+.cands{margin-top:5px;display:flex;flex-wrap:wrap;gap:14px;}
+.cand{font-size:15px;} .cand b{font-variant-numeric:tabular-nums;}
+.meta{font-size:12px;color:#555;margin-top:3px;}
+.safe{font-size:13px;color:#888;margin-top:4px;}
+.foot{margin-top:18px;font-size:11px;color:#777;border-top:1px solid #bbb;padding-top:8px;line-height:1.6;}
+@media print{ .toolbar{display:none !important;} body{padding:0;} }
+`;
+/* 내 기록 PDF: 새 탭에 리포트를 열고 그 탭의 버튼으로 인쇄/PDF 저장.
+   iOS Safari는 사용자 제스처 안에서만 print()가 동작하므로, setTimeout 없이
+   즉시 새 탭을 열고 그 페이지의 버튼(새 제스처)으로 인쇄하는 방식이 가장 안정적. */
 function exportRecordsPDF(){
   const logs=loadLogs();
-  document.getElementById('printReport').innerHTML=buildReportHTML(logs);
-  _reportOldTitle=document.title;
-  document.title='감정탐정_내기록_'+new Date().toISOString().slice(0,10);
-  document.body.classList.add('report-print');
-  setTimeout(()=>{ window.print(); }, 80);
-  // afterprint가 안 뜨는 브라우저 대비 이중 정리
-  setTimeout(endReportPrint, 3000);
+  const dateStr=new Date().toISOString().slice(0,10);
+  const w=window.open('','_blank');
+  if(!w){ alert('새 창(탭)이 차단되어 리포트를 열 수 없어요. 브라우저 팝업을 허용한 뒤 다시 눌러 주세요.'); return; }
+  const doc='<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">'
+    +'<meta name="viewport" content="width=device-width, initial-scale=1">'
+    +'<title>감정탐정_내기록_'+dateStr+'</title><style>'+REPORT_CSS+'</style></head><body>'
+    +'<div class="toolbar"><button type="button" onclick="window.print()">📄 PDF로 저장 · 인쇄</button>'
+    +'<span class="tip">아이폰: 위 버튼 → 인쇄 미리보기에서 두 손가락으로 벌려 확대 → 공유 아이콘으로 저장. (또는 사파리 하단 공유 → 프린트)</span></div>'
+    +buildReportHTML(logs)
+    +'</body></html>';
+  w.document.open(); w.document.write(doc); w.document.close(); w.focus();
 }
-window.addEventListener('afterprint', endReportPrint);
 
 /* =========================== 오버레이 =========================== */
 const helpOverlay=document.getElementById('helpOverlay');
