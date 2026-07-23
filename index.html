@@ -69,7 +69,7 @@
     display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
     border-radius:999px; background:var(--primary-soft); color:var(--primary); font-weight:800; font-size:14px;
   }
-  .choice-copy b{display:block; margin-bottom:4px; color:var(--ink-soft); font-size:14px; font-weight:700;}
+  .choice-copy b{display:block; margin-top:5px; color:var(--ink-soft); font-size:14px; font-weight:700;}
   .choice-copy span{display:block; color:var(--ink); font-size:18px; font-weight:800; line-height:1.45;}
   .choice-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;}
   .choice-actions .btn{margin-top:0; min-height:42px; font-size:14px; font-weight:500;}
@@ -1683,8 +1683,8 @@ function renderQuestion(q){
     </div>
     <h2>${questionHTML(q.text)}</h2>
     <div class="choice-grid">
-      <button class="btn choice-btn" data-choice="a"><span class="choice-letter">A</span><span class="choice-copy"><b>A에 더 가까워요</b><span>${safeText(q.a)}</span></span></button>
-      <button class="btn choice-btn" data-choice="b"><span class="choice-letter">B</span><span class="choice-copy"><b>B에 더 가까워요</b><span>${safeText(q.b)}</span></span></button>
+      <button class="btn choice-btn" data-choice="a"><span class="choice-letter">A</span><span class="choice-copy"><span>${safeText(q.a)}</span><b>A에 더 가까워요</b></span></button>
+      <button class="btn choice-btn" data-choice="b"><span class="choice-letter">B</span><span class="choice-copy"><span>${safeText(q.b)}</span><b>B에 더 가까워요</b></span></button>
     </div>
     <div class="choice-actions">
       <button class="btn ghost" data-choice="mixed">둘 다 비슷해요</button>
@@ -1890,8 +1890,8 @@ function renderNeedQuestion(q){
     <p class="caption" style="margin-top:2px">${lead}</p>
     <h2>${questionHTML(prompt)}</h2>
     <div class="choice-grid">
-      <button class="btn choice-btn" data-choice="a"><span class="choice-letter">A</span><span class="choice-copy"><b>A에 더 가까워요</b><span>${safeText(needChoiceText(q.needA, pleasant))}</span></span></button>
-      <button class="btn choice-btn" data-choice="b"><span class="choice-letter">B</span><span class="choice-copy"><b>B에 더 가까워요</b><span>${safeText(needChoiceText(q.needB, pleasant))}</span></span></button>
+      <button class="btn choice-btn" data-choice="a"><span class="choice-letter">A</span><span class="choice-copy"><span>${safeText(needChoiceText(q.needA, pleasant))}</span><b>A에 더 가까워요</b></span></button>
+      <button class="btn choice-btn" data-choice="b"><span class="choice-letter">B</span><span class="choice-copy"><span>${safeText(needChoiceText(q.needB, pleasant))}</span><b>B에 더 가까워요</b></span></button>
     </div>
     <div class="choice-actions">
       <button class="btn ghost" data-choice="mixed">둘 다 비슷해요</button>
