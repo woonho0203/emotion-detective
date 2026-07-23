@@ -1665,7 +1665,12 @@ function nextDynamic(post, asked){
     for(const id of IDS){ const pA=pChoiceA(q,id); postA[id]=post[id]*pA; postB[id]=post[id]*(1-pA); sumA+=postA[id]; sumB+=postB[id]; }
     for(const id of IDS){ postA[id]= sumA>0?postA[id]/sumA:0; postB[id]= sumB>0?postB[id]/sumB:0; }
     const EH = choiceProbability*entropy(postA) + (1-choiceProbability)*entropy(postB);
-    const gain = H0 - EH;
+    let gain = H0 - EH;
+    // 맥락 태그가 가리키는 감정을 다루는 문항에 가산점(점수가 아니라 경로만 바꾼다)
+    if(S.contextPrefer && S.contextPrefer.length){
+      const touches = [...(q.aBoost||[]), ...(q.bBoost||[])].some(id=>S.contextPrefer.includes(id));
+      if(touches) gain += 0.15;
+    }
     if(gain>bestGain){ bestGain=gain; best=q; }
   }
   return best;
@@ -1685,7 +1690,8 @@ function resetState(){
     confirmedEmotion:null, needCand:null, needScore:null, askedNeed:new Set(),
     needSteps:0, needAnswers:[], needTop:null, needConfirmed:null, needUnclear:false,
     detailEmotion:null, relatedNeeds:null, resultFeedback:null,
-    secondaryEmotions:[], resultMatch:null, subLabel:null
+    secondaryEmotions:[], resultMatch:null, subLabel:null,
+    contextTag:null, contextPrefer:[]
   };
 }
 function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
@@ -1780,6 +1786,47 @@ function applyAnswer(q, a){
   else if(key==='b' || key==='no'){ for(const id of IDS) S.logscore[id]+=Math.log(1-pChoiceA(q,id)); }
   // mixed/neither: 한쪽으로 강하게 밀지 않고 기록만 남김
 }
+/* 태그형 맥락 문항 — 점수를 바꾸지 않고 다음 질문 경로만 정한다 */
+const CONTEXT_TAGS = [
+  {id:'people',  label:'사람·관계',        prefer:['resentment','loneliness','affection','anger','gratitude']},
+  {id:'task',    label:'해야 할 일',        prefer:['anxiety','lethargy','pride','confusion']},
+  {id:'future',  label:'앞으로의 일',       prefer:['anxiety','fear','anticipation']},
+  {id:'body',    label:'내 몸 상태',        prefer:['lethargy','calm']},
+  {id:'loss',    label:'잃거나 멀어진 것',  prefer:['sadness','loneliness']},
+  {id:'achieve', label:'내가 해낸 일',      prefer:['pride','joy','gratitude']},
+  {id:'unknown', label:'정확히 모르겠음',   prefer:['confusion','lethargy']}
+];
+function renderContextTag(){
+  S.phase='context'; S.qStart=performance.now();
+  const pctEst = Math.min(95, Math.round((S.answers.length/ (MIN_STEPS_EARLY+2))*100));
+  app.innerHTML = `
+  <section class="card">
+    <div class="no-print">
+      <div class="clue-count">🔍 단서 ${clueCount()}개 수집 중</div>
+      <div class="progress"><i style="width:${pctEst}%"></i></div>
+    </div>
+    <h2>지금 마음은 주로 어디에 가 있나요?</h2>
+    <p class="caption">가장 가까운 하나만 골라 주세요. 무슨 일이 있었는지 자세히 말하지 않아도 괜찮아요.</p>
+    <div class="choice-actions" id="ctxOpts">
+      ${CONTEXT_TAGS.map(t=>`<button class="btn ghost" data-ctx="${t.id}">${safeText(t.label)}</button>`).join('')}
+    </div>
+  </section>`;
+  app.querySelectorAll('[data-ctx]').forEach(b=>b.onclick=()=>{
+    const tag = CONTEXT_TAGS.find(t=>t.id===b.dataset.ctx) || null;
+    S.contextTag = tag ? tag.id : null;
+    S.contextPrefer = tag ? tag.prefer : [];
+    S.answers.push({qid:'q_context', answer:tag?tag.id:'', choiceText:tag?tag.label:'', tMs:Math.round(performance.now()-S.qStart)});
+    S.phase='dynamic';
+    advanceAfterContext();
+  });
+}
+function advanceAfterContext(){
+  const post = softmax(S.logscore);
+  const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id) && questionApplies(d)).length;
+  if(remaining>0){ const nq = nextDynamic(post, S.askedDynamic); if(nq){ renderQuestion(nq); return; } }
+  if(S.intensity!=null){ finishToResult(); } else { renderIntensity(); }
+}
+
 function answerQuestion(q, a){
   const key = answerKey(a);
   S.answers.push({qid:q.id, answer:key, choiceText:choiceText(q,key), tMs:Math.round(performance.now()-S.qStart)});
@@ -1790,6 +1837,7 @@ function answerQuestion(q, a){
     S.fixedIdx++;
     if(S.fixedIdx < FIXED.length){ renderQuestion(FIXED[S.fixedIdx]); return; }
     S.phase='dynamic';
+    if(!S.contextTag){ renderContextTag(); return; } // 고정문항 뒤 맥락 태그 1문
   }
   if(S.phase==='dynamic'){
     S.askedDynamic.add(q.id); // 방금 답한 동적 문항 기록 (fixed는 무시됨)
@@ -2196,6 +2244,8 @@ function sessionRecord(){
     resultMatchScore:(S.resultMatch==null?null:S.resultMatch),
     subLabel:S.subLabel?S.subLabel.label:null,
     subLabelKey:S.subLabel?S.subLabel.key:null,
+    contextTag:S.contextTag||null,
+    contextTagLabel:(CONTEXT_TAGS.find(t=>t.id===S.contextTag)||{}).label||null,
     posteriorFinal: r.slice(0,5).map(x=>({emotion:x.id, p:Math.round(x.p*1000)/1000})),
     top1: topEmotionId, top3: r.slice(0,3).map(x=>x.id), need: needName,
     emotionName: emoInfo ? emoInfo.name : null, emotionKid: emoInfo ? emoInfo.kid : null,
