@@ -326,28 +326,28 @@ async function loadEmotionDatabase(){
 
 /* ---- 문항뱅크 (더 구체적인 문구) ---- */
 const FIXED = [
-  {id:'q_valence', text:'지금 마음이 편하다기보다, 뭔가 걸리거나 속이 불편한 쪽이에요?', boost:NEG, suppress:POS},
-  {id:'q_arousal', text:'심장이 빨리 뛰거나 몸에 힘이 들어가서, 가만히 앉아 있어도 긴장되는 느낌이에요?', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
-  {id:'q_cause', text:'방금 무슨 일이 있었거나, 누가 한 말·행동 때문에 이런 기분이 든 거예요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
+  {id:'q_valence', text:'예를 들어, 친구와 다투었거나 일이 마음대로 안 됐을 때처럼 속이 편하지 않고 마음 한쪽이 걸리는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:NEG, suppress:POS},
+  {id:'q_arousal', text:'예를 들어, 발표를 앞두고 있거나 누군가에게 화가 났을 때처럼 심장이 빨리 뛰고 몸에 힘이 들어가는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
+  {id:'q_cause', text:'예를 들어, 누가 한 말이나 방금 생긴 일 때문에 갑자기 마음이 달라진 것처럼, 이유가 떠오르는 기분인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
 ];
 
 const DYNAMIC = [
-  {id:'q_relation', text:'가족이나 친구처럼, 누군가와 있었던 일 때문에 생긴 기분이에요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
-  {id:'q_warm', text:'누군가가 나를 도와주거나 챙겨줘서, 마음이 따뜻해진 순간이 있었어요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
-  {id:'q_avoid', text:'지금은 아무도 안 만나고, 혼자 있고 싶어요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
-  {id:'q_confront', text:'누구한테 따지거나, 잘못된 걸 바로잡고 싶은 마음이 들어요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
-  {id:'q_social', text:'다른 사람은 괜찮은데 나만 손해 보거나, 사람들 앞에서 내 모습이 나쁘게 보였을까 걱정돼요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
-  {id:'q_threat', text:'앞으로 안 좋은 일이 생길까 봐 걱정돼요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
-  {id:'q_loss', text:'소중한 걸 잃었거나, 하고 싶던 걸 못 하게 된 느낌이 있어요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
-  {id:'q_block', text:'하고 싶은 게 막히거나, 방해받은 느낌이에요?', boost:['anger','resentment'], suppress:['calm']},
-  {id:'q_selfeval', text:'“내가 잘못했나”, “내가 부족한가” 하는 생각이 들어요?', boost:['shame','sadness'], suppress:['anger','pride']},
-  {id:'q_bodyhigh', text:'가슴이 답답하거나 심장이 빨리 뛰어서, 안절부절못하겠어요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
-  {id:'q_bodylow', text:'몸에 힘이 쭉 빠지고, 축 처져서 아무것도 하기 싫어요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
-  {id:'q_empty', text:'마음이 텅 빈 것 같고, 뭘 해도 재미없고 허무해요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
-  {id:'q_disgust', text:'뭔가가 너무 싫고 징그러워서, 멀리하고 싶어요?', boost:['disgust','anger'], suppress:['calm']},
-  {id:'q_achieve', text:'뭔가를 잘 해내서, 뿌듯하고 자랑스러워요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
-  {id:'q_clarity', text:'이 기분이 뭔지 딱 말하기 어렵고, 머릿속이 복잡하고 뿌옇게 느껴져요?', boost:['confusion'], suppress:['pride','joy']},
-  {id:'q_hide', text:'이 기분을 다른 사람한테는 들키고 싶지 않아요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
+  {id:'q_relation', text:'예를 들어, 친구나 가족이 한 말 때문에 그 장면이 계속 떠오를 때처럼, 사람과 있었던 일이 마음에 크게 남아 있나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
+  {id:'q_warm', text:'예를 들어, 누군가 말없이 도와주거나 챙겨줬을 때처럼 마음이 따뜻하고 고마운 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
+  {id:'q_avoid', text:'예를 들어, 피곤한 날 아무 말도 하고 싶지 않아 방에서 조용히 쉬고 싶을 때처럼, 혼자 있고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
+  {id:'q_confront', text:'예를 들어, 내 물건을 허락 없이 가져갔을 때처럼 “이건 아니야” 하고 말하고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
+  {id:'q_social', text:'예를 들어, 같이 잘못했는데 나만 혼나거나 사람들 앞에서 창피했던 때처럼 마음이 콕 찔리는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
+  {id:'q_threat', text:'예를 들어, 내일 중요한 시험이나 면접이 있을 때처럼 계속 신경이 쓰이고 마음이 편하지 않은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
+  {id:'q_loss', text:'예를 들어, 아끼던 물건을 잃거나 기대하던 약속이 사라졌을 때처럼 마음이 축 내려앉는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
+  {id:'q_block', text:'예를 들어, 하고 싶은 말을 못 하게 막히거나 계획이 갑자기 틀어졌을 때처럼 답답한 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anger','resentment'], suppress:['calm']},
+  {id:'q_selfeval', text:'예를 들어, 실수한 뒤에 “내가 왜 그랬지”라는 생각이 계속 떠오를 때처럼 나 자신이 작아지는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['shame','sadness'], suppress:['anger','pride']},
+  {id:'q_bodyhigh', text:'예를 들어, 기다리는 답이 안 와서 휴대폰을 자꾸 보게 될 때처럼 가슴이 답답하고 가만히 있기 어려운 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
+  {id:'q_bodylow', text:'예를 들어, 하루 종일 지친 뒤 소파에서 일어나기 힘들 때처럼 몸에 힘이 빠지고 아무것도 하기 싫은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
+  {id:'q_empty', text:'예를 들어, 좋아하던 것도 재미없고 방 안이 조용하게만 느껴질 때처럼 마음이 텅 빈 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
+  {id:'q_disgust', text:'예를 들어, 누가 내 선을 넘거나 너무 불쾌한 장면을 봤을 때처럼 가까이하기 싫고 밀어내고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['disgust','anger'], suppress:['calm']},
+  {id:'q_achieve', text:'예를 들어, 어려운 문제를 끝까지 풀어냈을 때처럼 “내가 해냈다” 하고 뿌듯한 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
+  {id:'q_clarity', text:'예를 들어, 숙제와 약속과 친구 문제가 한꺼번에 떠오를 때처럼 머릿속이 뒤죽박죽인 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['confusion'], suppress:['pride','joy']},
+  {id:'q_hide', text:'예를 들어, 실수한 걸 누가 알까 봐 얼굴이 뜨거워질 때처럼 이 마음을 숨기고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
 ];
 const DMAP = Object.fromEntries(DYNAMIC.map(q=>[q.id,q]));
 
@@ -542,25 +542,26 @@ const EMO_NEEDS = {
   gratitude:['help','consideration','understanding','support','recognition','connection','stability'], anticipation:['meaning','autonomy','competence','support']
 };
 const NEED_Q = [
-  {need:'certainty', text:'앞으로 어떤 일이 생길지 순서대로 알려 주면 마음이 놓일 것 같아요?'},
-  {need:'safety', text:'누가 “여기는 괜찮아, 너를 해치지 않아”라고 확인해 주면 좋겠어요?'},
-  {need:'comfort', text:'지금은 해결책보다 먼저 “힘들었겠다”라는 말을 듣고 싶어요?'},
-  {need:'understanding', text:'내 이야기를 끝까지 듣고 “네가 왜 그랬는지 알 것 같아”라고 해 주면 좋겠어요?'},
-  {need:'respect', text:'내 말이나 노력을 가볍게 넘기지 않고 제대로 봐 주면 좋겠어요?'},
-  {need:'fairness', text:'같은 일을 했는데 나만 혼나거나 나만 손해 보면 가장 힘들어요?'},
-  {need:'autonomy', text:'작은 일이라도 내가 직접 고를 수 있으면 마음이 나아질 것 같아요?'},
-  {need:'connection', text:'지금 혼자 두기보다 누군가가 옆에 있어 주면 좋겠어요?'},
-  {need:'belonging', text:'그 모임이나 관계 안에서 “나도 여기 있어도 돼”라고 느끼고 싶어요?'},
-  {need:'meaning', text:'이 일을 왜 해야 하는지 이유를 알면 더 견딜 수 있을 것 같아요?'},
-  {need:'competence', text:'누군가가 “너는 해낼 수 있어”라고 믿어 주면 힘이 날 것 같아요?'},
-  {need:'rest', text:'지금 계속 물어보거나 시키기보다 잠깐 멈추게 해 주면 좋겠어요?'},
-  {need:'acceptance', text:'실수한 뒤에도 “그래도 너는 괜찮은 사람이야”라는 말을 듣고 싶어요?'},
-  {need:'help', text:'어려운 일을 혼자 하지 않게 누가 함께 도와주면 좋겠어요?'},
-  {need:'consideration', text:'상대가 내 상황을 먼저 생각하고 조심해 주면 좋겠어요?'},
-  {need:'support', text:'힘들 때 누가 내 편이 되어 주거나 응원해 주면 좋겠어요?'},
-  {need:'recognition', text:'내 노력이나 어려움을 누가 알아봐 주면 좋겠어요?'},
-  {need:'stability', text:'문제가 생겨도 혼자 버려지지 않고 같이 해결할 수 있으면 좋겠어요?'}
+  {need:'certainty', text:'예를 들어, 여행 전에 몇 시에 어디로 가는지 알면 마음이 놓일 때처럼, 다음 일이 어떻게 될지 알고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'safety', text:'예를 들어, 무서운 길에서 믿는 사람이 “같이 가자”라고 하면 마음이 놓일 때처럼, 누가 괜찮다고 확인해 주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'comfort', text:'예를 들어, 힘든 날 누가 바로 해결책을 말하기보다 “힘들었겠다”라고 해주면 마음이 풀릴 때처럼, 먼저 다독여 주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'understanding', text:'예를 들어, 내 말을 끊지 않고 끝까지 들어줄 때 마음이 놓이는 것처럼, 누가 내 이야기를 끝까지 들어주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'respect', text:'예를 들어, 내가 열심히 한 일을 “별거 아니네”라고 들으면 속상할 때처럼, 내 말과 노력을 가볍게 보지 않았으면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'fairness', text:'예를 들어, 같은 일을 했는데 나만 혼나면 오래 생각날 때처럼, 사람마다 다르게 대하는 게 힘들게 느껴지나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'autonomy', text:'예를 들어, 내가 먹을 음식이나 할 일을 직접 고를 수 있을 때 마음이 편한 것처럼, 지금도 내가 직접 고르고 싶은 부분이 있나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'connection', text:'예를 들어, 쉬는 시간에 나만 혼자 있는 것 같을 때 누가 옆에 와주면 좋아지는 것처럼, 누군가와 마음이 이어지면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'belonging', text:'예를 들어, 모둠 활동에서 나도 자연스럽게 끼워 줄 때 마음이 편한 것처럼, 그 자리에서 나도 함께라고 느끼고 싶나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'meaning', text:'예를 들어, 숙제를 왜 해야 하는지 알면 조금 더 할 만해지는 것처럼, 지금 하는 일의 이유를 알고 싶나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'competence', text:'예를 들어, 어려운 문제 앞에서 누가 “너 할 수 있어”라고 말해주면 힘이 나는 것처럼, 나도 해낼 수 있다는 느낌이 필요하나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'rest', text:'예를 들어, 하루 종일 바빴던 날 누가 “잠깐 쉬어도 돼”라고 해주면 살 것 같은 느낌처럼, 지금 잠깐 멈추고 쉬고 싶나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'acceptance', text:'예를 들어, 실수했는데도 누가 “괜찮아, 다시 해보면 돼”라고 말해주면 마음이 놓이는 것처럼, 실수해도 괜찮다는 말이 필요하나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'help', text:'예를 들어, 혼자 들기 무거운 짐을 누가 같이 들어주면 숨이 트이는 것처럼, 지금 누가 일을 나눠 도와주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'consideration', text:'예를 들어, 내가 피곤해 보일 때 누가 먼저 “천천히 해도 돼”라고 해주면 고마운 것처럼, 누가 내 상황을 살펴주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'support', text:'예를 들어, 모두가 뭐라고 할 때 한 사람이 “나는 네 편이야”라고 해주면 든든한 것처럼, 누가 내 편이 되어주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'recognition', text:'예를 들어, 아무도 몰라준 노력을 누가 “고생했어”라고 말해주면 마음이 따뜻해지는 것처럼, 누가 내 노력을 알아주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
+  {need:'stability', text:'예를 들어, 문제가 생겨도 누가 “같이 해결하자”라고 하면 덜 무서운 것처럼, 무슨 일이 있어도 혼자가 아니라는 느낌이 필요하나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'}
 ];
+const INTENSITY_Q = '예를 들어, 이 마음 때문에 말투가 달라지거나 하던 일을 멈추게 될 때처럼, 지금 이 느낌이 오늘 내 행동에 영향을 주고 있나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?';
 /* 감정 스무고개 답변(yes)을 욕구 사전확률로 (이미 모은 단서를 재활용) */
 const ANSWER_NEED = {
   q_threat:['certainty','safety','stability'], q_bodyhigh:['safety','stability'], q_relation:['connection','understanding','support'],
@@ -912,6 +913,46 @@ function profileHTML(emo, detail, rankedNeeds){
     ${checkOptionsHTML(profile.check)}
   </div>`;
 }
+function needActionInnerHTML(needId){
+  const need=NEEDS[needId];
+  if(!need) return '<h3 style="color:var(--accent)">지금 해볼 수 있는 작은 확인</h3><p>아직 딱 고르기 어렵다면, 내 마음과 가까운 설명을 천천히 다시 읽어봐도 괜찮아요.</p>';
+  return `<h3 style="color:var(--accent)">지금 해볼 수 있는 작은 확인</h3><p>${safeText(need.act)}</p>`;
+}
+function selectedNeedResultHTML(emo, detail, needId){
+  const label=safeText(detail ? detail.term : emo.name);
+  if(!needId || !NEEDS[needId]){
+    return `<div class="insight" style="background:transparent;border:1px solid var(--line)">
+      <h3 style="color:var(--accent)">아직 하나로 고르기 어려워도 괜찮아요</h3>
+      <p><b>${label}</b> 안에는 여러 마음이 함께 섞여 있을 수 있어요. 지금은 관련 욕구 후보들을 기록해 두고, 나중에 다시 읽으며 더 가까운 것을 골라도 괜찮아요.</p>
+    </div>`;
+  }
+  const need=NEEDS[needId];
+  const positive=emo.v>0;
+  const text=positive
+    ? `<b>${label}</b>은(는) <b>${safeText(need.name)}</b>이(가) 채워졌을 때 생겼을 수 있어요.`
+    : `<b>${label}</b>은(는) <b>${safeText(need.name)}</b>이(가) 부족했을 때 커졌을 수 있어요.`;
+  return `<div class="insight" style="background:transparent;border:1px solid var(--line)">
+    <h3 style="color:var(--accent)">내가 고른 욕구로 더 정확히 보면</h3>
+    <p>${text} 단정은 아니고, 지금 내 마음과 맞는지 확인해 보는 설명이에요.</p>
+    <p style="margin-top:8px"><b>${safeText(need.name)} 뜻</b><br>${safeText(need.kid)}</p>
+    <p style="margin-top:8px"><b>확인 질문</b><br>${safeText(need.act)}</p>
+  </div>`;
+}
+function needSummaryInnerHTML(emo, detail, relatedNeeds, selectedNeedId){
+  const labelRaw = detail ? detail.term : emo.name;
+  const label = `<b style="color:${emo.color}">${safeText(labelRaw)}</b>${josa(labelRaw,'은','는')}`;
+  const selectedNeed = selectedNeedId ? NEEDS[selectedNeedId] : null;
+  if(selectedNeed){
+    const needName = safeText(selectedNeed.name);
+    return emo.v>0
+      ? `내가 고른 답을 반영하면, 지금의 ${label} <b>${needName}</b>이(가) 채워졌을 때 생겼을 가능성이 더 커 보여요. 그래도 다른 욕구도 함께 맞을 수 있으니, 아래 설명을 내 경험과 비교해 보세요.`
+      : `내가 고른 답을 반영하면, 지금의 ${label} <b>${needName}</b>이(가) 부족했을 때 커졌을 가능성이 더 커 보여요. 단정은 아니니, 아래 설명을 내 경험과 비교해 보세요.`;
+  }
+  const relatedNeedNames = relatedNeeds.map(id=>NEEDS[id].name).join(', ');
+  return emo.v>0
+    ? `지금의 ${label} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 채워졌을 때 생겼을 수 있어요. 어떤 것이 맞는지는 아래에서 천천히 골라 보세요.`
+    : `지금의 ${label} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 부족했을 때 보내는 신호일 수 있어요. 어떤 것이 맞는지는 아래에서 천천히 골라 보세요.`;
+}
 
 /* ---- 가중치·파라미터 (고시_추론엔진_가중치설정 v1.1) ---- */
 const P_BOOST=0.88, P_SUPPRESS=0.12, P_NEUTRAL=0.5;
@@ -972,7 +1013,7 @@ function resetState(){
     userConfirmed:null, userConfirmMatch:null, sessionId:uuid(),
     excluded:new Set(), hardCap:HARD_CAP, requeries:0,
     confirmedEmotion:null, needCand:null, needScore:null, askedNeed:new Set(),
-    needSteps:0, needAnswers:[], needTop:null, needConfirmed:null,
+    needSteps:0, needAnswers:[], needTop:null, needConfirmed:null, needUnclear:false,
     detailEmotion:null, relatedNeeds:null
   };
 }
@@ -1025,10 +1066,10 @@ function renderQuestion(q){
       <div class="clue-count">🔍 단서 ${clueCount()}개 수집 중</div>
       <div class="progress"><i style="width:${pctEst}%"></i></div>
     </div>
-    <h2>${q.text}</h2>
+    <h2>${questionHTML(q.text)}</h2>
     <div class="yesno">
-      <button class="btn" data-a="yes">네</button>
-      <button class="btn" data-a="no">아니요</button>
+      <button class="btn" data-a="yes">이 예시와 비슷해요</button>
+      <button class="btn" data-a="no">아니요, 달라요</button>
     </div>
     <div class="skip"><button data-a="skip">잘 모르겠어요</button></div>
   </section>`;
@@ -1078,7 +1119,7 @@ function renderIntensity(){
   app.innerHTML=`
   <section class="card">
     <div class="clue-count no-print">거의 다 왔어요</div>
-    <h2>이 마음 때문에 오늘 하던 일이나 말투가 달라질 만큼 세게 느껴져요?</h2>
+    <h2>${questionHTML(INTENSITY_Q)}</h2>
     <div class="likert">
       ${labels.map(([v,t])=>`<button class="btn" data-v="${v}">${v}<small>${t}</small></button>`).join('')}
     </div>
@@ -1196,14 +1237,14 @@ function startNeedFlow(emotionId){
 function renderNeedQuestion(q){
   S.qStart=performance.now();
   const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
-  const lead = pleasant ? '이 좋은 느낌에서 어떤 소중한 것이 채워졌을 수 있는지 함께 살펴봐요.' : '이 감정 뒤에 어떤 욕구가 부족했을 수 있는지 함께 살펴봐요.';
-  const stepTitle = pleasant ? `2단계 · ${emo.name}가 알려주는 것` : `2단계 · ${emo.name} 뒤의 욕구`;
+  const lead = pleasant ? '이 좋은 느낌이 어떤 일에서 왔는지 쉬운 예시로 확인해 볼게요.' : '이 마음이 무엇 때문에 생겼는지 쉬운 예시로 확인해 볼게요.';
+  const stepTitle = '2단계 · 마음을 더 자세히 보기';
   app.innerHTML=`
   <section class="card">
     <div class="no-print"><div class="clue-count">${stepTitle}</div></div>
     <p class="caption" style="margin-top:2px">${lead}</p>
-    <h2>${q.text}</h2>
-    <div class="yesno"><button class="btn" data-a="yes">네</button><button class="btn" data-a="no">아니요</button></div>
+    <h2>${questionHTML(q.text)}</h2>
+    <div class="yesno"><button class="btn" data-a="yes">이 예시와 비슷해요</button><button class="btn" data-a="no">아니요, 달라요</button></div>
     <div class="skip"><button data-a="skip">잘 모르겠어요</button></div>
   </section>`;
   app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>answerNeed(q,b.dataset.a));
@@ -1222,6 +1263,7 @@ function answerNeed(q,a){
 }
 
 /* 한글 조사(은/는, 이/가) 받침 기준 자동 선택 */
+function questionHTML(text){ return safeText(text).replace(/\n/g,'<br>'); }
 function hasBatchim(w){ if(!w) return false; const c=w.charCodeAt(w.length-1); if(c<0xAC00||c>0xD7A3) return false; return (c-0xAC00)%28!==0; }
 function josa(w,a,b){ return hasBatchim(w)?a:b; }
 
@@ -1238,13 +1280,9 @@ function renderFinalResult(){
   const detailOptions = detailCandidates(emo.id, 5);
   if(!S.detailEmotion) S.detailEmotion = detailOptions[0] || null;
   const detail = selectedDetail();
-  const emoJ = josa(emo.name,'은','는');
-  const relatedNeedNames = relatedNeeds.map(id=>NEEDS[id].name).join(', ');
   const resultTitle = pleasant ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
   const insightTitle = pleasant ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구';
-  const nvc = pleasant
-    ? `지금의 <b style="color:${emo.color}">${safeText(emo.name)}</b>${emoJ} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 채워졌을 때 생겼을 수 있어요. 어떤 것이 맞는지는 아래 질문으로 천천히 골라 보세요.`
-    : `지금 당신의 <b style="color:${emo.color}">${safeText(emo.name)}</b>${emoJ} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 부족했을 때 보내는 신호일 수 있어요. 어떤 것이 맞는지는 아래 질문으로 천천히 골라 보세요.`;
+  const nvc = needSummaryInnerHTML(emo, detail, relatedNeeds, S.needConfirmed);
   const showYellow = S.intensity>=3 && (emo.group==='부정' || emo.group==='사회');
   updateSession();
   app.innerHTML=`
@@ -1259,14 +1297,15 @@ function renderFinalResult(){
       <p id="detailBoxKid">${safeText(detail.kid)}</p>
       ${detailOptions.length>1?`<div class="detail-options">${detailOptions.map(d=>`<button class="btn detail-option ${d.id===detail.id?'active':''}" data-detail="${safeText(d.id)}"><strong>${safeText(d.term)}</strong><span>${safeText(d.kid)}</span></button>`).join('')}</div>`:''}
     </div>`:''}
-    <div class="insight"><h3>${insightTitle}</h3><p>${nvc}</p></div>
+    <div class="insight" id="needSummary"><h3>${insightTitle}</h3><p id="needSummaryText">${nvc}</p></div>
     ${profileHTML(emo, detail, rn)}
-    ${need?`<div class="insight" style="background:transparent;border:1px solid var(--line)"><h3 style="color:var(--accent)">지금 해볼 수 있는 작은 확인</h3><p>${safeText(need.act)}</p></div>`:''}
+    <div id="selectedNeedResult" class="${S.needConfirmed||S.needUnclear?'':'hidden'}">${S.needConfirmed||S.needUnclear?selectedNeedResultHTML(emo, detail, S.needConfirmed):''}</div>
+    <div id="needActionBox" class="insight" style="background:transparent;border:1px solid var(--line)">${needActionInnerHTML(S.needConfirmed || topNeedId)}</div>
     ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
     <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
     <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
     <div class="no-print" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;">
-      <div class="caption">아래 욕구 중 내 마음과 가까운 것을 골라 주세요. 여러 개가 함께 맞을 수도 있어요. <span style="color:var(--ink-soft)">(기록을 더 정확하게 만드는 데 도움이 돼요)</span></div>
+      <div class="caption">아래 욕구 중 내 마음과 가까운 것을 골라 주세요. 고르면 감정과 욕구 설명을 내가 고른 답에 맞춰 다시 정리해요. 여러 개가 함께 맞을 수도 있어요.</div>
       <div class="confirm-opts" id="needConfirm">
         ${relatedNeeds.map(id=>`<button class="btn small ${id===topNeedId?'':'ghost'}" data-need="${safeText(id)}">${safeText(NEEDS[id].name)}에 가까워요</button>`).join('')}
         <button class="btn small ghost" data-need="">아직 잘 모르겠어요</button>
@@ -1280,8 +1319,16 @@ function renderFinalResult(){
     <button class="btn ghost small no-print" id="openLog2">내 기록·데이터 보기</button>
   </section>`;
   app.querySelectorAll('[data-need]').forEach(b=>b.onclick=()=>{
-    S.needConfirmed=b.dataset.need || null; updateSession();
+    const selectedNeedId=b.dataset.need || null;
+    S.needConfirmed=selectedNeedId;
+    S.needUnclear=!selectedNeedId;
+    updateSession();
     document.getElementById('needConfirm').classList.add('hidden');
+    document.getElementById('needSummaryText').innerHTML=needSummaryInnerHTML(emo, S.detailEmotion || detail, relatedNeeds, selectedNeedId);
+    document.getElementById('selectedNeedResult').innerHTML=selectedNeedResultHTML(emo, S.detailEmotion || detail, selectedNeedId);
+    document.getElementById('selectedNeedResult').classList.remove('hidden');
+    document.getElementById('needActionBox').innerHTML=needActionInnerHTML(selectedNeedId || topNeedId);
+    document.getElementById('needThanks').textContent=selectedNeedId ? '고른 욕구를 반영해서 결과를 더 정확하게 정리했어요 🙏' : '아직 모르겠다고 기록했어요. 나중에 다시 골라도 괜찮아요 🙏';
     document.getElementById('needThanks').classList.remove('hidden');
   });
   app.querySelectorAll('[data-detail]').forEach(button=>button.onclick=()=>{
@@ -1290,6 +1337,10 @@ function renderFinalResult(){
     S.detailEmotion = next; updateSession();
     document.getElementById('detailBoxTerm').innerHTML = `<b>${safeText(next.term)}</b>`;
     document.getElementById('detailBoxKid').textContent = next.kid;
+    document.getElementById('needSummaryText').innerHTML=needSummaryInnerHTML(emo, next, relatedNeeds, S.needConfirmed);
+    if(S.needConfirmed || S.needUnclear){
+      document.getElementById('selectedNeedResult').innerHTML=selectedNeedResultHTML(emo, next, S.needConfirmed);
+    }
     app.querySelectorAll('[data-detail]').forEach(item=>item.classList.toggle('active', item.dataset.detail===next.id));
   });
   document.getElementById('pdfBtn').onclick=()=>window.print();
@@ -1306,7 +1357,7 @@ function sessionRecord(){
   const r = ranked(post);
   const topEmotionId = r[0] ? r[0].id : null;
   const finalEmotionId = S.confirmedEmotion || S.userConfirmed || topEmotionId;
-  const finalNeedId = S.needConfirmed || S.needTop || null;
+  const finalNeedId = S.needUnclear ? null : (S.needConfirmed || S.needTop || null);
   const emoInfo = finalEmotionId ? EMAP[finalEmotionId] : null;
   const needInfo = finalNeedId ? NEEDS[finalNeedId] : null;
   const needName = needInfo ? needInfo.name : null;
@@ -1337,7 +1388,7 @@ function sessionRecord(){
     needWordIds: needWords.map(word=>word.id),
     needWordTerms: needWords.map(word=>word.term),
     confidence: confidenceOf(post).level, excluded: Array.from(S.excluded||[]),
-    confirmedEmotion:S.confirmedEmotion||null, needTop:S.needTop||null, needConfirmed:S.needConfirmed||null,
+    confirmedEmotion:S.confirmedEmotion||null, needTop:S.needTop||null, needConfirmed:S.needConfirmed||null, needUnclear:!!S.needUnclear,
     needCandidates:S.needCand||null, needAnswers:S.needAnswers||null,
     userConfirmed:S.userConfirmed, userConfirmMatch:S.userConfirmMatch, openWord:S.openWord
   };
@@ -1367,7 +1418,7 @@ function exportJSON(){
 }
 function exportCSV(){
   const data=loadLogs().filter(s=>s.consentResearch);
-  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','relatedNeedNames','relatedNeedKids','needWordTerms','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
+  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','needConfirmed','needUnclear','relatedNeedNames','relatedNeedKids','needWordTerms','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
   const rows=data.map(record=>{
     const topResult=(record.posteriorFinal||[])[0];
     const emotionInfo=logEmotionInfo(record, topResult);
@@ -1376,7 +1427,7 @@ function exportCSV(){
       record.sessionId, record.startedAt, record.questionCount, record.intensity,
       record.top1, (record.top3||[]).join('|'), emotionInfo.name, emotionInfo.kid,
       record.detailEmotionTerm, record.detailEmotionKid, record.detailEmotionSection,
-      needInfo.name, needInfo.kid, (record.relatedNeedNames||[]).join('|'), (record.relatedNeedKids||[]).join('|'), (record.needWordTerms||[]).join('|'), record.confidence, record.userConfirmed,
+      needInfo.name, needInfo.kid, record.needConfirmed, record.needUnclear, (record.relatedNeedNames||[]).join('|'), (record.relatedNeedKids||[]).join('|'), (record.needWordTerms||[]).join('|'), record.confidence, record.userConfirmed,
       record.userConfirmMatch, record.openWord, record.crisis
     ].map(value=>`"${(value==null?'':String(value)).replace(/"/g,'""')}"`).join(',');
   });
@@ -1401,7 +1452,7 @@ function logEmotionInfo(record, topResult){
   };
 }
 function logNeedInfo(record, emotionInfo){
-  const needId=record.needConfirmed || record.needTop || null;
+  const needId=record.needUnclear ? null : (record.needConfirmed || record.needTop || null);
   const need=needId ? NEEDS[needId] : null;
   const emotion=emotionInfo && emotionInfo.id ? EMAP[emotionInfo.id] : null;
   const fallbackRelated = emotionInfo && emotionInfo.id ? relatedNeedIds(emotionInfo.id, []) : [];
@@ -1456,13 +1507,18 @@ function logInsightHTML(emotionInfo, needInfo){
   if(!needInfo || (!needInfo.name && !(needInfo.relatedNeedNames||[]).length)) return '';
   const emotion = emotionInfo && emotionInfo.id ? EMAP[emotionInfo.id] : null;
   const rawEmotionName = emotionInfo.coreName || emotionInfo.name || '이 감정';
-  const rawNeedName = (needInfo.relatedNeedNames && needInfo.relatedNeedNames.length) ? needInfo.relatedNeedNames.join(', ') : needInfo.name;
+  const hasSelectedNeed = !!(needInfo.id && needInfo.name);
+  const rawNeedName = hasSelectedNeed ? needInfo.name : ((needInfo.relatedNeedNames && needInfo.relatedNeedNames.length) ? needInfo.relatedNeedNames.join(', ') : needInfo.name);
   const color = emotion ? emotion.color : 'var(--primary)';
   const emoJ = josa(rawEmotionName,'은','는');
+  const title = hasSelectedNeed
+    ? (emotion && emotion.v>0 ? '내가 고른 채워졌을 수 있는 욕구' : '내가 고른 채워지지 않았을 수 있는 욕구')
+    : (emotion && emotion.v>0 ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구');
+  const prefix = hasSelectedNeed ? '기록에서 고른 욕구를 기준으로 보면' : '기록에 남은 관련 욕구 후보를 보면';
   const text = emotion && emotion.v>0
-    ? `지금의 <b style="color:${color}">${safeText(rawEmotionName)}</b>${emoJ} <b>${safeText(rawNeedName)}</b> 같은 욕구가 <b>채워졌을 때</b> 생겼을 수 있어요.`
-    : `지금 당신의 <b style="color:${color}">${safeText(rawEmotionName)}</b>${emoJ} <b>${safeText(rawNeedName)}</b> 같은 욕구가 <b>부족했을 때</b> 보내는 신호일 수 있어요.`;
-  return `<div class="insight"><h3>${emotion && emotion.v>0?'채워졌을 수 있는 욕구':'채워지지 않았을 수 있는 욕구'}</h3><p>${text}</p></div>`;
+    ? `${prefix}, <b style="color:${color}">${safeText(rawEmotionName)}</b>${emoJ} <b>${safeText(rawNeedName)}</b>${hasSelectedNeed?'':' 같은 욕구'}가 <b>채워졌을 때</b> 생겼을 수 있어요.`
+    : `${prefix}, <b style="color:${color}">${safeText(rawEmotionName)}</b>${emoJ} <b>${safeText(rawNeedName)}</b>${hasSelectedNeed?'':' 같은 욕구'}가 <b>부족했을 때</b> 커졌을 수 있어요.`;
+  return `<div class="insight"><h3>${title}</h3><p>${text}</p></div>`;
 }
 function logKidBoxHTML(emotionInfo, needInfo){
   const kidLines = kidLinesHTML(emotionInfo, needInfo);
@@ -1505,11 +1561,11 @@ function logTopThreeHTML(topThree){
   </div>`;
 }
 function answerText(answer){
-  const labels = {yes:'네', no:'아니요', skip:'잘 모르겠어요'};
+  const labels = {yes:'이 예시와 비슷해요', no:'아니요, 달라요', skip:'잘 모르겠어요'};
   return labels[answer] || answer || '-';
 }
 function questionTextById(qid){
-  if(qid==='q_intensity') return '감정의 세기';
+  if(qid==='q_intensity') return INTENSITY_Q;
   const question = FIXED.find(item=>item.id===qid) || DYNAMIC.find(item=>item.id===qid);
   return question ? question.text : qid;
 }
