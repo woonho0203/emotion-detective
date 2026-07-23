@@ -149,6 +149,11 @@
   .result-template-block p{margin:0; font-size:15px; line-height:1.65;}
   .result-template-block ul{margin:0; padding-left:20px;}
   .result-template-block li{font-size:15px; line-height:1.65; margin:3px 0;}
+  .summary-compact{margin:0; padding-left:20px;}
+  .summary-compact li{font-size:15px; line-height:1.65; margin:4px 0;}
+  .summary-compact b{color:var(--primary);}
+  .summary-more>summary{cursor:pointer; font-size:14px; color:var(--primary); font-weight:700;}
+  .summary-more-body{display:grid; gap:12px; margin-top:10px;}
   .flow-box{display:grid; gap:8px; margin-top:10px;}
   .flow-box div{border:1px solid var(--line); border-radius:13px; padding:9px 11px; font-size:14px; line-height:1.55; background:var(--surface);}
   .flow-box div:not(:last-child)::after{content:"↓"; display:block; color:var(--accent); font-weight:800; margin-top:6px;}
@@ -223,6 +228,9 @@
     .card{box-shadow:none; border:1px solid #ccc;}
     .print-only{display:block !important;}
     .rpwrap{box-shadow:none; padding:0;}
+    /* 인쇄·PDF에서는 접어둔 '자세히 보기'도 함께 나오게 한다. */
+    .summary-more>summary{display:none;}
+    .summary-more-body{display:grid !important;}
   }
   .print-only{display:none;}
   /* 내 기록 리포트: 흰 종이 카드(화면·인쇄 동일), 모바일에서 한눈에 */
@@ -249,7 +257,11 @@
   .rpwrap .result-template h3{font-size:13px; color:#7a5a1f;}
   .rpwrap .result-template-block h4{font-size:12px; margin-bottom:2px; color:#7a5a1f;}
   .rpwrap .result-template-block p,
-  .rpwrap .result-template-block li{font-size:12px; line-height:1.55;}
+  .rpwrap .result-template-block li,
+  .rpwrap .summary-compact li{font-size:12px; line-height:1.55;}
+  .rpwrap .summary-compact b{color:#7a5a1f;}
+  .rpwrap .summary-more>summary{display:none;}
+  .rpwrap .summary-more-body{margin-top:6px; gap:6px;}
   .summary-text{white-space:pre-line;}
   .rpwrap .rc-sub{font-size:12px; color:#7a7a7a; margin-top:6px;}
   .rpwrap .rc-safe{font-size:14px; color:#9a9a9a;}
@@ -1357,6 +1369,7 @@ function resultSimilarHTML(profile){
     ${listHTML(takeItems(profile.similar, 3))}
   </div>`;
 }
+/* 옛 기록(q_when·q_where·q_who)에 남아 있는 상황 단서 — 현재 문항뱅크에는 없다. */
 const RESULT_CONTEXT = {
   q_when:{
     a:'오늘 있었던 일 뒤부터',
@@ -1369,29 +1382,100 @@ const RESULT_CONTEXT = {
   q_who:{
     a:'누군가의 말·행동·표정·태도와 관련해',
     b:'해야 할 일, 결과, 내 실수나 선택과 관련해'
-  },
-  q_what_unpleasant:{
-    a:'누군가 선을 넘었거나 공평하지 않은 일을 겪으며',
-    b:'소중한 것이 멀어졌거나 사라진 일을 겪으며'
-  },
-  q_what_pleasant:{
-    a:'누군가의 도움·배려·따뜻한 말을 경험하며',
-    b:'내가 해냈거나 좋은 일이 생길 가능성을 느끼며'
   }
 };
-const INTENSITY_RESULT = {
-  0:'말투·표정·생각·행동에는 거의 영향을 주지 않을 정도였고',
-  1:'말투·표정·생각·행동에 약하게 영향을 주는 정도였고',
-  2:'생각에 자주 떠오르고 행동에도 분명히 영향을 주는 정도였고',
-  3:'말투·표정·생각·행동에 꽤 크게 영향을 주는 정도였고',
-  4:'혼자 견디기 버겁게 느껴질 만큼 말투·표정·생각·행동에 크게 영향을 주었고'
+/* 결과 요약 단서 — 사용자가 실제로 고른 답만 상황·마음·몸·행동으로 나눠 쉬운 말로 적는다.
+   질문 문장을 그대로 복사하지 않고, 고르지 않은 반응은 만들어 넣지 않는다. */
+const SUMMARY_CLUE = {
+  q_valence:{
+    a:{cat:'mind', text:'마음 한쪽에 계속 걸리는 것이 있었어요'},
+    b:{cat:'mind', text:'마음이 편안하고 잔잔한 쪽에 가까웠어요'}
+  },
+  q_arousal:{
+    a:{cat:'body', text:'몸에 힘이 들어가고 가슴이 두근거렸어요'},
+    b:{cat:'body', text:'몸에 힘이 빠지고 움직임이 느려졌어요'}
+  },
+  q_clarity:{
+    a:{cat:'mind', text:'무엇 때문에 이런 마음인지 어느 정도 알 것 같았어요'},
+    b:{cat:'mind', text:'불편한 건 알겠는데 무슨 마음인지는 말하기 어려웠어요'}
+  },
+  q_what_unpleasant:{
+    a:{cat:'mind', text:'같은 생각이 자꾸 되돌아왔어요'},
+    b:{cat:'mind', text:'여러 생각이 뒤엉켜 정리되지 않았어요'}
+  },
+  q_threat_loss:{
+    a:{cat:'mind', text:'앞으로 잘못될까 봐 걱정이 앞섰어요'},
+    b:{cat:'mind', text:'이미 지나간 일이 떠올라 마음이 무거웠어요'}
+  },
+  q_confront:{
+    a:{cat:'action', text:'말하거나 따져서 바로잡고 싶었어요'},
+    b:{cat:'action', text:'말을 줄이고 혼자 있고 싶었어요'}
+  },
+  q_drive:{
+    a:{cat:'action', text:'하던 것 대신 다른 걸 하고 싶었어요'},
+    b:{cat:'action', text:'무언가를 시작할 힘이 잘 나지 않았어요'}
+  },
+  q_fear_anxiety:{
+    a:{cat:'body', text:'위험할 것 같아 몸이 굳었어요'},
+    b:{cat:'mind', text:'잘못될까 봐 자꾸 확인하고 싶었어요'}
+  },
+  q_anger_resentment:{
+    a:{cat:'body', text:'몸이 달아오르고 말이 세게 나올 것 같았어요'},
+    b:{cat:'mind', text:'나만 다르게 대한 일이 계속 생각났어요'}
+  },
+  q_selfeval:{
+    a:{cat:'mind', text:'내 부족한 점이 드러나는 게 싫었어요'},
+    b:{cat:'mind', text:'내 잘못이라기보다 상황이 부당하게 느껴졌어요'}
+  },
+  q_disgust_fear:{
+    a:{cat:'action', text:'너무 싫어서 밀어내고 싶었어요'},
+    b:{cat:'action', text:'나쁜 일이 생길 것 같아 몸을 피하고 싶었어요'}
+  },
+  q_sad_lethargy:{
+    a:{cat:'mind', text:'소중한 것이 사라진 것 같아 울컥했어요'},
+    b:{cat:'body', text:'몸과 마음에 힘이 하나도 없었어요'}
+  },
+  q_lonely_rest:{
+    a:{cat:'mind', text:'누군가 곁에 와주면 좋겠다고 느꼈어요'},
+    b:{cat:'action', text:'말을 줄이고 혼자 편하게 쉬고 싶었어요'}
+  },
+  q_empty_confusion:{
+    a:{cat:'mind', text:'무엇을 해도 마음이 텅 빈 것 같았어요'},
+    b:{cat:'mind', text:'생각이 엉켜 무엇부터 할지 몰랐어요'}
+  },
+  q_hide:{
+    a:{cat:'action', text:'이 마음을 들키고 싶지 않았어요'},
+    b:{cat:'action', text:'믿을 만한 사람에게는 말해도 괜찮을 것 같았어요'}
+  },
+  q_what_pleasant:{
+    a:{cat:'situation', text:'누군가의 도움이나 따뜻한 말이 있었어요'},
+    b:{cat:'situation', text:'내가 해냈거나 좋은 일이 생길 것 같았어요'}
+  },
+  q_joy_calm:{
+    a:{cat:'body', text:'웃음이 나고 몸이 가벼워졌어요'},
+    b:{cat:'body', text:'숨이 편해지고 어깨가 가벼워졌어요'}
+  },
+  q_pride_gratitude:{
+    a:{cat:'mind', text:'내가 해냈다는 생각에 뿌듯했어요'},
+    b:{cat:'mind', text:'누군가가 나를 챙겨준 것이 고마웠어요'}
+  },
+  q_affection_gratitude:{
+    a:{cat:'mind', text:'그 사람 자체가 소중하게 느껴졌어요'},
+    b:{cat:'mind', text:'해준 배려가 떠올라 고마웠어요'}
+  },
+  q_anticipation_joy:{
+    a:{cat:'mind', text:'앞으로 좋은 일이 생길 것 같아 두근거렸어요'},
+    b:{cat:'mind', text:'지금 겪고 있는 일이 즐거웠어요'}
+  }
 };
-function naturalJoin(items){
-  const values=[...new Set((items || []).filter(Boolean))];
-  if(values.length<=1) return values[0] || '';
-  if(values.length===2) return `${values[0]}과 ${values[1]}`;
-  return `${values.slice(0,-1).join(', ')}, 그리고 ${values[values.length-1]}`;
-}
+/* 결과 요약용 세기 문장 — 세기 때문에 나타나지 않은 반응까지 추측하지 않는다. */
+const INTENSITY_SUMMARY = {
+  0:'거의 느껴지지 않을 만큼 약했어요',
+  1:'살짝 느껴지는 정도였어요',
+  2:'분명히 느껴지지만 아주 크지는 않았어요',
+  3:'하루 동안 꽤 크게 느껴졌어요',
+  4:'혼자 견디기 버거울 만큼 크게 느껴졌어요'
+};
 function actualChoiceTexts(answer){
   const q=QMAP[answer.qid];
   const key=answerKey(answer.answer);
@@ -1401,107 +1485,156 @@ function actualChoiceTexts(answer){
   if(key==='mixed') return [q.a,q.b].filter(Boolean);
   return [];
 }
-function oneSentenceEmotionMeaning(emo, detail){
-  const raw=(detail && detail.kid) || (emo && emo.kid) || '';
-  return String(raw)
-    .replace(/^쉽게 말하면,\s*/,'')
-    .replace(/[!?]+/g,'')
-    .split(/[.。]/)[0]
-    .replace(/\s*(마음|느낌)이에요$/,'')
-    .trim();
-}
-const RESULT_SUMMARY_TITLE='내 마음을 한 문장으로 정리하면';
+const RESULT_SUMMARY_TITLE='내 마음을 쉽게 정리하면';
+const SITUATION_LEAD='앞에서 떠올린 일을 생각했을 때';
 function resultLine(value){
   const text=String(value || '').replace(/\s+/g,' ').replace(/[.。]+$/,'').trim();
   return text ? `${text}.` : '';
 }
-function intensityResultSentence(intensity){
-  const text=INTENSITY_RESULT[intensity];
-  if(!text) return '마음의 세기는 아직 따로 고르지 않았어요.';
-  return `세기 ${intensity}/4로, ${String(text).replace(/였고$/,'였어요.').replace(/주었고$/,'주었어요.')}`;
+/* 감정 이름 뒤에 붙일 쉬운 뜻 — 사전 정의를 그대로 붙이지 않고 짧은 꾸밈말만 남긴다. */
+function easyEmotionClause(emo){
+  const raw=(emo && emo.kid) || '';
+  const stripped=String(raw)
+    .replace(/[!?]+/g,'')
+    .split(/[.。]/)[0]
+    .replace(/\s*(마음|느낌|기분)이에요$/,'')
+    .trim();
+  const lastClause=stripped.split(',').pop().trim();
+  return lastClause || stripped;
 }
-function emotionResultObject(value){
-  const text=String(value || '').replace(/\s+/g,' ').replace(/[.。]+$/,'').trim();
-  if(!text) return '마음이 중요한 신호를 보내는 느낌';
-  return /(느낌|마음)$/.test(text) ? text : `${text} 느낌`;
+function summaryClueFor(answer, key){
+  const map=SUMMARY_CLUE[answer.qid];
+  if(map){
+    if(key==='a' || key==='b') return map[key] ? [map[key]] : [];
+    if(key==='mixed') return [map.a, map.b].filter(Boolean);
+    return [];
+  }
+  return actualChoiceTexts(answer).map(text=>({cat:'mind', text:String(text).replace(/[.。]+$/,'')}));
+}
+function pickClueTexts(clues, cat, limit=2){
+  return [...new Set(clues.filter(clue=>clue.cat===cat).map(clue=>clue.text))].slice(0, limit);
+}
+function joinClueSentences(texts){
+  return texts.map(resultLine).join(' ');
+}
+function summarySituation(answers, clues){
+  const legacy=[];
+  for(const answer of answers || []){
+    const contextMap=RESULT_CONTEXT[answer.qid];
+    if(!contextMap) continue;
+    const key=answerKey(answer.answer);
+    if(key==='a' || key==='b') legacy.push(contextMap[key]);
+    else if(key==='mixed') legacy.push(contextMap.a, contextMap.b);
+  }
+  const picked=pickClueTexts(clues, 'situation', 2);
+  if(picked.length) return `${SITUATION_LEAD}, ${joinClueSentences(picked)}`;
+  if(legacy.length) return resultLine(`${SITUATION_LEAD}, ${[...new Set(legacy)].join(', ')} 마음이 움직였어요`);
+  return `${SITUATION_LEAD}의 마음을 살펴봤어요.`;
+}
+function summaryIntensity(intensity){
+  const text=INTENSITY_SUMMARY[intensity];
+  if(!text) return '마음의 세기는 아직 고르지 않았어요.';
+  return `세기 ${intensity}/4로, ${text}.`;
+}
+function summaryNeed(needAnswers, positive){
+  const meanings=selectedNeedIdsFromAnswers(needAnswers)
+    .map(id=>NEED_RESULT_MEANING[id])
+    .filter(Boolean)
+    .slice(0, 2);
+  if(!meanings.length){
+    return positive
+      ? '어떤 바람이 채워졌는지는 아직 뚜렷하게 고르지 않았어요.'
+      : '어떤 바람이 가장 컸는지는 아직 뚜렷하게 고르지 않았어요.';
+  }
+  const first=resultLine(`${meanings[0]}이 중요했어요`);
+  const second=meanings[1]
+    ? resultLine(`${meanings[1]}도 함께 ${positive?'채워졌을 수 있어요':'필요했을 수 있어요'}`)
+    : (positive ? '그 바람이 어느 정도 채워졌어요.' : '그 바람이 아직 채워지지 않았을 수 있어요.');
+  return `${first} ${second}`;
+}
+function summaryEmotion(emo, detail){
+  const name=(detail && detail.term) || (emo && emo.name) || '';
+  const clause=easyEmotionClause(emo);
+  if(!name) return '어떤 감정에 가까운지는 아직 정하지 않았어요.';
+  return clause
+    ? `그래서 ‘${name}’에 가까웠어요. ${clause} 느낌이에요.`
+    : `그래서 ‘${name}’에 가까웠어요.`;
 }
 function resultSummaryParts({emo, detail, answers, needAnswers, intensity, positive}){
-  const context=[];
-  const reactions=[];
+  const clues=[];
   for(const answer of answers || []){
-    const key=answerKey(answer.answer);
-    const contextMap=RESULT_CONTEXT[answer.qid];
-    if(contextMap){
-      if(key==='a' || key==='b') context.push(contextMap[key]);
-      else if(key==='mixed') context.push(contextMap.a,contextMap.b);
-      continue;
-    }
     if(answer.qid==='q_intensity') continue;
-    reactions.push(...actualChoiceTexts(answer));
+    if(RESULT_CONTEXT[answer.qid]) continue;
+    clues.push(...summaryClueFor(answer, answerKey(answer.answer)));
   }
-  const contextText=context.length ? [...new Set(context)].join(', ') : '앞에서 떠올린 실제 경험';
-  const reactionItems=[...new Set(reactions.map(resultLine).filter(Boolean))].slice(0,3);
-  if(!reactionItems.length) reactionItems.push('아직 생각·몸·행동 단서는 충분히 모이지 않았어요.');
-  const needMeanings=selectedNeedIdsFromAnswers(needAnswers).map(id=>NEED_RESULT_MEANING[id]).filter(Boolean);
-  const emotionMeaning=oneSentenceEmotionMeaning(emo, detail) || '마음이 중요한 신호를 보내는 느낌';
+  const mind=pickClueTexts(clues, 'mind', 2);
+  const body=pickClueTexts(clues, 'body', 2);
+  const action=pickClueTexts(clues, 'action', 2);
   return {
     title:RESULT_SUMMARY_TITLE,
-    situation:resultLine(`나는 ${contextText} 마음이 움직였어요`),
-    reactions:reactionItems,
-    impact:intensityResultSentence(intensity),
-    need:needMeanings.length
-      ? resultLine(`그때 ${naturalJoin(needMeanings)} 같은 바람이 ${positive?'충분히 채워졌다고 느꼈을 수 있어요':'충분히 채워지지 않았을 수 있어요'}`)
-      : '아직 어떤 바람이 가장 컸는지는 욕구 답변만으로 분명하지 않아요.',
-    result:resultLine(`그래서 ${emotionResultObject(emotionMeaning)}이 생겼을 수 있어요`)
+    positive:!!positive,
+    situation:summarySituation(answers, clues),
+    mind:mind.length ? joinClueSentences(mind) : '마음이 어느 쪽인지 뚜렷하게 잡히지는 않았어요.',
+    body:body.length ? joinClueSentences(body) : '뚜렷한 몸의 변화는 찾기 어려웠어요.',
+    action:action.length ? joinClueSentences(action) : '무엇을 하고 싶은지는 뚜렷하게 드러나지 않았어요.',
+    need:summaryNeed(needAnswers, positive),
+    emotion:summaryEmotion(emo, detail),
+    intensity:summaryIntensity(intensity)
   };
+}
+function summaryNeedTitle(positive){
+  return positive ? '💛 어떤 바람이 채워졌을까요?' : '💛 어떤 바람이 채워지지 않았을까요?';
+}
+function summaryCompactRows(parts){
+  return [
+    ['상황', parts.situation],
+    ['마음', parts.mind],
+    ['몸', parts.body],
+    ['하고 싶은 것', parts.action],
+    ['중요했던 것', parts.need],
+    ['찾은 감정', parts.emotion],
+    ['세기', parts.intensity]
+  ];
+}
+function summaryDetailRows(parts){
+  return [
+    ['📍 무슨 일이 있었나요?', parts.situation],
+    ['💭 어떤 마음이 들었나요?', parts.mind],
+    ['🫀 몸은 어떻게 반응했나요?', parts.body],
+    ['🚶 어떻게 하고 싶었나요?', parts.action],
+    [summaryNeedTitle(parts.positive), parts.need],
+    ['🎭 그래서 어떤 감정에 가까웠나요?', parts.emotion],
+    ['📈 얼마나 크게 느껴졌나요?', parts.intensity]
+  ];
 }
 function resultSummaryText(parts){
   return [
     `# ${parts.title}`,
     '',
-    '📍 상황',
-    parts.situation,
+    ...summaryCompactRows(parts).map(([label, text])=>`• ${label}: ${text}`),
     '',
-    '🧠 내 반응',
-    ...parts.reactions.map(item=>`• ${item}`),
-    '',
-    '📈 영향',
-    parts.impact,
-    '',
-    '💛 채워지지 않은 바람',
-    parts.need,
-    '',
-    '🎭 결과',
-    parts.result
+    '[자세히 보기]',
+    ...summaryDetailRows(parts).map(([label, text])=>`${label}\n${text}`)
   ].join('\n');
 }
 function resultSummarySentence(args){
   return resultSummaryText(resultSummaryParts(args));
 }
-function resultSummaryTemplateHTML(parts){
+function resultSummaryTemplateHTML(parts, {expanded=false}={}){
   if(!parts) return '';
+  const compact=summaryCompactRows(parts)
+    .map(([label, text])=>`<li><b>${safeText(label)}</b> · ${safeText(text)}</li>`)
+    .join('');
+  const detail=summaryDetailRows(parts)
+    .map(([label, text])=>`<div class="result-template-block"><h4>${safeText(label)}</h4><p>${safeText(text)}</p></div>`)
+    .join('');
   return `<div class="result-template">
     <h3>${safeText(parts.title)}</h3>
-    <div class="result-template-block">
-      <h4>📍 상황</h4>
-      <p>${safeText(parts.situation)}</p>
-    </div>
-    <div class="result-template-block">
-      <h4>🧠 내 반응</h4>
-      <ul>${parts.reactions.map(item=>`<li>${safeText(item)}</li>`).join('')}</ul>
-    </div>
-    <div class="result-template-block">
-      <h4>📈 영향</h4>
-      <p>${safeText(parts.impact)}</p>
-    </div>
-    <div class="result-template-block">
-      <h4>💛 채워지지 않은 바람</h4>
-      <p>${safeText(parts.need)}</p>
-    </div>
-    <div class="result-template-block">
-      <h4>🎭 결과</h4>
-      <p>${safeText(parts.result)}</p>
-    </div>
+    <ul class="summary-compact">${compact}</ul>
+    <details class="summary-more"${expanded?' open':''}>
+      <summary>자세히 보기</summary>
+      <div class="summary-more-body">${detail}</div>
+    </details>
   </div>`;
 }
 function resultSummaryPlainHTML(text){
@@ -1691,7 +1824,8 @@ function resetState(){
     needSteps:0, needAnswers:[], needTop:null, needConfirmed:null, needUnclear:false,
     detailEmotion:null, relatedNeeds:null, resultFeedback:null,
     secondaryEmotions:[], resultMatch:null, subLabel:null,
-    contextTag:null, contextPrefer:[]
+    contextTag:null, contextPrefer:[],
+    lateWhen:null, lateWho:null, lateContexts:[]
   };
 }
 function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
@@ -2160,6 +2294,58 @@ function hasBatchim(w){ if(!w) return false; const c=w.charCodeAt(w.length-1); i
 function josa(w,a,b){ return hasBatchim(w)?a:b; }
 
 /* 3단계: 최종 결과 (감정 + 욕구 + 작은 실천) */
+/* 후반 맥락(선택) — 결과가 나온 뒤 원할 때만. 감정 점수를 바꾸지 않고 결과 설명·기록에만 쓴다. */
+const LATE_WHEN = [{id:'sudden',label:'방금·오늘 갑자기 커졌어요'},{id:'gradual',label:'며칠 동안 조금씩 쌓였어요'},{id:'unknown',label:'잘 모르겠어요'}];
+const LATE_WHO  = [{id:'person',label:'특정 사람의 말·행동'},{id:'self',label:'내 생각·몸 상태'},{id:'task',label:'해야 할 일'},{id:'unknown',label:'잘 모르겠어요'}];
+const LATE_DETAIL = ['사람·관계','해야 할 일','미래','몸 상태','상실','성취','부당함','타인의 평가','기타'];
+function renderLateContext(){
+  S.phase='latecontext';
+  const chips=(arr,attr,sel)=>arr.map(o=>{
+    const id=o.id||o, label=o.label||o;
+    const on = Array.isArray(sel) ? sel.includes(label) : sel===id;
+    return `<button class="btn ghost${on?' active':''}" data-${attr}="${id}">${safeText(label)}</button>`;
+  }).join('');
+  app.innerHTML=`
+  <section class="card">
+    <div class="clue-count no-print">선택 · 이 마음의 배경 기록</div>
+    <h2>원하면 이 마음의 배경만 짧게 남겨 둘까요?</h2>
+    <p class="caption">무슨 일이 있었는지 자세히 쓰지 않아도 돼요. 안 해도 결과에는 영향이 없어요.</p>
+
+    <div class="caption" style="margin-top:14px">이 마음은 어떻게 커졌나요?</div>
+    <div class="choice-actions">${chips(LATE_WHEN,'lw',S.lateWhen)}</div>
+
+    <div class="caption" style="margin-top:14px">주로 무엇과 이어져 있나요?</div>
+    <div class="choice-actions">${chips(LATE_WHO,'lo',S.lateWho)}</div>
+
+    <div class="caption" style="margin-top:14px">관련된 자리를 골라 주세요 (여러 개 가능)</div>
+    <div class="choice-actions">${chips(LATE_DETAIL,'ld',S.lateContexts)}</div>
+
+    <div class="btn-row" style="margin-top:18px;">
+      <button class="btn primary" id="lateSave">기록하고 결과 보기</button>
+      <button class="btn" id="lateSkip">건너뛰기</button>
+    </div>
+  </section>`;
+  app.querySelectorAll('[data-lw]').forEach(b=>b.onclick=()=>{ S.lateWhen=b.dataset.lw; renderLateContext(); });
+  app.querySelectorAll('[data-lo]').forEach(b=>b.onclick=()=>{ S.lateWho=b.dataset.lo; renderLateContext(); });
+  app.querySelectorAll('[data-ld]').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.ld; const i=S.lateContexts.indexOf(v);
+    if(i>=0) S.lateContexts.splice(i,1); else S.lateContexts.push(v);
+    renderLateContext();
+  });
+  document.getElementById('lateSave').onclick=()=>{
+    S.answers.push({qid:'q_late_context', answer:[S.lateWhen,S.lateWho].filter(Boolean).join('|'), choiceText:S.lateContexts.join(', '), tMs:0});
+    updateSession(); renderFinalResult();
+  };
+  document.getElementById('lateSkip').onclick=()=>{ S.lateWhen=null; S.lateWho=null; S.lateContexts=[]; renderFinalResult(); };
+}
+function lateContextSummary(){
+  const w=(LATE_WHEN.find(x=>x.id===S.lateWhen)||{}).label;
+  const o=(LATE_WHO.find(x=>x.id===S.lateWho)||{}).label;
+  const parts=[w,o].filter(Boolean);
+  if(S.lateContexts && S.lateContexts.length) parts.push(S.lateContexts.join(' · '));
+  return parts.join(' / ');
+}
+
 function renderFinalResult(){
   const emo=EMAP[S.confirmedEmotion];
   const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
@@ -2181,6 +2367,7 @@ function renderFinalResult(){
     ${S.subLabel?`<p class="caption">마음의 결: <b style="color:${EMAP[S.subLabel.core]?EMAP[S.subLabel.core].color:'inherit'}">${safeText(S.subLabel.label)}</b>에 더 가까워요</p>`:''}
     ${(S.secondaryEmotions&&S.secondaryEmotions.length)?`<p class="caption">함께 느껴진 마음: ${S.secondaryEmotions.map(id=>EMAP[id]?`<b style="color:${EMAP[id].color}">${EMAP[id].name}</b>`:'').filter(Boolean).join(' · ')}</p>`:''}
     ${(S.resultMatch!=null)?`<p class="caption">이 결과가 내 마음을 설명하는 정도: <b>${S.resultMatch}/4</b></p>`:''}
+    ${lateContextSummary()?`<p class="caption">이 마음의 배경: <b>${safeText(lateContextSummary())}</b></p>`:''}
     ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
     <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
     <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
@@ -2188,6 +2375,7 @@ function renderFinalResult(){
       <button class="btn primary" id="pdfBtn">📄 PDF로 저장</button>
       <button class="btn" id="againBtn">다시 하기</button>
     </div>
+    <button class="btn ghost small no-print" id="lateCtxBtn">${lateContextSummary()?'배경 기록 고치기':'이 마음의 배경도 남길래요 (선택)'}</button>
     <button class="btn ghost small no-print" id="openLog2">내 기록·데이터 보기</button>
   </section>`;
   app.querySelectorAll('[data-result-feedback]').forEach(button=>button.onclick=()=>{
@@ -2206,6 +2394,7 @@ function renderFinalResult(){
   document.getElementById('restartFromFeedback')?.addEventListener('click',()=>{ resetState(); renderIntro(); });
   document.getElementById('pdfBtn').onclick=()=>window.print();
   document.getElementById('againBtn').onclick=()=>{ resetState(); renderIntro(); };
+  document.getElementById('lateCtxBtn').onclick=renderLateContext;
   document.getElementById('openLog2').onclick=openLogModal;
 }
 
@@ -2246,6 +2435,9 @@ function sessionRecord(){
     subLabelKey:S.subLabel?S.subLabel.key:null,
     contextTag:S.contextTag||null,
     contextTagLabel:(CONTEXT_TAGS.find(t=>t.id===S.contextTag)||{}).label||null,
+    lateWhen:S.lateWhen||null,
+    lateWho:S.lateWho||null,
+    lateContexts:S.lateContexts||[],
     posteriorFinal: r.slice(0,5).map(x=>({emotion:x.id, p:Math.round(x.p*1000)/1000})),
     top1: topEmotionId, top3: r.slice(0,3).map(x=>x.id), need: needName,
     emotionName: emoInfo ? emoInfo.name : null, emotionKid: emoInfo ? emoInfo.kid : null,
@@ -2575,7 +2767,7 @@ function buildReportHTML(logs){
     const sub=[]; if(dots) sub.push('세기 '+dots); if(record.confidence) sub.push('잘 맞는 정도 '+record.confidence);
     if(record.userConfirmed && EMAP[record.userConfirmed] && (!topResult||record.userConfirmed!==topResult.emotion)) sub.push('내가 고른 감정: '+emName(record.userConfirmed));
     const kidLines=kidLinesHTML(emotionInfo, needInfo);
-    const detailForSummary=record.detailEmotionKid ? {kid:record.detailEmotionKid} : null;
+    const detailForSummary=(record.detailEmotionTerm || record.detailEmotionKid) ? {term:record.detailEmotionTerm, kid:record.detailEmotionKid} : null;
     const summaryParts=emotion
       ? resultSummaryParts({emo:emotion, detail:detailForSummary, answers:record.answers||[], needAnswers:record.needAnswers||[], intensity:record.intensity, positive:emotion.v>0})
       : null;
@@ -2586,7 +2778,7 @@ function buildReportHTML(logs){
       <div class="rc-bar">${seg}</div>
       ${others?`<div class="rc-others">그다음 · ${safeText(others)}</div>`:''}
       ${(needInfo.relatedNeedNames||[]).length?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.relatedNeedNames.join(' · '))}</b></div>`:(needInfo.name?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.name)}</b></div>`:'')}
-      ${summaryParts?`<div class="rc-kid">${resultSummaryTemplateHTML(summaryParts)}</div>`:(summarySentence?`<div class="rc-kid">${resultSummaryPlainHTML(summarySentence)}</div>`:'')}
+      ${summaryParts?`<div class="rc-kid">${resultSummaryTemplateHTML(summaryParts, {expanded:true})}</div>`:(summarySentence?`<div class="rc-kid">${resultSummaryPlainHTML(summarySentence)}</div>`:'')}
       ${kidLines.length?`<div class="rc-kid"><b>쉽게 말하면</b><br>${kidLines.join('<br><br>')}</div>`:''}
       ${sub.length?`<div class="rc-sub">${safeText(sub.join(' · '))}</div>`:''}
     </div>`;
