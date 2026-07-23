@@ -611,15 +611,22 @@ function answerNeed(q,a){
   renderFinalResult();
 }
 
+/* 한글 조사(은/는, 이/가) 받침 기준 자동 선택 */
+function hasBatchim(w){ if(!w) return false; const c=w.charCodeAt(w.length-1); if(c<0xAC00||c>0xD7A3) return false; return (c-0xAC00)%28!==0; }
+function josa(w,a,b){ return hasBatchim(w)?a:b; }
+
 /* 3단계: 최종 결과 (감정 + 욕구 + 작은 실천) */
 function renderFinalResult(){
   const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
   const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
   const topN=rn[0]; const need=NEEDS[topN.id]; S.needTop=topN.id;
   const second = (rn[1] && (topN.p-rn[1].p)<0.18) ? rn[1] : null;
+  const emoJ = josa(emo.name,'은','는');
+  const needJ = josa(need.name,'이','가');
+  const secondNote = second ? ` (‘${NEEDS[second.id].name}’도 함께일 수 있어요.)` : '';
   const nvc = pleasant
-    ? `지금의 <b style="color:${emo.color}">${emo.name}</b>은 <b>${need.name}</b>${second?` (그리고 ${NEEDS[second.id].name})`:''}이(가) <b>채워져서</b> 온 것 같아요.`
-    : `지금 당신의 <b style="color:${emo.color}">${emo.name}</b>은 <b>${need.name}</b>${second?` (또는 ${NEEDS[second.id].name})`:''}이(가) <b>채워지길 바라는</b> 신호일 수 있어요.`;
+    ? `지금의 <b style="color:${emo.color}">${emo.name}</b>${emoJ} <b>${need.name}</b>${needJ} <b>채워져서</b> 온 것 같아요.${secondNote}`
+    : `지금 당신의 <b style="color:${emo.color}">${emo.name}</b>${emoJ} <b>${need.name}</b>${needJ} <b>채워지길 바라는</b> 신호일 수 있어요.${secondNote}`;
   const showYellow = S.intensity>=3 && (emo.group==='부정' || emo.group==='사회');
   updateSession();
   app.innerHTML=`
