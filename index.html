@@ -104,6 +104,12 @@
   .btn.detail-option strong{display:block; font-size:15px;}
   .btn.detail-option span{display:block; margin-top:3px; color:var(--ink-soft); font-size:13px; font-weight:400;}
   .btn.detail-option.active{background:var(--primary-soft); border-color:var(--primary); color:var(--ink);}
+  .needwords{border:1px solid var(--line); border-radius:14px; padding:13px 14px; margin:14px 0; background:transparent;}
+  .needwords h3{margin:0 0 8px; font-size:15px; color:var(--primary);}
+  .need-word-list{display:flex; flex-direction:column; gap:8px;}
+  .need-word{border:1px solid var(--line); border-radius:12px; padding:9px 10px; font-size:14px; line-height:1.5;}
+  .need-word b{display:block; margin-bottom:2px;}
+  .need-word span{color:var(--ink-soft);}
   .log-recent{margin:14px 0 4px;}
   .log-recent h3{font-size:15px; margin:0 0 8px; color:var(--primary);}
   .log-card{border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-top:8px;}
@@ -218,6 +224,7 @@
 </div>
 
 <script src="emotion-dictionary.js"></script>
+<script src="need-dictionary.js"></script>
 <script>
 "use strict";
 /* =========================================================================
@@ -390,6 +397,75 @@ const NEEDS = {
   rest:{name:'휴식·회복', kid:'그만 쉬고, 힘을 다시 채우고 싶은 마음이에요.', act:'지금 5분이라도 나에게 줄 수 있는 쉼은 무엇일까요?'},
   acceptance:{name:'자기수용·회복', kid:'실수해도 나를 미워하지 않고, 나를 받아들이고 싶은 마음이에요.', act:'“그럴 수도 있어”라고 나에게 건네보면 어떤가요?'}
 };
+const NEED_IDS = Object.keys(NEEDS);
+let NEED_WORDS = Array.isArray(window.NEED_WORD_DICTIONARY) ? window.NEED_WORD_DICTIONARY : [];
+let NEED_WORDS_BY_NEED = groupNeedWords(NEED_WORDS);
+const NEED_HINTS = {
+  safety:['안전','보호','안정','안심','위험','지키','생존','경계','평온'],
+  certainty:['예측','확신','분명','질서','정리','통제','계획','명료','기준'],
+  autonomy:['자율','자유','독립','스스로','선택','간섭','주도','내 뜻'],
+  respect:['존중','인정','칭찬','대접','체면','명예','자존','가치','무시'],
+  fairness:['공정','정의','공평','억울','평등','권리','보상','부당'],
+  understanding:['이해','공감','알아주','들어주','속마음','수용','소통'],
+  connection:['연결','친밀','사랑','연애','친구','함께','대화','유대'],
+  belonging:['소속','함께','공동체','친구','가족','보금자리','우리'],
+  comfort:['위로','돌봄','보살핌','편안','안락','따뜻','달래','다독'],
+  meaning:['의미','목적','이상','가치','정체성','자기실현','기여','꿈','보람'],
+  competence:['성취','유능','성장','실력','능력','해내','배우','발전','성공','도전'],
+  rest:['휴식','회복','잠','쉬','평온','피로','충전','여유','멈추'],
+  acceptance:['자기수용','수용','받아들','용서','회복','실수','자존','있는 그대로','내려놓']
+};
+const NEED_WORD_KIND_BONUS = {
+  '자연스러운 표현':1.2,
+  '단어':0.9,
+  '관용구':0.7,
+  '전문·분류 용어':0.5,
+  '속담·한자성어':0.2,
+  '옛말·방언':0.1
+};
+function groupNeedWords(items){
+  const grouped=Object.fromEntries(NEED_IDS.map(id=>[id,[]]));
+  for(const item of items || []){
+    const needs=Array.isArray(item.needs) ? item.needs : [];
+    for(const needId of needs){
+      if(grouped[needId]) grouped[needId].push(item);
+    }
+  }
+  return grouped;
+}
+async function loadNeedWordDatabase(){
+  if(location.hostname.endsWith('github.io')) return;
+  try{
+    const res = await fetch('/api/needs', {headers:{'Accept':'application/json'}});
+    if(!res.ok) throw new Error('need api failed');
+    const data = await res.json();
+    const items = Array.isArray(data.needWords) ? data.needWords : [];
+    if(items.length){
+      NEED_WORDS = items;
+      NEED_WORDS_BY_NEED = groupNeedWords(items);
+    }
+  }catch(e){
+    NEED_WORDS_BY_NEED = groupNeedWords(NEED_WORDS);
+  }
+}
+function needWordMatches(item, words){
+  const haystack = `${item.term} ${item.kid} ${item.section}`;
+  return words.reduce((score, word)=>score + (haystack.includes(word) ? 1 : 0), 0);
+}
+function needWordCandidates(needId, limit=5){
+  const list=(NEED_WORDS_BY_NEED[needId] || []).slice();
+  if(!list.length) return [];
+  const hints=NEED_HINTS[needId] || [];
+  return list.map(item=>{
+    let score=5;
+    score += needWordMatches(item, hints) * 3;
+    score += NEED_WORD_KIND_BONUS[item.kind] || 0;
+    if(item.term && item.term.length<=12) score += 0.4;
+    if(item.term && item.term.length>22) score -= 0.3;
+    score += 1 / (item.no + 1000);
+    return {...item, score};
+  }).sort((a,b)=>b.score-a.score || a.no-b.no).slice(0,limit);
+}
 const EMO_NEEDS = {
   anxiety:['certainty','safety','comfort'], fear:['safety','comfort','certainty'],
   anger:['respect','autonomy','fairness'], disgust:['safety','autonomy','respect'],
@@ -741,6 +817,7 @@ function renderFinalResult(){
   const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
   const topN=rn[0]; const need=NEEDS[topN.id]; S.needTop=topN.id;
   const detailOptions = detailCandidates(emo.id, 5);
+  const needWords = needWordCandidates(topN.id, 5);
   if(!S.detailEmotion) S.detailEmotion = detailOptions[0] || null;
   const detail = selectedDetail();
   const second = (rn[1] && (topN.p-rn[1].p)<0.18) ? rn[1] : null;
@@ -765,6 +842,10 @@ function renderFinalResult(){
       ${detailOptions.length>1?`<div class="detail-options">${detailOptions.map(d=>`<button class="btn detail-option ${d.id===detail.id?'active':''}" data-detail="${d.id}"><strong>${safeText(d.term)}</strong><span>${safeText(d.kid)}</span></button>`).join('')}</div>`:''}
     </div>`:''}
     <div class="insight"><h3>${pleasant?'채워진 욕구':'바라는 것 (욕구)'}</h3><p>${nvc}</p></div>
+    ${needWords.length?`<div class="needwords">
+      <h3>욕구 단어</h3>
+      <div class="need-word-list">${needWords.map(word=>`<div class="need-word"><b>${safeText(word.term)}</b><span>${safeText(word.kid)}</span></div>`).join('')}</div>
+    </div>`:''}
     <div class="kidbox"><h3>🧒 쉽게 말하면</h3>
       <p><b id="kidEmotionName" style="color:${emo.color}">감정 · ${detail?safeText(detail.term):emo.name}</b><br><span id="kidEmotionText">${detail?safeText(detail.kid):emo.kid}</span></p>
       <p style="margin-top:7px"><b>바라는 것 · ${need.name}</b><br>${need.kid}</p>
@@ -822,6 +903,7 @@ function sessionRecord(){
   const needInfo = finalNeedId ? NEEDS[finalNeedId] : null;
   const needName = needInfo ? needInfo.name : (topEmotionId ? (EMAP[topEmotionId]||{}).need : null);
   const detail = S.detailEmotion || null;
+  const needWords = finalNeedId ? needWordCandidates(finalNeedId, 5) : [];
   return {
     sessionId:S.sessionId, startedAt:S.startedAt, finishedAt:S.finishedAt||null,
     consentResearch:S.consent, isMinor:S.minor,
@@ -837,6 +919,8 @@ function sessionRecord(){
     detailEmotionSection: detail ? detail.section : null,
     detailEmotionCore: detail ? detail.core : null,
     needName: needName, needKid: needInfo ? needInfo.kid : null,
+    needWordIds: needWords.map(word=>word.id),
+    needWordTerms: needWords.map(word=>word.term),
     confidence: confidenceOf(post).level, excluded: Array.from(S.excluded||[]),
     confirmedEmotion:S.confirmedEmotion||null, needTop:S.needTop||null, needConfirmed:S.needConfirmed||null,
     needCandidates:S.needCand||null, needAnswers:S.needAnswers||null,
@@ -868,7 +952,7 @@ function exportJSON(){
 }
 function exportCSV(){
   const data=loadLogs().filter(s=>s.consentResearch);
-  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
+  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','needWordTerms','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
   const rows=data.map(record=>{
     const topResult=(record.posteriorFinal||[])[0];
     const emotionInfo=logEmotionInfo(record, topResult);
@@ -877,7 +961,7 @@ function exportCSV(){
       record.sessionId, record.startedAt, record.questionCount, record.intensity,
       record.top1, (record.top3||[]).join('|'), emotionInfo.name, emotionInfo.kid,
       record.detailEmotionTerm, record.detailEmotionKid, record.detailEmotionSection,
-      needInfo.name, needInfo.kid, record.confidence, record.userConfirmed,
+      needInfo.name, needInfo.kid, (record.needWordTerms||[]).join('|'), record.confidence, record.userConfirmed,
       record.userConfirmMatch, record.openWord, record.crisis
     ].map(value=>`"${(value==null?'':String(value)).replace(/"/g,'""')}"`).join(',');
   });
@@ -1037,7 +1121,7 @@ document.getElementById('deleteAll').onclick=()=>{
 
 /* =========================== 시작 =========================== */
 resetState();
-loadEmotionDatabase().finally(renderIntro);
+Promise.all([loadEmotionDatabase(), loadNeedWordDatabase()]).finally(renderIntro);
 </script>
 </body>
 </html>
