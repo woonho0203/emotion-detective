@@ -259,6 +259,56 @@ const CLUE = {
   q_disgust:'거부감', q_achieve:'해냄', q_clarity:'막막함', q_hide:'숨기고 싶음'
 };
 
+/* ---- 욕구(NVC) 데이터: 감정 뒤의 '바라는 것' 찾기 ---- */
+const NEEDS = {
+  safety:{name:'안전·안정', act:'지금 안전하다고 느껴지는 작은 것 하나를 떠올려볼까요?'},
+  certainty:{name:'예측가능성·확신', act:'무엇이 어떻게 될지, 지금 분명히 아는 것 하나만 적어볼까요?'},
+  autonomy:{name:'자율·내 뜻대로', act:'아주 작은 것이라도 지금 내가 스스로 정할 수 있는 한 가지는?'},
+  respect:{name:'존중·인정', act:'내가 인정받고 싶은 부분을 한 문장으로 적어볼까요?'},
+  fairness:{name:'공정함', act:'무엇이 불공평하게 느껴졌는지 사실 그대로 적어볼까요?'},
+  understanding:{name:'이해받음·공감', act:'지금 마음을 있는 그대로 들어줄 사람이 한 명 떠오르나요?'},
+  connection:{name:'연결·친밀', act:'가볍게 안부를 전할 한 사람을 떠올려볼까요?'},
+  belonging:{name:'소속·함께함', act:'내가 편하게 속해 있다고 느끼는 자리를 하나 떠올려볼까요?'},
+  comfort:{name:'위로·돌봄', act:'지금 나에게 건넬 다정한 한 마디를 적어볼까요?'},
+  meaning:{name:'의미·목적', act:'이 일이 나에게 왜 중요한지 한 가지 이유를 적어볼까요?'},
+  competence:{name:'해낼 수 있다는 느낌', act:'예전에 비슷한 걸 넘겨본 경험을 하나 떠올려볼까요?'},
+  rest:{name:'휴식·회복', act:'지금 5분이라도 나에게 줄 수 있는 쉼은 무엇일까요?'},
+  acceptance:{name:'자기수용·회복', act:'“그럴 수도 있어”라고 나에게 건네보면 어떤가요?'}
+};
+const EMO_NEEDS = {
+  anxiety:['certainty','safety','comfort'], fear:['safety','comfort','certainty'],
+  anger:['respect','autonomy','fairness'], disgust:['safety','autonomy','respect'],
+  sadness:['comfort','connection','meaning'], lethargy:['rest','meaning','autonomy'],
+  loneliness:['connection','belonging','understanding'], resentment:['understanding','fairness','respect'],
+  shame:['acceptance','respect','belonging'], confusion:['certainty','understanding','rest'],
+  joy:['meaning','connection','competence'], calm:['safety','rest'],
+  affection:['connection','belonging'], pride:['competence','respect'],
+  gratitude:['connection','meaning'], anticipation:['meaning','autonomy','competence']
+};
+const NEED_Q = [
+  {need:'certainty', text:'무엇이 어떻게 될지 “분명해지고 예측되는 것”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'safety', text:'위협 없이 “안전하다는 느낌”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'comfort', text:'따뜻하게 “위로받고 보살핌받는 것”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'understanding', text:'누군가 내 마음을 “있는 그대로 알아주는 것”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'respect', text:'“존중받고 인정받는 것”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'fairness', text:'“공정하게 대우받는 것”(억울하지 않음)이 지금 가장 중요하게 느껴지나요?'},
+  {need:'autonomy', text:'내 뜻대로 “선택하고 결정할 여지”가 지금 가장 중요하게 느껴지나요?'},
+  {need:'connection', text:'가까운 누군가와 “이어져 있다는 느낌”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'belonging', text:'어딘가에 “속해 있고 함께한다는 느낌”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'meaning', text:'지금 하는 일에 “의미나 이유”가 가장 중요하게 느껴지나요?'},
+  {need:'competence', text:'“해낼 수 있다는 느낌”(유능감)이 지금 가장 중요하게 느껴지나요?'},
+  {need:'rest', text:'그냥 “쉬고 회복하는 것”이 지금 가장 중요하게 느껴지나요?'},
+  {need:'acceptance', text:'잘못했더라도 “나를 받아들이고 회복하는 것”이 지금 가장 중요하게 느껴지나요?'}
+];
+/* 감정 스무고개 답변(yes)을 욕구 사전확률로 (이미 모은 단서를 재활용) */
+const ANSWER_NEED = {
+  q_threat:['certainty','safety'], q_bodyhigh:['safety'], q_relation:['connection','understanding'],
+  q_social:['understanding','fairness'], q_confront:['respect','fairness'], q_block:['autonomy'],
+  q_selfeval:['acceptance'], q_loss:['comfort','meaning','connection'], q_empty:['meaning','rest'],
+  q_avoid:['rest','safety'], q_bodylow:['rest'], q_warm:['connection','belonging'],
+  q_achieve:['competence','respect'], q_hide:['acceptance','understanding']
+};
+
 /* ---- 가중치·파라미터 (고시_추론엔진_가중치설정 v1.1) ---- */
 const P_BOOST=0.88, P_SUPPRESS=0.12, P_NEUTRAL=0.5;
 const CONF_HIGH_P1=0.55, CONF_HIGH_GAP=0.15, CONF_MID_P1=0.40, MIX_GAP=0.12;
@@ -316,7 +366,9 @@ function resetState(){
     intensity:null, consent:false, minor:false,
     startedAt:null, qStart:0, openWord:null,
     userConfirmed:null, userConfirmMatch:null, sessionId:uuid(),
-    excluded:new Set(), hardCap:HARD_CAP, requeries:0
+    excluded:new Set(), hardCap:HARD_CAP, requeries:0,
+    confirmedEmotion:null, needCand:null, needScore:null, askedNeed:new Set(),
+    needSteps:0, needAnswers:[], needTop:null, needConfirmed:null
   };
 }
 function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
@@ -433,96 +485,51 @@ function renderIntensity(){
   });
 }
 
-/* ---------- 결과 ---------- */
-function finishToResult(){ S.phase='result'; S.finishedAt=new Date().toISOString(); saveSession(); renderResult(); }
+/* ---------- 결과: 3단계 (감정 → 욕구 → 최종) ---------- */
+function finishToResult(){ S.phase='result'; S.finishedAt=new Date().toISOString(); saveSession(); renderEmotionResult(); }
 
-function renderResult(){
+/* 1단계: 감정 결과 (후보 확인 → 그 감정이 바라는 것으로 자동 진행) */
+function renderEmotionResult(){
   const post = softmax(S.logscore);
   const r = ranked(post);
   const conf = confidenceOf(post);
   const top3 = r.slice(0,3);
   const mixed = (r[0].p - r[1].p) < MIX_GAP;
   const clues = S.answers.filter(a=>a.answer==='yes' && CLUE[a.qid]).map(a=>CLUE[a.qid]);
-  const primary = EMAP[r[0].id];
-  const showYellow = S.intensity>=3 && (primary.group==='부정' || primary.group==='사회');
-
   const bars = top3.map(x=>{
     const e=EMAP[x.id]; const pct=Math.round(x.p*100);
-    return `<div class="barrow">
-      <div class="top"><span class="em" style="color:${e.color}">${e.name}</span><span class="pct">${pct}%</span></div>
-      <div class="bar"><i style="width:${Math.max(4,pct)}%;background:${e.color}"></i></div>
-    </div>`;
+    return `<div class="barrow"><div class="top"><span class="em" style="color:${e.color}">${e.name}</span><span class="pct">${pct}%</span></div><div class="bar"><i style="width:${Math.max(4,pct)}%;background:${e.color}"></i></div></div>`;
   }).join('');
-
   const confNote = conf.cls==='low'
     ? `<p class="caption">후보들이 서로 비슷해서 <b>아직 분명하지 않아요.</b> 맞는 감정이 없으면 아래 <b>“다른 감정 찾기”</b>로 더 좁혀볼 수 있어요.</p>`
     : mixed ? `<p class="caption"><b>혼합감정</b>일 수 있어요 — 위 두 감정이 함께 느껴지는 상태로 보입니다.</p>` : '';
-
   app.innerHTML=`
-  <section class="card" id="resultCard">
-    <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 결과</div>
+  <section class="card">
+    <div class="clue-count no-print">1단계 · 지금 감정</div>
     <h2>가장 가까운 감정 후보</h2>
     <span class="badge ${conf.cls}">확신도 ${conf.level}</span>
     ${confNote}
     ${bars}
     ${clues.length?`<div style="margin-top:12px"><div class="caption">모은 단서</div><div class="chips">${clues.map(c=>`<span class="chip">${c}</span>`).join('')}</div></div>`:''}
-    <div class="insight">
-      <h3>이 감정이 바라는 것 (욕구)</h3>
-      <p>${primary.name} 뒤에는 <b>${primary.need}</b>에 대한 바람이 있을 수 있어요.</p>
-    </div>
-    <div class="insight" style="background:transparent;border:1px solid var(--line)">
-      <h3 style="color:var(--accent)">지금 해볼 수 있는 것</h3>
-      <p>${primary.cope}.</p>
-    </div>
-    ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
-    <div class="notice">이 결과는 확정된 감정이 아니라 <b>참고용 후보</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
-    <div class="print-only notice">도움 연결 · 24시간 : 109(자살예방) · 1577-0199(정신건강위기) · 1388(청소년) · 119(응급)</div>
-
     <div class="no-print" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
-      <div class="caption">이 결과가 지금 느낌과 맞나요? <span style="color:var(--ink-soft)">(연구·검증에 큰 도움이 돼요)</span></div>
+      <div class="caption">이 중 가장 가까운 감정을 골라 주세요. 그 감정이 <b>무엇을 바라는지</b> 이어서 함께 찾아볼게요.</div>
       <div class="confirm-opts" id="confirmOpts">
-        ${top3.map(x=>`<button class="btn small" data-cid="${x.id}">${EMAP[x.id].name} — 이게 맞아요</button>`).join('')}
+        ${top3.map(x=>`<button class="btn small" data-cid="${x.id}">${EMAP[x.id].name} — 이게 가까워요</button>`).join('')}
         <button class="btn small ghost" id="reqOther">셋 다 아니에요 · 다른 감정 찾기</button>
       </div>
-      <div id="confirmThanks" class="caption hidden" style="color:var(--calm);margin-top:8px;">기록했어요. 고마워요 🙏</div>
     </div>
-
-    <div class="no-print btn-row" style="margin-top:18px;">
-      <button class="btn primary" id="pdfBtn">📄 PDF로 저장</button>
-      <button class="btn" id="againBtn">다시 하기</button>
-    </div>
-    <button class="btn ghost small no-print" id="openLog2">내 기록·데이터 보기</button>
   </section>`;
-
-  // 자기확인
-  app.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{
-    recordConfirm(b.dataset.cid, r);
-    afterConfirm();
-  });
+  app.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{ recordConfirm(b.dataset.cid, r); startNeedFlow(b.dataset.cid); });
   document.getElementById('reqOther').onclick=()=>requeryDifferent(r);
-  document.getElementById('pdfBtn').onclick=()=>window.print();
-  document.getElementById('againBtn').onclick=()=>{ resetState(); renderIntro(); };
-  document.getElementById('openLog2').onclick=openLogModal;
-}
-function matchWord(w){
-  if(!w) return null;
-  for(const e of EMOTIONS){ if(e.name.includes(w) || w.includes(e.name.split('·')[0])) return e.id; }
-  const dict={'초조':'anxiety','걱정':'anxiety','짜증':'anger','화':'anger','서운':'resentment','억울':'resentment','우울':'sadness','슬픔':'sadness','외로':'loneliness','부끄':'shame','죄책':'shame','무기력':'lethargy','귀찮':'lethargy','벅참':'gratitude','고마':'gratitude','설렘':'anticipation','뿌듯':'pride'};
-  for(const k in dict){ if(w.includes(k)) return dict[k]; }
-  return null;
 }
 function recordConfirm(cid, r){
-  S.userConfirmed = cid;
+  S.userConfirmed = cid; S.confirmedEmotion = cid;
   if(r[0].id===cid) S.userConfirmMatch='top1';
   else if(r.slice(0,3).some(x=>x.id===cid)) S.userConfirmMatch='top3';
   else S.userConfirmMatch='miss';
   updateSession();
 }
-function afterConfirm(){
-  document.getElementById('confirmOpts').classList.add('hidden');
-  document.getElementById('confirmThanks').classList.remove('hidden');
-}
-/* 셋 다 아니면: 현재 상위 후보를 제외하고 몇 문항 더 물어 다른 감정을 찾는다 (#6) */
+/* 셋 다 아니면: 현재 상위 후보를 제외하고 몇 문항 더 물어 다른 감정을 찾는다 */
 function requeryDifferent(r){
   S.requeries=(S.requeries||0)+1;
   r.slice(0,3).forEach(x=>{ S.excluded.add(x.id); S.logscore[x.id]=-1e9; });
@@ -533,13 +540,121 @@ function requeryDifferent(r){
   }
   S.phase='dynamic';
   const answered = S.answers.filter(x=>x.qid!=='q_safety').length;
-  S.hardCap = answered + 3;   // 다른 감정을 찾도록 최대 3문 더
+  S.hardCap = answered + 3;
   const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id));
   if(remaining.length){
     const nq = nextDynamic(softmax(S.logscore), S.askedDynamic);
     if(nq){ renderQuestion(nq); return; }
   }
   finishToResult();
+}
+
+/* 2단계: 욕구 미니탐정 (감정 스무고개 답변을 사전확률로, 필요한 만큼만 2~4문) */
+function needPyes(need,q){ return need===q.need?0.85:0.20; }
+function needSoftmax(score,cand){ const v=cand.map(id=>score[id]||0); const m=Math.max(...v); const e=v.map(x=>Math.exp(x-m)); const s=e.reduce((a,b)=>a+b,0); const o={}; cand.forEach((id,i)=>o[id]=s>0?e[i]/s:1/cand.length); return o; }
+function needRanked(post,cand){ return cand.map(id=>({id,p:post[id]})).sort((a,b)=>b.p-a.p); }
+function needEntropy(post,cand){ let h=0; for(const id of cand){const p=post[id]; if(p>1e-9)h-=p*Math.log(p);} return h; }
+function computeNeedPrior(emotionId){
+  const cand=(EMO_NEEDS[emotionId]||[]).slice(); const score={}; cand.forEach(id=>score[id]=0);
+  for(const a of S.answers){
+    if(a.answer!=='yes') continue;
+    const ns=ANSWER_NEED[a.qid]; if(!ns) continue;
+    for(const n of ns){ if(n in score) score[n]+=Math.log(1.9); }
+  }
+  return {cand, score};
+}
+function nextNeedQuestion(){
+  const cand=S.needCand; const post=needSoftmax(S.needScore,cand); const H0=needEntropy(post,cand);
+  let best=null,bg=-1e9;
+  for(const q of NEED_Q){
+    if(!cand.includes(q.need) || S.askedNeed.has(q.need)) continue;
+    let Py=0; for(const id of cand) Py+=post[id]*needPyes(id,q);
+    const py={},pn={}; let sy=0,sn=0;
+    for(const id of cand){ const t=needPyes(id,q); py[id]=post[id]*t; pn[id]=post[id]*(1-t); sy+=py[id]; sn+=pn[id]; }
+    for(const id of cand){ py[id]=sy>0?py[id]/sy:0; pn[id]=sn>0?pn[id]/sn:0; }
+    const g=H0-(Py*needEntropy(py,cand)+(1-Py)*needEntropy(pn,cand));
+    if(g>bg){bg=g;best=q;}
+  }
+  return best;
+}
+function startNeedFlow(emotionId){
+  const {cand,score}=computeNeedPrior(emotionId);
+  S.confirmedEmotion=emotionId; S.needCand=cand; S.needScore=score; S.askedNeed=new Set(); S.needSteps=0; S.needAnswers=[];
+  if(cand.length<=1){ renderFinalResult(); return; }
+  const nq=nextNeedQuestion();
+  if(nq) renderNeedQuestion(nq); else renderFinalResult();
+}
+function renderNeedQuestion(q){
+  S.qStart=performance.now();
+  const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
+  const lead = pleasant ? '이 좋은 느낌이 어디서 왔는지 함께 찾고 있어요.' : '이 감정이 무엇을 바라는지 함께 찾고 있어요.';
+  app.innerHTML=`
+  <section class="card">
+    <div class="no-print"><div class="clue-count">2단계 · ${emo.name}가 바라는 것</div></div>
+    <p class="caption" style="margin-top:2px">${lead}</p>
+    <h2>${q.text}</h2>
+    <div class="yesno"><button class="btn" data-a="yes">네</button><button class="btn" data-a="no">아니요</button></div>
+    <div class="skip"><button data-a="skip">잘 모르겠어요</button></div>
+  </section>`;
+  app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>answerNeed(q,b.dataset.a));
+}
+function answerNeed(q,a){
+  S.needAnswers.push({need:q.need,answer:a,tMs:Math.round(performance.now()-S.qStart)});
+  if(a==='yes'){ for(const id of S.needCand) S.needScore[id]+=Math.log(needPyes(id,q)); }
+  else if(a==='no'){ for(const id of S.needCand) S.needScore[id]+=Math.log(1-needPyes(id,q)); }
+  S.askedNeed.add(q.need); if(a!=='skip') S.needSteps++;
+  const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
+  const remaining=NEED_Q.filter(x=>S.needCand.includes(x.need)&&!S.askedNeed.has(x.need)).length;
+  const clear = S.needSteps>=2 && rn[0].p>=0.6;
+  const cap = S.needAnswers.length>=4;
+  if(!clear && !cap && remaining>0){ const nq=nextNeedQuestion(); if(nq){ renderNeedQuestion(nq); return; } }
+  renderFinalResult();
+}
+
+/* 3단계: 최종 결과 (감정 + 욕구 + 작은 실천) */
+function renderFinalResult(){
+  const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
+  const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
+  const topN=rn[0]; const need=NEEDS[topN.id]; S.needTop=topN.id;
+  const second = (rn[1] && (topN.p-rn[1].p)<0.18) ? rn[1] : null;
+  const nvc = pleasant
+    ? `지금의 <b style="color:${emo.color}">${emo.name}</b>은 <b>${need.name}</b>${second?` (그리고 ${NEEDS[second.id].name})`:''}이(가) <b>채워져서</b> 온 것 같아요.`
+    : `지금 당신의 <b style="color:${emo.color}">${emo.name}</b>은 <b>${need.name}</b>${second?` (또는 ${NEEDS[second.id].name})`:''}이(가) <b>채워지길 바라는</b> 신호일 수 있어요.`;
+  const showYellow = S.intensity>=3 && (emo.group==='부정' || emo.group==='사회');
+  updateSession();
+  app.innerHTML=`
+  <section class="card" id="finalCard">
+    <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 결과</div>
+    <div class="clue-count no-print">3단계 · 결과</div>
+    <h2>이 감정이 바라는 것</h2>
+    <div class="barrow"><div class="top"><span class="em" style="color:${emo.color}">${emo.name}</span>${S.intensity!=null?`<span class="pct">강도 ${S.intensity}/4</span>`:''}</div><div class="bar"><i style="width:100%;background:${emo.color}"></i></div></div>
+    <div class="insight"><h3>${pleasant?'채워진 욕구':'바라는 것 (욕구)'}</h3><p>${nvc}</p></div>
+    <div class="insight" style="background:transparent;border:1px solid var(--line)"><h3 style="color:var(--accent)">지금 해볼 수 있는 것</h3><p>${need.act}</p></div>
+    ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
+    <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
+    <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
+    <div class="no-print" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;">
+      <div class="caption">이 '바라는 것'이 지금 마음에 맞나요? <span style="color:var(--ink-soft)">(연구·검증에 도움이 돼요)</span></div>
+      <div class="confirm-opts" id="needConfirm">
+        <button class="btn small" data-need="${topN.id}">네, 맞아요</button>
+        ${S.needCand.filter(id=>id!==topN.id).map(id=>`<button class="btn small ghost" data-need="${id}">아니요 · ‘${NEEDS[id].name}’에 가까워요</button>`).join('')}
+      </div>
+      <div id="needThanks" class="caption hidden" style="color:var(--calm);margin-top:8px;">기록했어요. 고마워요 🙏</div>
+    </div>
+    <div class="no-print btn-row" style="margin-top:16px;">
+      <button class="btn primary" id="pdfBtn">📄 PDF로 저장</button>
+      <button class="btn" id="againBtn">다시 하기</button>
+    </div>
+    <button class="btn ghost small no-print" id="openLog2">내 기록·데이터 보기</button>
+  </section>`;
+  app.querySelectorAll('[data-need]').forEach(b=>b.onclick=()=>{
+    S.needConfirmed=b.dataset.need; updateSession();
+    document.getElementById('needConfirm').classList.add('hidden');
+    document.getElementById('needThanks').classList.remove('hidden');
+  });
+  document.getElementById('pdfBtn').onclick=()=>window.print();
+  document.getElementById('againBtn').onclick=()=>{ resetState(); renderIntro(); };
+  document.getElementById('openLog2').onclick=openLogModal;
 }
 
 /* =========================== 저장/로그 =========================== */
@@ -549,15 +664,17 @@ function writeLogs(a){ try{localStorage.setItem(LKEY, JSON.stringify(a));}catch(
 function sessionRecord(){
   const post = softmax(S.logscore);
   const r = ranked(post);
-  const primaryNeed = r[0] ? (EMAP[r[0].id]||{}).need : null;
+  const needName = S.needTop ? (NEEDS[S.needTop]||{}).name : (r[0] ? (EMAP[r[0].id]||{}).need : null);
   return {
     sessionId:S.sessionId, startedAt:S.startedAt, finishedAt:S.finishedAt||null,
     consentResearch:S.consent, isMinor:S.minor,
     answers:S.answers, questionCount:S.answers.filter(a=>a.qid!=='q_intensity').length,
     intensity:S.intensity,
     posteriorFinal: r.slice(0,5).map(x=>({emotion:x.id, p:Math.round(x.p*1000)/1000})),
-    top1: r[0]?r[0].id:null, top3: r.slice(0,3).map(x=>x.id), need: primaryNeed,
+    top1: r[0]?r[0].id:null, top3: r.slice(0,3).map(x=>x.id), need: needName,
     confidence: confidenceOf(post).level, excluded: Array.from(S.excluded||[]),
+    confirmedEmotion:S.confirmedEmotion||null, needTop:S.needTop||null, needConfirmed:S.needConfirmed||null,
+    needCandidates:S.needCand||null, needAnswers:S.needAnswers||null,
     userConfirmed:S.userConfirmed, userConfirmMatch:S.userConfirmMatch, openWord:S.openWord
   };
 }
