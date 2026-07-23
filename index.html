@@ -60,6 +60,19 @@
   .yesno .btn{margin-top:0;}
   .skip{margin-top:12px; text-align:center;}
   .skip button{background:none;border:none;color:var(--ink-soft);text-decoration:underline;cursor:pointer;font-size:14px;}
+  .choice-grid{display:grid; gap:10px; margin-top:18px;}
+  .btn.choice-btn{
+    display:grid; grid-template-columns:34px 1fr; gap:10px; align-items:start;
+    min-height:auto; text-align:left; line-height:1.55; margin-top:0; padding:14px 15px;
+  }
+  .choice-letter{
+    display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
+    border-radius:999px; background:var(--primary-soft); color:var(--primary); font-weight:800; font-size:14px;
+  }
+  .choice-copy b{display:block; margin-bottom:3px;}
+  .choice-copy span{display:block; color:var(--ink-soft); font-size:14px; font-weight:500;}
+  .choice-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;}
+  .choice-actions .btn{margin-top:0; min-height:42px; font-size:14px; font-weight:500;}
   .progress{height:8px; background:var(--primary-soft); border-radius:999px; overflow:hidden; margin:2px 0 4px;}
   .progress > i{display:block; height:100%; background:var(--accent); width:0; transition:width .35s ease;}
   .clue-count{font-size:13px; color:var(--accent); font-weight:600; letter-spacing:.2px;}
@@ -335,62 +348,233 @@ async function loadEmotionDatabase(){
   }
 }
 
-/* ---- 문항뱅크 (더 구체적인 문구) ---- */
+/* ---- 문항뱅크: 실제 경험 기반 5W1H A/B 질문 ---- */
 const FIXED = [
-  {id:'q_valence', text:'예를 들어, 친구와 다투었거나 일이 마음대로 안 됐을 때처럼 속이 편하지 않고 마음 한쪽이 걸리는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:NEG, suppress:POS},
-  {id:'q_arousal', text:'예를 들어, 발표를 앞두고 있거나 누군가에게 화가 났을 때처럼 심장이 빨리 뛰고 몸에 힘이 들어가는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
-  {id:'q_cause', text:'예를 들어, 누가 한 말이나 방금 생긴 일 때문에 갑자기 마음이 달라진 것처럼, 이유가 떠오르는 기분인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
+  {
+    id:'q_valence',
+    text:'지금 떠오른 실제 일을 생각해 봐요. 그 일을 떠올릴 때 마음의 방향은 어디에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'속이 불편하거나 마음 한쪽이 걸려요.',
+    b:'마음이 좋거나 따뜻하거나 편안해요.',
+    aBoost:NEG,
+    bBoost:POS
+  },
+  {
+    id:'q_arousal',
+    text:'그 마음이 몸에서는 어떻게 느껴지나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'심장이 뛰거나 몸에 힘이 들어가고, 가만히 있기 어려워요.',
+    b:'몸에 힘이 빠지거나 조용히 가라앉고, 움직이기 어려워요.',
+    aBoost:['anxiety','fear','anger','joy','pride','anticipation'],
+    bBoost:['sadness','lethargy','calm','loneliness','confusion']
+  },
+  {
+    id:'q_when',
+    text:'그 마음은 언제부터 더 크게 느껴졌나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'방금 전이나 오늘 있었던 일 때문에 갑자기 커졌어요.',
+    b:'조금 전부터 계속 이어졌거나, 오래 생각할수록 커졌어요.',
+    aBoost:['anger','fear','joy','gratitude','anticipation'],
+    bBoost:['sadness','lethargy','loneliness','resentment','confusion'],
+    strength:'weak'
+  },
+  {
+    id:'q_where',
+    text:'그 마음은 어디에서 가장 크게 느껴지나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'사람이 있는 자리나 누군가와 만난 장면에서 크게 느껴져요.',
+    b:'혼자 있을 때, 화면을 볼 때, 또는 머릿속에서 계속 떠올라요.',
+    scored:false
+  },
+  {
+    id:'q_who',
+    text:'그 마음은 누구 또는 무엇과 더 많이 관련되어 있나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'누군가의 말, 행동, 표정, 태도와 관련이 커요.',
+    b:'해야 할 일, 결과, 내 실수, 내 선택과 관련이 커요.',
+    aBoost:['anger','resentment','loneliness','affection','shame','gratitude'],
+    bBoost:['anxiety','confusion','pride','lethargy','anticipation'],
+    strength:'weak'
+  }
 ];
 
 const DYNAMIC = [
-  {id:'q_relation', text:'예를 들어, 친구나 가족이 한 말 때문에 그 장면이 계속 떠오를 때처럼, 사람과 있었던 일이 마음에 크게 남아 있나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
-  {id:'q_warm', text:'예를 들어, 누군가 말없이 도와주거나 챙겨줬을 때처럼 마음이 따뜻하고 고마운 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
-  {id:'q_avoid', text:'예를 들어, 피곤한 날 아무 말도 하고 싶지 않아 방에서 조용히 쉬고 싶을 때처럼, 혼자 있고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
-  {id:'q_confront', text:'예를 들어, 내 물건을 허락 없이 가져갔을 때처럼 “이건 아니야” 하고 말하고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
-  {id:'q_social', text:'예를 들어, 같이 잘못했는데 나만 혼나거나 사람들 앞에서 창피했던 때처럼 마음이 콕 찔리는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
-  {id:'q_threat', text:'예를 들어, 내일 중요한 시험이나 면접이 있을 때처럼 계속 신경이 쓰이고 마음이 편하지 않은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
-  {id:'q_loss', text:'예를 들어, 아끼던 물건을 잃거나 기대하던 약속이 사라졌을 때처럼 마음이 축 내려앉는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
-  {id:'q_block', text:'예를 들어, 하고 싶은 말을 못 하게 막히거나 계획이 갑자기 틀어졌을 때처럼 답답한 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anger','resentment'], suppress:['calm']},
-  {id:'q_selfeval', text:'예를 들어, 실수한 뒤에 “내가 왜 그랬지”라는 생각이 계속 떠오를 때처럼 나 자신이 작아지는 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['shame','sadness'], suppress:['anger','pride']},
-  {id:'q_bodyhigh', text:'예를 들어, 기다리는 답이 안 와서 휴대폰을 자꾸 보게 될 때처럼 가슴이 답답하고 가만히 있기 어려운 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
-  {id:'q_bodylow', text:'예를 들어, 하루 종일 지친 뒤 소파에서 일어나기 힘들 때처럼 몸에 힘이 빠지고 아무것도 하기 싫은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
-  {id:'q_empty', text:'예를 들어, 좋아하던 것도 재미없고 방 안이 조용하게만 느껴질 때처럼 마음이 텅 빈 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
-  {id:'q_disgust', text:'예를 들어, 누가 내 선을 넘거나 너무 불쾌한 장면을 봤을 때처럼 가까이하기 싫고 밀어내고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['disgust','anger'], suppress:['calm']},
-  {id:'q_achieve', text:'예를 들어, 어려운 문제를 끝까지 풀어냈을 때처럼 “내가 해냈다” 하고 뿌듯한 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
-  {id:'q_clarity', text:'예를 들어, 숙제와 약속과 친구 문제가 한꺼번에 떠오를 때처럼 머릿속이 뒤죽박죽인 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['confusion'], suppress:['pride','joy']},
-  {id:'q_hide', text:'예를 들어, 실수한 걸 누가 알까 봐 얼굴이 뜨거워질 때처럼 이 마음을 숨기고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
+  {
+    id:'q_what_unpleasant',
+    route:'negative',
+    text:'마음이 불편해진 이유를 보면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'누군가 선을 넘었거나 공평하지 않아서 “이건 아니야”라고 느껴져요.',
+    b:'소중한 것이 멀어졌거나 사라진 것 같아서 마음이 아래로 내려앉아요.',
+    aBoost:['anger','resentment','disgust'],
+    bBoost:['sadness','loneliness','lethargy']
+  },
+  {
+    id:'q_what_pleasant',
+    route:'positive',
+    text:'마음이 좋아진 이유를 보면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'누군가의 도움, 배려, 따뜻한 말 때문에 마음이 따뜻해졌어요.',
+    b:'내가 해냈거나 좋은 일이 생길 것 같아서 밝고 신나요.',
+    aBoost:['gratitude','affection','calm'],
+    bBoost:['joy','pride','anticipation']
+  },
+  {
+    id:'q_confront',
+    text:'그 마음이 행동으로 나오려 한다면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'말하거나 따지거나 바로잡고 싶어요.',
+    b:'피하거나 숨거나 조용히 거리를 두고 싶어요.',
+    aBoost:['anger','resentment'],
+    bBoost:['shame','sadness','fear','disgust','lethargy']
+  },
+  {
+    id:'q_threat_loss',
+    text:'머릿속에서 가장 자주 도는 생각은 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'앞으로 잘못될까 봐 걱정돼요.',
+    b:'이미 끝났거나 잃은 것이 마음에 남아요.',
+    aBoost:['anxiety','fear','confusion'],
+    bBoost:['sadness','loneliness','resentment']
+  },
+  {
+    id:'q_fear_anxiety',
+    text:'두근거림이나 긴장이 있다면, 그 느낌은 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'지금 바로 위험하거나 다칠 것 같아서 피하고 싶어요.',
+    b:'아직 어떻게 될지 몰라서 계속 확인하고 싶어요.',
+    aBoost:['fear','disgust'],
+    bBoost:['anxiety','confusion']
+  },
+  {
+    id:'q_anger_resentment',
+    text:'화나 서운한 마음이 있다면, 가장 아픈 부분은 무엇인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'내 기준을 넘은 일을 바로잡고 싶어요.',
+    b:'내 입장이나 노력을 몰라준 것이 억울하고 서운해요.',
+    aBoost:['anger','disgust'],
+    bBoost:['resentment','loneliness']
+  },
+  {
+    id:'q_selfeval',
+    text:'나 자신에 대한 생각은 어디에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'“내가 왜 그랬지, 내가 부족한가?”라는 생각이 들어요.',
+    b:'“상황이 답답하고 부당하다”는 생각이 더 커요.',
+    aBoost:['shame','sadness'],
+    bBoost:['anger','resentment','confusion']
+  },
+  {
+    id:'q_disgust_fear',
+    text:'피하고 싶은 마음이 있다면, 그 이유는 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'너무 싫거나 불쾌해서 멀리하고 싶어요.',
+    b:'무섭거나 안전하지 않은 느낌이라 피하고 싶어요.',
+    aBoost:['disgust','anger'],
+    bBoost:['fear','anxiety']
+  },
+  {
+    id:'q_sad_lethargy',
+    text:'마음이 아래로 내려앉는다면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'가슴이 아프거나 눈물이 날 것 같아요.',
+    b:'기운이 없고 아무것도 시작하기 어려워요.',
+    aBoost:['sadness','loneliness','resentment'],
+    bBoost:['lethargy','confusion']
+  },
+  {
+    id:'q_lonely_rest',
+    text:'혼자 있고 싶은 마음이 있다면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'누군가 내 마음을 알아주면 좋겠지만 혼자인 것 같아요.',
+    b:'사람을 만나기보다 쉬면서 힘을 채우고 싶어요.',
+    aBoost:['loneliness','sadness','resentment'],
+    bBoost:['lethargy','calm']
+  },
+  {
+    id:'q_empty_confusion',
+    text:'마음이 막막하다면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'마음이 텅 빈 것 같고 재미나 의미가 잘 안 느껴져요.',
+    b:'생각이 너무 많아서 무엇부터 해야 할지 모르겠어요.',
+    aBoost:['lethargy','sadness','loneliness'],
+    bBoost:['confusion','anxiety']
+  },
+  {
+    id:'q_hide',
+    text:'이 마음을 다른 사람이 알게 되는 것을 생각하면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'들키고 싶지 않고 숨고 싶어요.',
+    b:'내 이야기를 제대로 말하고 알아줬으면 해요.',
+    aBoost:['shame','fear','sadness'],
+    bBoost:['resentment','anger','loneliness']
+  },
+  {
+    id:'q_joy_calm',
+    text:'좋은 느낌이 있다면 몸의 느낌은 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'웃음이 나고 에너지가 올라와요.',
+    b:'걱정이 풀리고 숨이 편해져요.',
+    aBoost:['joy','pride','anticipation'],
+    bBoost:['calm','gratitude','affection']
+  },
+  {
+    id:'q_pride_gratitude',
+    text:'뿌듯하거나 고마운 마음이 있다면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'내가 애쓴 일을 해내서 스스로 뿌듯해요.',
+    b:'누군가 나를 도와주거나 알아줘서 고마워요.',
+    aBoost:['pride','joy'],
+    bBoost:['gratitude','affection']
+  },
+  {
+    id:'q_affection_gratitude',
+    text:'따뜻한 관계의 느낌이 있다면 무엇에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'그 사람 자체가 소중하고 마음이 가까워요.',
+    b:'그 사람이 해준 행동이 특히 고마워요.',
+    aBoost:['affection','joy','calm'],
+    bBoost:['gratitude','pride']
+  },
+  {
+    id:'q_anticipation_joy',
+    text:'밝고 좋은 마음이 있다면 시간은 어디에 더 가까운가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'앞으로 좋은 일이 생길 것 같아 기대돼요.',
+    b:'이미 생긴 좋은 일 때문에 지금 즐거워요.',
+    aBoost:['anticipation','anxiety'],
+    bBoost:['joy','pride','gratitude']
+  }
 ];
 const DMAP = Object.fromEntries(DYNAMIC.map(q=>[q.id,q]));
+const QMAP = Object.fromEntries([...FIXED, ...DYNAMIC].map(q=>[q.id,q]));
 
-/* 단서(clue) 라벨 — yes 응답을 사람이 읽을 수 있는 단서로 */
+/* 단서(clue) 라벨 — A/B 응답을 사람이 읽을 수 있는 단서로 */
 const CLUE = {
-  q_valence:'불편한 느낌', q_arousal:'높은 에너지', q_cause:'뚜렷한 계기',
-  q_relation:'관계 맥락', q_warm:'따뜻한 느낌', q_avoid:'피하고 싶음', q_confront:'바로잡고 싶음',
-  q_social:'사람 사이의 감정', q_threat:'다가올 걱정', q_loss:'상실감', q_block:'방해받음',
-  q_selfeval:'자기비난', q_bodyhigh:'몸의 긴장', q_bodylow:'힘 빠짐', q_empty:'공허함',
-  q_disgust:'거부감', q_achieve:'해냄', q_clarity:'막막함', q_hide:'숨기고 싶음'
+  q_valence:{a:'불편한 쪽', b:'좋거나 따뜻한 쪽'},
+  q_arousal:{a:'몸의 힘이 올라감', b:'몸이 가라앉음'},
+  q_when:{a:'오늘 갑자기 커짐', b:'오래 이어짐'},
+  q_where:{a:'사람이 있는 자리', b:'혼자 또는 머릿속'},
+  q_who:{a:'사람의 말·행동', b:'일·결과·내 선택'},
+  q_what_unpleasant:{a:'선을 넘음·불공평함', b:'소중한 것의 멀어짐'},
+  q_what_pleasant:{a:'도움·배려의 따뜻함', b:'해냄·기대의 밝음'},
+  q_confront:{a:'바로잡고 싶음', b:'피하거나 숨고 싶음'},
+  q_threat_loss:{a:'앞일 걱정', b:'이미 잃은 것의 아픔'},
+  q_fear_anxiety:{a:'바로 앞 위험', b:'아직 모르는 앞일'},
+  q_anger_resentment:{a:'바로잡고 싶은 화', b:'알아주지 않아 서운함'},
+  q_selfeval:{a:'내가 부족한 것 같음', b:'상황이 부당함'},
+  q_disgust_fear:{a:'불쾌해서 밀어냄', b:'무서워서 피함'},
+  q_sad_lethargy:{a:'가슴 아픔', b:'기운 없음'},
+  q_lonely_rest:{a:'알아주길 바람', b:'쉬고 싶음'},
+  q_empty_confusion:{a:'마음이 텅 빔', b:'생각이 뒤죽박죽'},
+  q_hide:{a:'숨고 싶음', b:'말하고 싶음'},
+  q_joy_calm:{a:'밝고 신남', b:'편안하고 안도함'},
+  q_pride_gratitude:{a:'내가 해냄', b:'도움이 고마움'},
+  q_affection_gratitude:{a:'사람이 소중함', b:'행동이 고마움'},
+  q_anticipation_joy:{a:'앞으로 기대됨', b:'지금 즐거움'}
 };
 
 const DETAIL_HINTS = {
-  q_valence:['불편','나쁘','속상','싫','괴롭','못마땅'],
-  q_arousal:['두근','흥분','세게','충동','긴장','치밀'],
-  q_cause:['때문','당하여','보고','일이','상황'],
-  q_relation:['사람','상대','친구','마음','함께','믿음'],
-  q_warm:['따뜻','고맙','좋아','사랑','감사','흐뭇'],
-  q_avoid:['피하','멀리','혼자','감추','꺼리','닫다'],
-  q_confront:['따지','바로잡','화','분','맞서','대들'],
-  q_social:['무시','창피','인정','사람','부끄','서운'],
-  q_threat:['걱정','불안','위험','두려','잘못될까','의심'],
-  q_loss:['잃','상실','그립','빈자리','아쉽','절망'],
-  q_block:['막히','방해','뜻대로','억울','분','답답'],
-  q_selfeval:['잘못','부족','자책','죄책','부끄','후회'],
-  q_bodyhigh:['심장','가슴','답답','떨','긴장','안절부절'],
-  q_bodylow:['힘','기운','축','지치','의욕','맥'],
-  q_empty:['텅','공허','허무','재미','의미','빈'],
-  q_disgust:['싫','역겹','징그럽','거부','혐오','불쾌'],
-  q_achieve:['해내','뿌듯','자랑','성취','당당','긍지'],
-  q_clarity:['복잡','모르','막막','혼란','갈피','묘한'],
-  q_hide:['숨기','들키','감추','부끄','창피','수치']
+  q_valence:{a:['불편','나쁘','속상','싫','괴롭','못마땅'], b:['좋','따뜻','편안','기쁘','고맙','즐거']},
+  q_arousal:{a:['두근','흥분','세게','충동','긴장','치밀'], b:['힘','기운','축','지치','의욕','고요']},
+  q_when:{a:['갑자기','오늘','방금','순간','터지'], b:['오래','계속','쌓이','반복','남아']},
+  q_where:{a:['사람','자리','상대','함께','우리'], b:['혼자','머릿속','화면','방','생각']},
+  q_who:{a:['사람','상대','친구','마음','함께','믿음'], b:['일','결과','실수','선택','해야']},
+  q_what_unpleasant:{a:['선','공평','억울','분','화','무시'], b:['잃','상실','그립','빈자리','아쉽','절망']},
+  q_what_pleasant:{a:['따뜻','고맙','감사','배려','도움','흐뭇'], b:['해내','뿌듯','신나','기대','즐거','당당']},
+  q_confront:{a:['따지','바로잡','화','분','맞서','대들'], b:['피하','멀리','혼자','감추','꺼리','닫다']},
+  q_threat_loss:{a:['걱정','불안','위험','두려','잘못될까','의심'], b:['잃','상실','그립','빈자리','아쉽','절망']},
+  q_fear_anxiety:{a:['위험','무서','도망','경계','떨'], b:['걱정','확인','불안','의심','미리']},
+  q_anger_resentment:{a:['따지','바로잡','화','분','맞서'], b:['억울','서운','몰라','인정','공평']},
+  q_selfeval:{a:['잘못','부족','자책','죄책','부끄','후회'], b:['막히','방해','뜻대로','억울','분','답답']},
+  q_disgust_fear:{a:['싫','역겹','징그럽','거부','혐오','불쾌'], b:['걱정','불안','위험','두려','무서']},
+  q_sad_lethargy:{a:['눈물','아프','슬프','가슴','상실'], b:['힘','기운','축','지치','의욕','맥']},
+  q_lonely_rest:{a:['혼자','연결','알아주','외로','소속'], b:['쉬','휴식','회복','피로','충전']},
+  q_empty_confusion:{a:['텅','공허','허무','재미','의미','빈'], b:['복잡','모르','막막','혼란','갈피','묘한']},
+  q_hide:{a:['숨기','들키','감추','부끄','창피','수치'], b:['말하','들어주','이해','알아주','설명']},
+  q_joy_calm:{a:['웃','신나','즐거','밝','활기'], b:['편안','안도','고요','숨','놓이']},
+  q_pride_gratitude:{a:['해내','뿌듯','자랑','성취','당당','긍지'], b:['고맙','감사','도움','배려','챙겨']},
+  q_affection_gratitude:{a:['소중','사랑','가깝','유대','마음'], b:['고맙','감사','도움','행동','배려']},
+  q_anticipation_joy:{a:['기대','설렘','앞으로','두근','상상'], b:['기쁨','즐거','웃','좋','만족']}
 };
 const STRONG_DETAIL_WORDS = ['매우','몹시','깊','강','크게','폭발','사무치','끝이 없다','하늘'];
 const SOFT_DETAIL_WORDS = ['은근','잔잔','가볍','조용','살짝','조금','편안','고요'];
@@ -399,16 +583,29 @@ function detailMatches(detail, words){
   const haystack = `${detail.term} ${detail.kid}`;
   return words.reduce((score, word)=>score + (haystack.includes(word) ? 1 : 0), 0);
 }
+function answerKey(answer){
+  if(answer==='yes') return 'a';
+  if(answer==='no') return 'b';
+  if(answer==='a' || answer==='b' || answer==='mixed' || answer==='neither' || answer==='skip') return answer;
+  return answer;
+}
+function detailWordsForAnswer(answer){
+  const key = answerKey(answer.answer);
+  const hints = DETAIL_HINTS[answer.qid];
+  if(!hints) return [];
+  if(Array.isArray(hints)) return key==='a' ? hints : [];
+  return hints[key] || [];
+}
 function detailCandidates(coreId, limit=3){
   const list = (LITERARY_BY_CORE[coreId] || []).slice();
   if(!list.length){
     const fallback = EMAP[coreId];
     return fallback ? [{id:`core_${coreId}`, term:fallback.name, kid:fallback.kid, core:coreId, section:'핵심 감정'}] : [];
   }
-  const yesQuestions = S.answers.filter(answer=>answer.answer==='yes').map(answer=>answer.qid);
+  const selectedAnswers = S.answers.filter(answer=>['a','b','yes','no'].includes(answerKey(answer.answer)));
   return list.map(detail=>{
     let score=0;
-    for(const qid of yesQuestions) score += detailMatches(detail, DETAIL_HINTS[qid] || []) * 2;
+    for(const answer of selectedAnswers) score += detailMatches(detail, detailWordsForAnswer(answer)) * 2;
     if(S.intensity>=3) score += detailMatches(detail, STRONG_DETAIL_WORDS);
     if(S.intensity!=null && S.intensity<=1) score += detailMatches(detail, SOFT_DETAIL_WORDS);
     if(detail.section && !/^[ㄱ-ㅎ]$/.test(detail.section)) score += 0.5;
@@ -553,33 +750,70 @@ const EMO_NEEDS = {
   gratitude:['help','consideration','understanding','support','recognition','connection','stability'], anticipation:['meaning','autonomy','competence','support']
 };
 const NEED_Q = [
-  {need:'certainty', text:'예를 들어, 여행 전에 몇 시에 어디로 가는지 알면 마음이 놓일 때처럼, 다음 일이 어떻게 될지 알고 싶은 느낌인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'safety', text:'예를 들어, 무서운 길에서 믿는 사람이 “같이 가자”라고 하면 마음이 놓일 때처럼, 누가 괜찮다고 확인해 주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'comfort', text:'예를 들어, 힘든 날 누가 바로 해결책을 말하기보다 “힘들었겠다”라고 해주면 마음이 풀릴 때처럼, 먼저 다독여 주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'understanding', text:'예를 들어, 내 말을 끊지 않고 끝까지 들어줄 때 마음이 놓이는 것처럼, 누가 내 이야기를 끝까지 들어주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'respect', text:'예를 들어, 내가 열심히 한 일을 “별거 아니네”라고 들으면 속상할 때처럼, 내 말과 노력을 가볍게 보지 않았으면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'fairness', text:'예를 들어, 같은 일을 했는데 나만 혼나면 오래 생각날 때처럼, 사람마다 다르게 대하는 게 힘들게 느껴지나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'autonomy', text:'예를 들어, 내가 먹을 음식이나 할 일을 직접 고를 수 있을 때 마음이 편한 것처럼, 지금도 내가 직접 고르고 싶은 부분이 있나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'connection', text:'예를 들어, 쉬는 시간에 나만 혼자 있는 것 같을 때 누가 옆에 와주면 좋아지는 것처럼, 누군가와 마음이 이어지면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'belonging', text:'예를 들어, 모둠 활동에서 나도 자연스럽게 끼워 줄 때 마음이 편한 것처럼, 그 자리에서 나도 함께라고 느끼고 싶나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'meaning', text:'예를 들어, 숙제를 왜 해야 하는지 알면 조금 더 할 만해지는 것처럼, 지금 하는 일의 이유를 알고 싶나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'competence', text:'예를 들어, 어려운 문제 앞에서 누가 “너 할 수 있어”라고 말해주면 힘이 나는 것처럼, 나도 해낼 수 있다는 느낌이 필요하나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'rest', text:'예를 들어, 하루 종일 바빴던 날 누가 “잠깐 쉬어도 돼”라고 해주면 살 것 같은 느낌처럼, 지금 잠깐 멈추고 쉬고 싶나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'acceptance', text:'예를 들어, 실수했는데도 누가 “괜찮아, 다시 해보면 돼”라고 말해주면 마음이 놓이는 것처럼, 실수해도 괜찮다는 말이 필요하나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'help', text:'예를 들어, 혼자 들기 무거운 짐을 누가 같이 들어주면 숨이 트이는 것처럼, 지금 누가 일을 나눠 도와주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'consideration', text:'예를 들어, 내가 피곤해 보일 때 누가 먼저 “천천히 해도 돼”라고 해주면 고마운 것처럼, 누가 내 상황을 살펴주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'support', text:'예를 들어, 모두가 뭐라고 할 때 한 사람이 “나는 네 편이야”라고 해주면 든든한 것처럼, 누가 내 편이 되어주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'recognition', text:'예를 들어, 아무도 몰라준 노력을 누가 “고생했어”라고 말해주면 마음이 따뜻해지는 것처럼, 누가 내 노력을 알아주면 좋겠나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'},
-  {need:'stability', text:'예를 들어, 문제가 생겨도 누가 “같이 해결하자”라고 하면 덜 무서운 것처럼, 무슨 일이 있어도 혼자가 아니라는 느낌이 필요하나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'}
+  {need:'certainty', label:'앞을 알고 싶은 마음', met:'다음 일이 어떻게 될지 알게 되어 마음이 놓였어요.', unmet:'다음 일이 어떻게 될지 몰라 마음이 계속 신경 쓰였어요.'},
+  {need:'safety', label:'안전하다고 느끼고 싶은 마음', met:'위험하지 않고 괜찮다는 느낌이 있었어요.', unmet:'위험하거나 다칠 수 있을 것 같아 몸과 마음이 긴장했어요.'},
+  {need:'comfort', label:'다독임을 받고 싶은 마음', met:'누군가 내 마음을 다독여 주거나 쉬게 해 주었어요.', unmet:'힘든 마음을 알아주고 달래 주는 것이 부족했어요.'},
+  {need:'understanding', label:'내 마음을 알아줬으면 하는 마음', met:'누군가 내 이야기를 끝까지 듣고 이해해 주었어요.', unmet:'내 이야기를 제대로 듣지 않고 판단한 것 같았어요.'},
+  {need:'respect', label:'가볍게 보이지 않고 싶은 마음', met:'내 말과 존재를 소중하게 대해 준 느낌이 있었어요.', unmet:'무시당하거나 함부로 대해진 것 같았어요.'},
+  {need:'fairness', label:'공평했으면 하는 마음', met:'규칙이나 결과가 사람마다 비슷하게 적용된 것 같았어요.', unmet:'나만 손해 보거나 나만 다르게 대해진 것 같았어요.'},
+  {need:'autonomy', label:'내가 고르고 싶은 마음', met:'내가 직접 고르고 정할 수 있는 부분이 있었어요.', unmet:'내 뜻을 묻지 않고 누군가가 마음대로 정한 것 같았어요.'},
+  {need:'connection', label:'마음이 이어지고 싶은 마음', met:'누군가와 마음이 이어져 있고 혼자가 아니라고 느꼈어요.', unmet:'곁에 사람이 있어도 마음은 혼자인 것 같았어요.'},
+  {need:'belonging', label:'함께라고 느끼고 싶은 마음', met:'그 자리에서 나도 함께이고 받아들여진다고 느꼈어요.', unmet:'나만 빠졌거나 끼지 못한 것처럼 느껴졌어요.'},
+  {need:'meaning', label:'이유와 의미를 알고 싶은 마음', met:'이 일이 나에게 왜 중요한지 느껴졌어요.', unmet:'왜 해야 하는지 몰라 마음이 비거나 지쳤어요.'},
+  {need:'competence', label:'해낼 수 있다고 느끼고 싶은 마음', met:'내가 해낼 수 있다는 믿음이나 경험이 있었어요.', unmet:'아무리 해도 안 될 것 같아 자신감이 줄었어요.'},
+  {need:'rest', label:'쉬고 회복하고 싶은 마음', met:'잠깐 멈추고 몸과 마음을 회복할 시간이 있었어요.', unmet:'계속 버텨야 해서 쉴 시간이 부족했어요.'},
+  {need:'acceptance', label:'실수해도 나를 받아들이고 싶은 마음', met:'실수해도 나를 완전히 나쁜 사람으로 보지 않았어요.', unmet:'실수 하나 때문에 나 전체가 부족한 사람처럼 느껴졌어요.'},
+  {need:'help', label:'도움을 받고 싶은 마음', met:'버거운 일을 누군가가 같이 해결해 주었어요.', unmet:'혼자 감당하기 어려운데 도와주는 사람이 없는 것 같았어요.'},
+  {need:'consideration', label:'내 상황을 살펴줬으면 하는 마음', met:'상대가 내 상황과 마음을 생각해서 행동해 주었어요.', unmet:'내 상태를 생각하지 않은 말이나 행동이 들어온 것 같았어요.'},
+  {need:'support', label:'내 편이 있었으면 하는 마음', met:'어려운 순간에 누군가가 내 편이 되어 주었어요.', unmet:'힘든데도 내 편이 없는 것처럼 느껴졌어요.'},
+  {need:'recognition', label:'내 노력을 알아줬으면 하는 마음', met:'내 노력이나 어려움을 누군가가 알아봐 주었어요.', unmet:'애쓴 일이 당연한 것처럼 지나가거나 무시된 것 같았어요.'},
+  {need:'stability', label:'든든함이 있었으면 하는 마음', met:'문제가 생겨도 같이 해결할 수 있다는 든든함이 있었어요.', unmet:'언제든 무너지거나 혼자 남을 것 같은 느낌이 있었어요.'}
 ];
-const INTENSITY_Q = '예를 들어, 이 마음 때문에 말투가 달라지거나 하던 일을 멈추게 될 때처럼, 지금 이 느낌이 오늘 내 행동에 영향을 주고 있나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?';
-/* 감정 스무고개 답변(yes)을 욕구 사전확률로 (이미 모은 단서를 재활용) */
-const ANSWER_NEED = {
-  q_threat:['certainty','safety','stability'], q_bodyhigh:['safety','stability'], q_relation:['connection','understanding','support'],
-  q_social:['understanding','fairness','recognition'], q_confront:['respect','fairness','recognition'], q_block:['autonomy','help'],
-  q_selfeval:['acceptance','support'], q_loss:['comfort','meaning','connection','support'], q_empty:['meaning','rest'],
-  q_avoid:['rest','safety','stability'], q_bodylow:['rest','support'], q_warm:['connection','belonging','consideration','help'],
-  q_achieve:['competence','respect','recognition'], q_hide:['acceptance','understanding','support']
+const NEED_Q_MAP = Object.fromEntries(NEED_Q.map(q=>[q.need,q]));
+const NEED_RESULT_MEANING = {
+  certainty:'앞으로 어떻게 될지 분명히 알고 마음을 놓는 것',
+  safety:'지금 위험하지 않고 괜찮다고 느끼는 것',
+  comfort:'누군가에게 따뜻하게 위로받고 마음을 다독이는 것',
+  understanding:'판단받지 않고 내 말을 끝까지 이해받는 것',
+  respect:'내 말과 존재를 가볍게 여기지 않고 소중하게 대하는 것',
+  fairness:'누구에게나 같은 기준이 적용되고 나만 손해 보지 않는 것',
+  autonomy:'다른 사람이 대신 정하지 않고 내가 직접 고르고 결정하는 것',
+  connection:'누군가와 마음이 이어져 있고 혼자가 아니라고 느끼는 것',
+  belonging:'어떤 모임이나 자리에서 나도 자연스럽게 함께라고 느끼는 것',
+  meaning:'지금 하는 일이 왜 중요한지 알고 의미를 느끼는 것',
+  competence:'나도 해낼 수 있고 잘할 수 있다고 느끼는 것',
+  rest:'잠깐 멈추고 편하게 쉬며 몸과 마음의 힘을 채우는 것',
+  acceptance:'실수했어도 나를 미워하지 않고 괜찮다고 받아들이는 것',
+  help:'혼자 버티지 않고 누군가와 일을 나누어 해결하는 것',
+  consideration:'누군가가 내 상황과 마음을 살피고 조심스럽게 대해 주는 것',
+  support:'힘든 순간에 누군가가 내 편이 되어 주고 응원해 주는 것',
+  recognition:'내가 애쓴 일과 힘들었던 점을 누군가가 알아주는 것',
+  stability:'문제가 생겨도 버려지지 않고 함께 해결할 수 있다고 느끼는 것'
+};
+const INTENSITY_Q = '지금 이 감정이 오늘 내 말투, 표정, 생각이나 행동에 얼마나 영향을 주고 있나요?';
+/* 감정 A/B 답변을 욕구 사전확률로 재활용 */
+const ANSWER_NEED_BY_CHOICE = {
+  q_valence:{a:['safety','comfort','support'], b:['connection','meaning','rest']},
+  q_arousal:{a:['safety','certainty','autonomy','recognition'], b:['rest','comfort','support','meaning']},
+  q_when:{a:['certainty','safety','respect'], b:['stability','comfort','support']},
+  q_where:{a:['connection','belonging','respect','understanding'], b:['rest','certainty','stability']},
+  q_who:{a:['respect','understanding','connection','consideration'], b:['competence','certainty','autonomy','meaning']},
+  q_what_unpleasant:{a:['fairness','respect','autonomy','recognition'], b:['comfort','connection','support','meaning']},
+  q_what_pleasant:{a:['help','consideration','support','connection','recognition'], b:['competence','recognition','meaning','autonomy']},
+  q_confront:{a:['respect','fairness','autonomy'], b:['safety','acceptance','rest']},
+  q_threat_loss:{a:['certainty','safety','stability'], b:['comfort','connection','meaning']},
+  q_fear_anxiety:{a:['safety','help','support'], b:['certainty','stability','support']},
+  q_anger_resentment:{a:['respect','autonomy','fairness'], b:['understanding','recognition','fairness']},
+  q_selfeval:{a:['acceptance','support','respect'], b:['fairness','autonomy','understanding']},
+  q_disgust_fear:{a:['respect','autonomy','safety'], b:['safety','stability','support']},
+  q_sad_lethargy:{a:['comfort','connection','support'], b:['rest','meaning','help']},
+  q_lonely_rest:{a:['connection','belonging','understanding'], b:['rest','stability','comfort']},
+  q_empty_confusion:{a:['meaning','connection','rest'], b:['certainty','understanding','support']},
+  q_hide:{a:['acceptance','safety','respect'], b:['understanding','recognition','fairness']},
+  q_joy_calm:{a:['meaning','connection','competence'], b:['safety','rest','stability']},
+  q_pride_gratitude:{a:['competence','recognition','respect','meaning'], b:['help','consideration','support','recognition']},
+  q_affection_gratitude:{a:['connection','belonging','consideration'], b:['help','consideration','support','recognition']},
+  q_anticipation_joy:{a:['meaning','autonomy','competence','support'], b:['connection','meaning','recognition','rest']}
 };
 
 const NEED_EXAMPLES = {
@@ -985,18 +1219,58 @@ function takeItems(items, limit=5){
 function resultNeedIds(relatedNeeds, topNeedId, limit=5){
   return uniqueIds([topNeedId, ...(relatedNeeds || [])]).slice(0, limit);
 }
+function selectedNeedIdsFromAnswers(needAnswers){
+  const ids=[];
+  for(const answer of needAnswers || []){
+    const key=answerKey(answer.answer);
+    if(answer.selectedNeed && NEEDS[answer.selectedNeed]) ids.push(answer.selectedNeed);
+    else if(key==='a' && NEEDS[answer.needA]) ids.push(answer.needA);
+    else if(key==='b' && NEEDS[answer.needB]) ids.push(answer.needB);
+    else if(key==='mixed'){
+      if(NEEDS[answer.needA]) ids.push(answer.needA);
+      if(NEEDS[answer.needB]) ids.push(answer.needB);
+    }else if(answer.answer==='yes' && NEEDS[answer.need]) ids.push(answer.need);
+  }
+  return uniqueIds(ids);
+}
 function evidenceFromAnswers(answers, limit=5){
   return takeItems((answers || [])
-    .filter(answer=>answer.answer==='yes' && ANSWER_EVIDENCE[answer.qid])
-    .map(answer=>ANSWER_EVIDENCE[answer.qid]), limit);
+    .filter(answer=>QMAP[answer.qid] && answer.qid!=='q_intensity')
+    .map(answer=>{
+      const q = QMAP[answer.qid];
+      const key = answerKey(answer.answer);
+      if(key==='a' || key==='b') return `“${choiceText(q, key)}” 쪽이 더 가깝다고 답했어요.`;
+      if(key==='mixed') return `“${q.a}”와 “${q.b}”가 둘 다 비슷하다고 답했어요.`;
+      if(key==='neither') return `“${q.a}”와 “${q.b}”가 둘 다 아닌 것 같다고 답했어요.`;
+      return '';
+    }).filter(Boolean), limit);
 }
 function evidenceFromNeedAnswers(needAnswers, limit=5){
   return takeItems((needAnswers || [])
-    .filter(answer=>answer.answer==='yes' && NEED_EVIDENCE[answer.need])
-    .map(answer=>NEED_EVIDENCE[answer.need]), limit);
+    .map(answer=>{
+      const key = answerKey(answer.answer);
+      if(answer.needA && answer.needB){
+        const needA = NEEDS[answer.needA], needB = NEEDS[answer.needB];
+        if(key==='a' || key==='b'){
+          const selectedNeed = key==='a' ? needA : needB;
+          return `${selectedNeed.name} 쪽이 더 가깝다고 답했어요. “${answer.choiceText || selectedNeed.kid}”`;
+        }
+        if(key==='mixed') return `${needA.name}와 ${needB.name}가 둘 다 비슷하다고 답했어요.`;
+        if(key==='neither') return `${needA.name}와 ${needB.name}가 둘 다 아닌 것 같다고 답했어요.`;
+      }
+      if(answer.answer==='yes' && NEED_EVIDENCE[answer.need]) return NEED_EVIDENCE[answer.need];
+      return '';
+    }).filter(Boolean), limit);
 }
 function answerConnectionForNeed(needId, needAnswers, positive){
-  const answer = (needAnswers || []).find(item=>item.need===needId);
+  const answer = (needAnswers || []).find(item=>item.selectedNeed===needId || item.need===needId || item.needA===needId || item.needB===needId);
+  if(answer && answer.needA && answer.needB){
+    const key = answerKey(answer.answer);
+    if(answer.selectedNeed===needId) return `이 욕구가 더 가까운 쪽이라고 골랐어요. “${answer.choiceText || NEEDS[needId].kid}”`;
+    if(key==='mixed') return '이 욕구와 다른 욕구가 둘 다 비슷하다고 답했어요. 그래서 가능성으로 함께 남겨 두었어요.';
+    if(key==='neither') return '비교한 두 욕구가 모두 아닌 것 같다고 답했어요. 그래서 확정하지 않고 낮은 가능성으로만 보았어요.';
+    return '다른 욕구를 더 가깝게 골랐지만, 앞의 감정 단서 때문에 함께 살펴볼 수 있어요.';
+  }
   if(answer && answer.answer==='yes') return NEED_EVIDENCE[needId] || '이 욕구와 가까운 예시에 그렇다고 답했어요.';
   if(answer && answer.answer==='no') return '이 예시는 내 마음과 다르다고 답했지만, 앞의 감정 단서 때문에 함께 살펴볼 욕구일 수 있어요.';
   if(answer && answer.answer==='skip') return '이 예시는 잘 모르겠다고 답했어요. 그래서 확정하지 않고 가능성으로만 남겨 두었어요.';
@@ -1076,6 +1350,86 @@ function resultSimilarHTML(profile){
     ${listHTML(takeItems(profile.similar, 3))}
   </div>`;
 }
+const RESULT_CONTEXT = {
+  q_when:{
+    a:'오늘 있었던 일 뒤부터',
+    b:'조금 전부터 계속 이어지거나 오래 생각할수록'
+  },
+  q_where:{
+    a:'사람이 있는 자리나 누군가와 만난 장면에서',
+    b:'혼자 있거나 화면을 보거나 머릿속으로 떠올리는 동안'
+  },
+  q_who:{
+    a:'누군가의 말·행동·표정·태도와 관련해',
+    b:'해야 할 일, 결과, 내 실수나 선택과 관련해'
+  },
+  q_what_unpleasant:{
+    a:'누군가 선을 넘었거나 공평하지 않은 일을 겪으며',
+    b:'소중한 것이 멀어졌거나 사라진 일을 겪으며'
+  },
+  q_what_pleasant:{
+    a:'누군가의 도움·배려·따뜻한 말을 경험하며',
+    b:'내가 해냈거나 좋은 일이 생길 가능성을 느끼며'
+  }
+};
+const INTENSITY_RESULT = {
+  0:'말투·표정·생각·행동에는 거의 영향을 주지 않을 정도였고',
+  1:'말투·표정·생각·행동에 약하게 영향을 주는 정도였고',
+  2:'생각에 자주 떠오르고 행동에도 분명히 영향을 주는 정도였고',
+  3:'말투·표정·생각·행동에 꽤 크게 영향을 주는 정도였고',
+  4:'혼자 견디기 버겁게 느껴질 만큼 말투·표정·생각·행동에 크게 영향을 주었고'
+};
+function naturalJoin(items){
+  const values=[...new Set((items || []).filter(Boolean))];
+  if(values.length<=1) return values[0] || '';
+  if(values.length===2) return `${values[0]}과 ${values[1]}`;
+  return `${values.slice(0,-1).join(', ')}, 그리고 ${values[values.length-1]}`;
+}
+function actualChoiceTexts(answer){
+  const q=QMAP[answer.qid];
+  const key=answerKey(answer.answer);
+  if(!q) return [];
+  if(key==='a') return [answer.choiceText || q.a].filter(Boolean);
+  if(key==='b') return [answer.choiceText || q.b].filter(Boolean);
+  if(key==='mixed') return [q.a,q.b].filter(Boolean);
+  return [];
+}
+function oneSentenceEmotionMeaning(emo, detail){
+  const raw=(detail && detail.kid) || (emo && emo.kid) || '';
+  return String(raw)
+    .replace(/^쉽게 말하면,\s*/,'')
+    .replace(/[!?]+/g,'')
+    .split(/[.。]/)[0]
+    .replace(/\s*(마음|느낌)이에요$/,'')
+    .trim();
+}
+function resultSummarySentence({emo, detail, answers, needAnswers, intensity, positive}){
+  const context=[];
+  const reactions=[];
+  for(const answer of answers || []){
+    const key=answerKey(answer.answer);
+    const contextMap=RESULT_CONTEXT[answer.qid];
+    if(contextMap){
+      if(key==='a' || key==='b') context.push(contextMap[key]);
+      else if(key==='mixed') context.push(contextMap.a,contextMap.b);
+      continue;
+    }
+    if(answer.qid==='q_intensity') continue;
+    reactions.push(...actualChoiceTexts(answer));
+  }
+  const contextText=context.length ? [...new Set(context)].join(' ') : '앞에서 떠올린 실제 경험에서';
+  const reactionText=naturalJoin(reactions.map(text=>`“${String(text).replace(/[.。]+$/,'')}”`));
+  const reactionClause=reactionText ? `내 생각·몸·행동은 ${reactionText}에 가까웠고, ` : '';
+  const intensityClause=INTENSITY_RESULT[intensity] ? `${INTENSITY_RESULT[intensity]}, ` : '';
+  const needMeanings=selectedNeedIdsFromAnswers(needAnswers).map(id=>NEED_RESULT_MEANING[id]).filter(Boolean);
+  const needClause=needMeanings.length
+    ? `그때 ${naturalJoin(needMeanings)} 같은 바람이 ${positive?'충분히 채워져':'충분히 채워지지 않아'}, `
+    : '왜 그런지는 욕구 답변만으로 아직 분명하지 않지만, ';
+  const emotionMeaning=oneSentenceEmotionMeaning(emo, detail) || '마음이 중요한 신호를 보내는 느낌';
+  return `나는 ${contextText} ${reactionClause}${intensityClause}${needClause}${emotionMeaning}에 가까운 마음이 생겼을 수 있어요.`
+    .replace(/\s+/g,' ')
+    .trim();
+}
 function resultFeedbackHTML(readOnly, resultFeedback){
   if(readOnly){
     return resultFeedback ? `<div class="result-section"><h3>결과 확인</h3><p>이 기록에서는 <b>${safeText(RESULT_FEEDBACK_LABELS[resultFeedback] || resultFeedback)}</b>라고 남겼어요.</p></div>` : '';
@@ -1112,9 +1466,7 @@ function resultExplanationHTML({emo, detail, relatedNeeds, topNeedId, rankedNeed
   const oneLook = positive
     ? `<b>${safeText(emotionName)}</b>${josa(emotionName,'은','는')} 마음에 좋은 것이 채워졌다는 신호일 수 있어요. 특히 <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 마음이 관련되었을 수 있어요. 이 설명은 진단이 아니라, 내 경험과 비교해 보는 지도예요.`
     : `<b>${safeText(emotionName)}</b>${josa(emotionName,'은','는')} 마음속 중요한 것이 부족하거나 흔들렸다는 신호일 수 있어요. 특히 <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 마음이 관련되었을 수 있어요. 이 설명은 진단이 아니라, 내 경험과 비교해 보는 지도예요.`;
-  const resultSentence = positive
-    ? `당신의 <b>${safeText(emotionName)}</b>은(는) <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 욕구가 채워졌다고 느꼈기 때문에 생겼을 수 있어요. 어떤 부분이 실제 마음과 맞는지 천천히 확인해 보세요.`
-    : `당신의 <b>${safeText(emotionName)}</b>은(는) <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 욕구가 부족하거나 흔들렸다고 느꼈기 때문에 커졌을 수 있어요. 어떤 부분이 실제 마음과 맞는지 천천히 확인해 보세요.`;
+  const resultSentence = resultSummarySentence({emo, detail, answers, needAnswers, intensity, positive});
   const candidateText = (topThree || []).length>1
     ? `<p class="soft-note">비슷하게 나온 감정 후보 · ${(topThree || []).slice(0,3).map(candidate=>`${safeText(emName(candidate.emotion || candidate.id))} ${Math.round((candidate.p || 0)*100)}%`).join(' · ')}</p>`
     : '';
@@ -1172,21 +1524,36 @@ function resultExplanationHTML({emo, detail, relatedNeeds, topNeedId, rankedNeed
     </div>
     <div class="result-section">
       <h3>내 마음을 한 문장으로 정리하면</h3>
-      <p>${resultSentence}</p>
+      <p>${safeText(resultSentence)}</p>
     </div>
     ${resultFeedbackHTML(readOnly, resultFeedback)}
   `;
 }
 
-/* ---- 가중치·파라미터 (고시_추론엔진_가중치설정 v1.1) ---- */
-const P_BOOST=0.88, P_SUPPRESS=0.12, P_NEUTRAL=0.5;
+/* ---- 가중치·파라미터 (고시_추론엔진_가중치설정 v1.3) ---- */
+const P_BOOST=0.88, P_SUPPRESS=0.12, P_CONTEXT=0.65, P_NEUTRAL=0.5;
 const CONF_HIGH_P1=0.55, CONF_HIGH_GAP=0.15, CONF_MID_P1=0.40, MIX_GAP=0.12;
-const MIN_STEPS_EARLY=5, HARD_CAP=10;
+const MIN_STEPS_EARLY=6, HARD_CAP=10;
 
-function pyes(q, id){
-  if(q.boost && q.boost.includes(id)) return P_BOOST;
-  if(q.suppress && q.suppress.includes(id)) return P_SUPPRESS;
+function pChoiceA(q, id){
+  if(!q || q.scored===false) return P_NEUTRAL;
+  const high = q.strength==='weak' ? P_CONTEXT : P_BOOST;
+  const low = 1 - high;
+  if(q.aBoost && q.aBoost.includes(id)) return high;
+  if(q.bBoost && q.bBoost.includes(id)) return low;
   return P_NEUTRAL;
+}
+function isEmotionAnswerChoice(answer){
+  return answerKey(answer)==='a' || answerKey(answer)==='b' || answerKey(answer)==='yes' || answerKey(answer)==='no';
+}
+function answeredChoice(qid){
+  const answer = S.answers.find(item=>item.qid===qid);
+  return answer ? answerKey(answer.answer) : null;
+}
+function questionApplies(q){
+  if(q.route==='negative') return answeredChoice('q_valence')==='a' || answeredChoice('q_valence')==='yes';
+  if(q.route==='positive') return answeredChoice('q_valence')==='b' || answeredChoice('q_valence')==='no';
+  return true;
 }
 function softmax(logscore){
   const vals = IDS.map(id=>logscore[id]||0);
@@ -1209,16 +1576,19 @@ function confidenceOf(post){
 }
 /* 정보이득: 남은 동적 문항 중 기대 엔트로피 감소 최대 */
 function nextDynamic(post, asked){
+  const branchId = (answeredChoice('q_valence')==='b' || answeredChoice('q_valence')==='no') ? 'q_what_pleasant' : 'q_what_unpleasant';
+  if(DMAP[branchId] && !asked.has(branchId)) return DMAP[branchId];
   const H0 = entropy(post);
   let best=null, bestGain=-Infinity;
   for(const q of DYNAMIC){
     if(asked.has(q.id)) continue;
-    let Pyes=0; for(const id of IDS) Pyes += post[id]*pyes(q,id);
+    if(!questionApplies(q)) continue;
+    let choiceProbability=0; for(const id of IDS) choiceProbability += post[id]*pChoiceA(q,id);
     // 가상 갱신 후 분포
-    const postYes={}, postNo={}; let sy=0,sn=0;
-    for(const id of IDS){ const py=pyes(q,id); postYes[id]=post[id]*py; postNo[id]=post[id]*(1-py); sy+=postYes[id]; sn+=postNo[id]; }
-    for(const id of IDS){ postYes[id]= sy>0?postYes[id]/sy:0; postNo[id]= sn>0?postNo[id]/sn:0; }
-    const EH = Pyes*entropy(postYes) + (1-Pyes)*entropy(postNo);
+    const postA={}, postB={}; let sumA=0,sumB=0;
+    for(const id of IDS){ const pA=pChoiceA(q,id); postA[id]=post[id]*pA; postB[id]=post[id]*(1-pA); sumA+=postA[id]; sumB+=postB[id]; }
+    for(const id of IDS){ postA[id]= sumA>0?postA[id]/sumA:0; postB[id]= sumB>0?postB[id]/sumB:0; }
+    const EH = choiceProbability*entropy(postA) + (1-choiceProbability)*entropy(postB);
     const gain = H0 - EH;
     if(gain>bestGain){ bestGain=gain; best=q; }
   }
@@ -1280,9 +1650,30 @@ function renderIntro(){
 /* ---------- 감정 탐색 흐름 ---------- */
 function startEmotionFlow(){ S.phase='fixed'; S.fixedIdx=0; renderQuestion(FIXED[0]); }
 
+function choiceText(q, answer){
+  const key = answerKey(answer);
+  if(key==='a') return q && q.a ? q.a : 'A에 더 가까워요';
+  if(key==='b') return q && q.b ? q.b : 'B에 더 가까워요';
+  if(key==='mixed') return '둘 다 비슷해요';
+  if(key==='neither') return '둘 다 아닌 것 같아요';
+  if(key==='skip') return '잘 모르겠어요';
+  return answer || '-';
+}
+function clueForAnswer(answer){
+  const clue = CLUE[answer.qid];
+  const key = answerKey(answer.answer);
+  if(typeof clue === 'string') return key==='a' ? clue : '';
+  return clue ? clue[key] || '' : '';
+}
+function scoredEmotionAnswerCount(){
+  return S.answers.filter(answer=>{
+    const q = QMAP[answer.qid];
+    return q && q.scored!==false && isEmotionAnswerChoice(answer.answer);
+  }).length;
+}
 function renderQuestion(q){
   S.qStart=performance.now();
-  const answered = S.answers.filter(a=>a.qid!=='q_safety').length;
+  const answered = scoredEmotionAnswerCount();
   const pctEst = Math.min(95, Math.round((answered/ (MIN_STEPS_EARLY+2))*100));
   app.innerHTML = `
   <section class="card">
@@ -1291,26 +1682,32 @@ function renderQuestion(q){
       <div class="progress"><i style="width:${pctEst}%"></i></div>
     </div>
     <h2>${questionHTML(q.text)}</h2>
-    <div class="yesno">
-      <button class="btn" data-a="yes">이 예시와 비슷해요</button>
-      <button class="btn" data-a="no">아니요, 달라요</button>
+    <div class="choice-grid">
+      <button class="btn choice-btn" data-choice="a"><span class="choice-letter">A</span><span class="choice-copy"><b>A에 더 가까워요</b><span>${safeText(q.a)}</span></span></button>
+      <button class="btn choice-btn" data-choice="b"><span class="choice-letter">B</span><span class="choice-copy"><b>B에 더 가까워요</b><span>${safeText(q.b)}</span></span></button>
     </div>
-    <div class="skip"><button data-a="skip">잘 모르겠어요</button></div>
+    <div class="choice-actions">
+      <button class="btn ghost" data-choice="mixed">둘 다 비슷해요</button>
+      <button class="btn ghost" data-choice="neither">둘 다 아닌 것 같아요</button>
+    </div>
   </section>`;
-  app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>answerQuestion(q, b.dataset.a));
+  app.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>answerQuestion(q, b.dataset.choice));
 }
 function clueCount(){
-  return S.answers.filter(a=>a.answer==='yes' && a.qid!=='q_safety').length;
+  return scoredEmotionAnswerCount();
 }
 function applyAnswer(q, a){
-  if(a==='yes'){ for(const id of IDS) S.logscore[id]+=Math.log(pyes(q,id)); }
-  else if(a==='no'){ for(const id of IDS) S.logscore[id]+=Math.log(1-pyes(q,id)); }
-  // skip: 갱신 없음
+  const key = answerKey(a);
+  if(q.scored===false) return;
+  if(key==='a' || key==='yes'){ for(const id of IDS) S.logscore[id]+=Math.log(pChoiceA(q,id)); }
+  else if(key==='b' || key==='no'){ for(const id of IDS) S.logscore[id]+=Math.log(1-pChoiceA(q,id)); }
+  // mixed/neither: 한쪽으로 강하게 밀지 않고 기록만 남김
 }
 function answerQuestion(q, a){
-  S.answers.push({qid:q.id, answer:a, tMs:Math.round(performance.now()-S.qStart)});
+  const key = answerKey(a);
+  S.answers.push({qid:q.id, answer:key, choiceText:choiceText(q,key), tMs:Math.round(performance.now()-S.qStart)});
   applyAnswer(q, a);
-  if(a!=='skip') S.stepsForStop++;
+  if(q.scored!==false && (key==='a' || key==='b' || key==='yes' || key==='no')) S.stepsForStop++;
 
   if(S.phase==='fixed'){
     S.fixedIdx++;
@@ -1323,8 +1720,8 @@ function answerQuestion(q, a){
   // 종료 조건 판단
   const post = softmax(S.logscore);
   const conf = confidenceOf(post);
-  const nonSafety = S.answers.filter(x=>x.qid!=='q_safety').length;
-  const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id)).length;
+  const nonSafety = scoredEmotionAnswerCount();
+  const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id) && questionApplies(d)).length;
   const earlyStop = (S.stepsForStop>=MIN_STEPS_EARLY) && conf.cls==='high';
   const hardStop = nonSafety>=S.hardCap || remaining===0;
 
@@ -1365,7 +1762,7 @@ function renderEmotionResult(){
   const conf = confidenceOf(post);
   const top3 = r.slice(0,3);
   const mixed = (r[0].p - r[1].p) < MIX_GAP;
-  const clues = S.answers.filter(a=>a.answer==='yes' && CLUE[a.qid]).map(a=>CLUE[a.qid]);
+  const clues = S.answers.map(clueForAnswer).filter(Boolean);
   const bars = top3.map(x=>{
     const e=EMAP[x.id]; const pct=Math.round(x.p*100);
     return `<div class="barrow"><div class="top"><span class="em" style="color:${e.color}">${e.name}</span><span class="pct">${pct}%</span></div><div class="bar"><i style="width:${Math.max(4,pct)}%;background:${e.color}"></i></div>${detailListHTML(x.id, 2)}</div>`;
@@ -1413,9 +1810,9 @@ function requeryDifferent(r){
     resetState(); renderIntro(); return;
   }
   S.phase='dynamic';
-  const answered = S.answers.filter(x=>x.qid!=='q_safety').length;
+  const answered = scoredEmotionAnswerCount();
   S.hardCap = answered + 3;
-  const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id));
+  const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id) && questionApplies(d));
   if(remaining.length){
     const nq = nextDynamic(softmax(S.logscore), S.askedDynamic);
     if(nq){ renderQuestion(nq); return; }
@@ -1423,16 +1820,28 @@ function requeryDifferent(r){
   finishToResult();
 }
 
-/* 2단계: 욕구 미니탐정 (감정 스무고개 답변을 사전확률로, 필요한 만큼만 2~4문) */
-function needPyes(need,q){ return need===q.need?0.85:0.20; }
+/* 2단계: 욕구 미니탐정 (감정 A/B 답변을 사전확률로, 욕구는 쌍대비교) */
+const NEED_PAIR_A=0.82, NEED_PAIR_B=0.18, NEED_PAIR_MIXED=0.65, NEED_PAIR_NEITHER=0.35;
 function needSoftmax(score,cand){ const v=cand.map(id=>score[id]||0); const m=Math.max(...v); const e=v.map(x=>Math.exp(x-m)); const s=e.reduce((a,b)=>a+b,0); const o={}; cand.forEach((id,i)=>o[id]=s>0?e[i]/s:1/cand.length); return o; }
 function needRanked(post,cand){ return cand.map(id=>({id,p:post[id]})).sort((a,b)=>b.p-a.p); }
 function needEntropy(post,cand){ let h=0; for(const id of cand){const p=post[id]; if(p>1e-9)h-=p*Math.log(p);} return h; }
+function needPairKey(needA, needB){ return [needA, needB].sort().join('__'); }
+function needChoiceText(needId, positive){
+  const entry = NEED_Q_MAP[needId];
+  if(!entry) return NEEDS[needId] ? NEEDS[needId].kid : needId;
+  return positive ? entry.met : entry.unmet;
+}
+function pNeedChoiceA(needId, q){
+  if(needId===q.needA) return NEED_PAIR_A;
+  if(needId===q.needB) return NEED_PAIR_B;
+  return P_NEUTRAL;
+}
 function computeNeedPrior(emotionId){
   const cand=(EMO_NEEDS[emotionId]||[]).slice(); const score={}; cand.forEach(id=>score[id]=0);
   for(const a of S.answers){
-    if(a.answer!=='yes') continue;
-    const ns=ANSWER_NEED[a.qid]; if(!ns) continue;
+    const key = answerKey(a.answer);
+    if(key!=='a' && key!=='b') continue;
+    const ns=(ANSWER_NEED_BY_CHOICE[a.qid] || {})[key]; if(!ns) continue;
     for(const n of ns){ if(n in score) score[n]+=Math.log(1.9); }
   }
   return {cand, score};
@@ -1440,14 +1849,21 @@ function computeNeedPrior(emotionId){
 function nextNeedQuestion(){
   const cand=S.needCand; const post=needSoftmax(S.needScore,cand); const H0=needEntropy(post,cand);
   let best=null,bg=-1e9;
-  for(const q of NEED_Q){
-    if(!cand.includes(q.need) || S.askedNeed.has(q.need)) continue;
-    let Py=0; for(const id of cand) Py+=post[id]*needPyes(id,q);
-    const py={},pn={}; let sy=0,sn=0;
-    for(const id of cand){ const t=needPyes(id,q); py[id]=post[id]*t; pn[id]=post[id]*(1-t); sy+=py[id]; sn+=pn[id]; }
-    for(const id of cand){ py[id]=sy>0?py[id]/sy:0; pn[id]=sn>0?pn[id]/sn:0; }
-    const g=H0-(Py*needEntropy(py,cand)+(1-Py)*needEntropy(pn,cand));
-    if(g>bg){bg=g;best=q;}
+  for(let left=0; left<cand.length; left++){
+    for(let right=left+1; right<cand.length; right++){
+      const needA = cand[left], needB = cand[right];
+      const pairId = needPairKey(needA, needB);
+      if(S.askedNeed.has(pairId)) continue;
+      const q = {id:pairId, needA, needB};
+      let pA=0; for(const id of cand) pA+=post[id]*pNeedChoiceA(id,q);
+      const postA={},postB={}; let sumA=0,sumB=0;
+      for(const id of cand){ const t=pNeedChoiceA(id,q); postA[id]=post[id]*t; postB[id]=post[id]*(1-t); sumA+=postA[id]; sumB+=postB[id]; }
+      for(const id of cand){ postA[id]=sumA>0?postA[id]/sumA:0; postB[id]=sumB>0?postB[id]/sumB:0; }
+      const closeness = 1 - Math.abs((post[needA] || 0) - (post[needB] || 0));
+      const priority = ((post[needA] || 0) + (post[needB] || 0)) * 0.04 + closeness * 0.01;
+      const g=H0-(pA*needEntropy(postA,cand)+(1-pA)*needEntropy(postB,cand)) + priority;
+      if(g>bg){bg=g;best=q;}
+    }
   }
   return best;
 }
@@ -1461,25 +1877,45 @@ function startNeedFlow(emotionId){
 function renderNeedQuestion(q){
   S.qStart=performance.now();
   const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
-  const lead = pleasant ? '이 좋은 느낌이 어떤 일에서 왔는지 쉬운 예시로 확인해 볼게요.' : '이 마음이 무엇 때문에 생겼는지 쉬운 예시로 확인해 볼게요.';
+  const lead = pleasant
+    ? '앞에서 떠올린 실제 일을 생각해 보세요. 마음의 이름보다 쉬운 설명을 읽고 골라 주세요.'
+    : '앞에서 떠올린 실제 일을 생각해 보세요. 마음의 이름보다 쉬운 설명을 읽고 골라 주세요.';
   const stepTitle = '2단계 · 마음을 더 자세히 보기';
+  const prompt = pleasant
+    ? '지금 좋은 마음에서 더 채워졌다고 느끼는 쪽은 어디인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?'
+    : '지금 힘든 마음에서 더 필요했거나 부족했던 쪽은 어디인가요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?';
   app.innerHTML=`
   <section class="card">
     <div class="no-print"><div class="clue-count">${stepTitle}</div></div>
     <p class="caption" style="margin-top:2px">${lead}</p>
-    <h2>${questionHTML(q.text)}</h2>
-    <div class="yesno"><button class="btn" data-a="yes">이 예시와 비슷해요</button><button class="btn" data-a="no">아니요, 달라요</button></div>
-    <div class="skip"><button data-a="skip">잘 모르겠어요</button></div>
+    <h2>${questionHTML(prompt)}</h2>
+    <div class="choice-grid">
+      <button class="btn choice-btn" data-choice="a"><span class="choice-letter">A</span><span class="choice-copy"><b>A에 더 가까워요</b><span>${safeText(needChoiceText(q.needA, pleasant))}</span></span></button>
+      <button class="btn choice-btn" data-choice="b"><span class="choice-letter">B</span><span class="choice-copy"><b>B에 더 가까워요</b><span>${safeText(needChoiceText(q.needB, pleasant))}</span></span></button>
+    </div>
+    <div class="choice-actions">
+      <button class="btn ghost" data-choice="mixed">둘 다 비슷해요</button>
+      <button class="btn ghost" data-choice="neither">둘 다 아닌 것 같아요</button>
+    </div>
   </section>`;
-  app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>answerNeed(q,b.dataset.a));
+  app.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>answerNeed(q,b.dataset.choice));
 }
 function answerNeed(q,a){
-  S.needAnswers.push({need:q.need,answer:a,tMs:Math.round(performance.now()-S.qStart)});
-  if(a==='yes'){ for(const id of S.needCand) S.needScore[id]+=Math.log(needPyes(id,q)); }
-  else if(a==='no'){ for(const id of S.needCand) S.needScore[id]+=Math.log(1-needPyes(id,q)); }
-  S.askedNeed.add(q.need); if(a!=='skip') S.needSteps++;
+  const key = answerKey(a);
+  const selectedNeed = key==='a' ? q.needA : key==='b' ? q.needB : null;
+  const pleasant = EMAP[S.confirmedEmotion].v>0;
+  const selectedText = selectedNeed ? needChoiceText(selectedNeed, pleasant) : choiceText(null, key);
+  S.needAnswers.push({pairId:q.id, needA:q.needA, needB:q.needB, need:selectedNeed, answer:key, selectedNeed, choiceText:selectedText, tMs:Math.round(performance.now()-S.qStart)});
+  if(key==='a' || key==='b'){
+    for(const id of S.needCand) S.needScore[id]+=Math.log(key==='a' ? pNeedChoiceA(id,q) : (1-pNeedChoiceA(id,q)));
+  }else if(key==='mixed'){
+    for(const id of S.needCand) S.needScore[id]+=Math.log((id===q.needA || id===q.needB) ? NEED_PAIR_MIXED : P_NEUTRAL);
+  }else if(key==='neither'){
+    for(const id of S.needCand) S.needScore[id]+=Math.log((id===q.needA || id===q.needB) ? NEED_PAIR_NEITHER : P_NEUTRAL);
+  }
+  S.askedNeed.add(q.id); if(key==='a' || key==='b') S.needSteps++;
   const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
-  const remaining=NEED_Q.filter(x=>S.needCand.includes(x.need)&&!S.askedNeed.has(x.need)).length;
+  const remaining=(S.needCand.length*(S.needCand.length-1)/2) - S.askedNeed.size;
   const clear = S.needSteps>=2 && rn[0].p>=0.6;
   const cap = S.needAnswers.length>=4;
   if(!clear && !cap && remaining>0){ const nq=nextNeedQuestion(); if(nq){ renderNeedQuestion(nq); return; } }
@@ -1557,10 +1993,16 @@ function sessionRecord(){
   const relatedNeedIdsForRecord = S.relatedNeeds || (finalEmotionId ? relatedNeedIds(finalEmotionId, rankedNeeds) : []);
   const relatedNeedInfos = relatedNeedIdsForRecord.map(id=>NEEDS[id]).filter(Boolean);
   const needWords = finalNeedId ? needWordCandidates(finalNeedId, 5) : [];
+  const resultSentence = emoInfo
+    ? resultSummarySentence({emo:emoInfo, detail, answers:S.answers, needAnswers:S.needAnswers, intensity:S.intensity, positive:emoInfo.v>0})
+    : '';
   return {
     sessionId:S.sessionId, startedAt:S.startedAt, finishedAt:S.finishedAt||null,
     consentResearch:S.consent, isMinor:S.minor,
-    answers:S.answers, questionCount:S.answers.filter(a=>a.qid!=='q_intensity').length,
+    questionFormat:'actual-5w1h-ab-v1',
+    answers:S.answers,
+    contextAnswers:S.answers.filter(answer=>['q_when','q_where','q_who'].includes(answer.qid)),
+    questionCount:S.answers.filter(a=>a.qid!=='q_intensity').length,
     intensity:S.intensity,
     posteriorFinal: r.slice(0,5).map(x=>({emotion:x.id, p:Math.round(x.p*1000)/1000})),
     top1: topEmotionId, top3: r.slice(0,3).map(x=>x.id), need: needName,
@@ -1577,6 +2019,7 @@ function sessionRecord(){
     relatedNeedKids: relatedNeedInfos.map(need=>need.kid),
     needWordIds: needWords.map(word=>word.id),
     needWordTerms: needWords.map(word=>word.term),
+    resultSentence,
     confidence: confidenceOf(post).level, excluded: Array.from(S.excluded||[]),
     confirmedEmotion:S.confirmedEmotion||null, needTop:S.needTop||null, needConfirmed:S.needConfirmed||null, needUnclear:!!S.needUnclear,
     needCandidates:S.needCand||null, needAnswers:S.needAnswers||null,
@@ -1609,16 +2052,16 @@ function exportJSON(){
 }
 function exportCSV(){
   const data=loadLogs().filter(s=>s.consentResearch);
-  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','needConfirmed','needUnclear','relatedNeedNames','relatedNeedKids','needWordTerms','confidence','resultFeedback','userConfirmed','userConfirmMatch','openWord','crisis'];
+  const head=['sessionId','startedAt','questionFormat','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','needConfirmed','needUnclear','relatedNeedNames','relatedNeedKids','needWordTerms','resultSentence','confidence','resultFeedback','userConfirmed','userConfirmMatch','openWord','crisis'];
   const rows=data.map(record=>{
     const topResult=(record.posteriorFinal||[])[0];
     const emotionInfo=logEmotionInfo(record, topResult);
     const needInfo=logNeedInfo(record, emotionInfo);
     return [
-      record.sessionId, record.startedAt, record.questionCount, record.intensity,
+      record.sessionId, record.startedAt, record.questionFormat, record.questionCount, record.intensity,
       record.top1, (record.top3||[]).join('|'), emotionInfo.name, emotionInfo.kid,
       record.detailEmotionTerm, record.detailEmotionKid, record.detailEmotionSection,
-      needInfo.name, needInfo.kid, record.needConfirmed, record.needUnclear, (record.relatedNeedNames||[]).join('|'), (record.relatedNeedKids||[]).join('|'), (record.needWordTerms||[]).join('|'), record.confidence, record.resultFeedback, record.userConfirmed,
+      needInfo.name, needInfo.kid, record.needConfirmed, record.needUnclear, (record.relatedNeedNames||[]).join('|'), (record.relatedNeedKids||[]).join('|'), (record.needWordTerms||[]).join('|'), record.resultSentence, record.confidence, record.resultFeedback, record.userConfirmed,
       record.userConfirmMatch, record.openWord, record.crisis
     ].map(value=>`"${(value==null?'':String(value)).replace(/"/g,'""')}"`).join(',');
   });
@@ -1753,23 +2196,30 @@ function logTopThreeHTML(topThree){
   </div>`;
 }
 function answerText(answer){
-  const labels = {yes:'이 예시와 비슷해요', no:'아니요, 달라요', skip:'잘 모르겠어요'};
-  return labels[answer] || answer || '-';
+  const labels = {a:'A에 더 가까워요', b:'B에 더 가까워요', mixed:'둘 다 비슷해요', neither:'둘 다 아닌 것 같아요', yes:'A에 더 가까워요', no:'B에 더 가까워요', skip:'잘 모르겠어요'};
+  return labels[answerKey(answer)] || answer || '-';
 }
 function questionTextById(qid){
   if(qid==='q_intensity') return INTENSITY_Q;
-  const question = FIXED.find(item=>item.id===qid) || DYNAMIC.find(item=>item.id===qid);
+  const question = QMAP[qid] || FIXED.find(item=>item.id===qid) || DYNAMIC.find(item=>item.id===qid);
   return question ? question.text : qid;
 }
 function logAnswersHTML(record){
   const rows = [];
   for(const answer of record.answers || []){
-    rows.push(`${questionTextById(answer.qid)} — ${answerText(answer.answer)}`);
+    const q = QMAP[answer.qid];
+    const selected = q ? choiceText(q, answer.answer) : (answer.choiceText || answer.answer);
+    rows.push(`${questionTextById(answer.qid)} — ${answerText(answer.answer)}${selected && selected!==answerText(answer.answer)?` · ${selected}`:''}`);
   }
   for(const answer of record.needAnswers || []){
-    const question = NEED_Q.find(item=>item.need===answer.need);
-    const need = NEEDS[answer.need];
-    rows.push(`${question ? question.text : (need ? need.name : answer.need)} — ${answerText(answer.answer)}`);
+    if(answer.needA && answer.needB){
+      const needA = NEEDS[answer.needA], needB = NEEDS[answer.needB];
+      rows.push(`${needA ? needA.name : answer.needA} / ${needB ? needB.name : answer.needB} — ${answerText(answer.answer)}${answer.choiceText?` · ${answer.choiceText}`:''}`);
+    }else{
+      const question = NEED_Q.find(item=>item.need===answer.need);
+      const need = NEEDS[answer.need];
+      rows.push(`${question ? question.label : (need ? need.name : answer.need)} — ${answerText(answer.answer)}`);
+    }
   }
   if(!rows.length) return '';
   return `<div class="log-answer-list"><h3>상세 문답</h3><ol>${rows.map(row=>`<li>${safeText(row)}</li>`).join('')}</ol></div>`;
@@ -1883,12 +2333,17 @@ function buildReportHTML(logs){
     const sub=[]; if(dots) sub.push('세기 '+dots); if(record.confidence) sub.push('잘 맞는 정도 '+record.confidence);
     if(record.userConfirmed && EMAP[record.userConfirmed] && (!topResult||record.userConfirmed!==topResult.emotion)) sub.push('내가 고른 감정: '+emName(record.userConfirmed));
     const kidLines=kidLinesHTML(emotionInfo, needInfo);
+    const detailForSummary=record.detailEmotionKid ? {kid:record.detailEmotionKid} : null;
+    const summarySentence=record.resultSentence || (emotion
+      ? resultSummarySentence({emo:emotion, detail:detailForSummary, answers:record.answers||[], needAnswers:record.needAnswers||[], intensity:record.intensity, positive:emotion.v>0})
+      : '');
     return `<div class="rcard">
       <div class="rc-date">${safeText(fmtDate(record.startedAt))}</div>
       <div class="rc-head"><span class="rc-dot" style="background:${emotion?emotion.color:'#c9c6c0'}"></span><span class="rc-emo">${safeText(emotionInfo.name||'-')}</span><span class="rc-pct">${selectedPercent}%</span></div>
       <div class="rc-bar">${seg}</div>
       ${others?`<div class="rc-others">그다음 · ${safeText(others)}</div>`:''}
       ${(needInfo.relatedNeedNames||[]).length?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.relatedNeedNames.join(' · '))}</b></div>`:(needInfo.name?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.name)}</b></div>`:'')}
+      ${summarySentence?`<div class="rc-kid"><b>내 마음을 한 문장으로 정리하면</b><br>${safeText(summarySentence)}</div>`:''}
       ${kidLines.length?`<div class="rc-kid"><b>쉽게 말하면</b><br>${kidLines.join('<br><br>')}</div>`:''}
       ${sub.length?`<div class="rc-sub">${safeText(sub.join(' · '))}</div>`:''}
     </div>`;
