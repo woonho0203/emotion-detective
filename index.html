@@ -110,12 +110,53 @@
   .need-word{border:1px solid var(--line); border-radius:12px; padding:9px 10px; font-size:14px; line-height:1.5;}
   .need-word b{display:block; margin-bottom:2px;}
   .need-word span{color:var(--ink-soft);}
+  .profile{border:1px solid var(--line); border-radius:18px; padding:16px 15px; margin:14px 0; background:var(--surface);}
+  .profile h3{font-size:19px; margin:0 0 6px; color:var(--primary);}
+  .profile h4{font-size:15px; margin:16px 0 6px; color:var(--primary);}
+  .profile p{font-size:15px; line-height:1.65; margin:0 0 9px;}
+  .profile ul{margin:6px 0 0; padding-left:20px;}
+  .profile li{font-size:14px; line-height:1.6; margin:3px 0;}
+  .profile .quote{border-left:3px solid var(--accent); padding:6px 0 6px 10px; color:var(--ink-soft); font-size:14px; margin:8px 0;}
+  .need-grid{display:grid; gap:8px; margin-top:8px;}
+  .need-card{border:1px solid var(--line); border-radius:13px; padding:10px 11px; background:var(--surface);}
+  .need-card b{display:block; color:var(--primary);}
+  .need-card span{display:block; color:var(--ink-soft); font-size:14px; line-height:1.55; margin-top:3px;}
+  .need-card em{display:block; font-style:normal; font-size:13px; color:var(--ink-soft); margin-top:5px;}
+  .check-options{display:grid; gap:7px; margin-top:7px;}
+  .check-option{border:1px solid var(--line); border-radius:12px; padding:8px 10px; font-size:14px; line-height:1.5; background:var(--surface);}
+  .soft-note{color:var(--ink-soft); font-size:14px; line-height:1.6; margin-top:8px;}
   .log-recent{margin:14px 0 4px;}
   .log-recent h3{font-size:15px; margin:0 0 8px; color:var(--primary);}
   .log-card{border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-top:8px;}
   .log-title{display:flex; justify-content:space-between; gap:10px; font-size:14px; font-weight:700;}
   .log-kid{background:#FBF3E4; border:1px solid #EAD9B8; border-radius:12px; padding:10px 12px; margin-top:8px; font-size:13px; line-height:1.55; color:#4a3f2e;}
   @media (prefers-color-scheme: dark){ .log-kid{background:#332a1a; border-color:#5a4a2a; color:#e8dcc4;} }
+  .log-list{display:grid; gap:12px; margin:14px 0;}
+  .log-list h3{font-size:15px; margin:0; color:var(--primary);}
+  .log-empty{border:1px dashed var(--line); border-radius:14px; padding:16px 14px; color:var(--ink-soft); font-size:14px; line-height:1.6;}
+  .log-result-card{
+    appearance:none; width:100%; text-align:left; border:1px solid var(--line);
+    border-radius:18px; background:var(--surface); color:var(--ink); padding:16px 15px;
+    cursor:pointer; box-shadow:0 4px 16px rgba(43,42,51,.06);
+    transition:transform .12s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .log-result-card:hover{border-color:var(--primary); box-shadow:var(--shadow);}
+  .log-result-card:focus-visible{outline:2px solid var(--primary); outline-offset:3px;}
+  .log-result-card:active{transform:scale(.995);}
+  .log-result-card .barrow{margin:10px 0 8px;}
+  .log-result-card .barrow .em{font-size:18px;}
+  .log-result-card .insight, .log-result-card .kidbox{margin:10px 0 0;}
+  .log-card-action{display:flex; justify-content:flex-end; color:var(--primary); font-size:13px; font-weight:700; margin-top:10px;}
+  .log-detail-meta{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 14px;}
+  .log-detail-meta span{border:1px solid var(--line); border-radius:999px; padding:3px 9px; color:var(--ink-soft); font-size:12px;}
+  .log-top3{border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin:14px 0;}
+  .log-top3 h3{margin:0 0 8px; font-size:15px; color:var(--primary);}
+  .log-answer-list{border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin:14px 0;}
+  .log-answer-list h3{margin:0 0 8px; font-size:15px; color:var(--primary);}
+  .log-answer-list ol{margin:0; padding-left:20px;}
+  .log-answer-list li{font-size:13px; line-height:1.55; margin:4px 0; color:var(--ink-soft);}
+  .log-safe{border:1.5px solid var(--danger); background:var(--danger-bg); border-radius:18px; padding:18px 16px; margin:14px 0;}
+  .log-safe h3{margin:0 0 6px; color:var(--danger); font-size:18px;}
   .notice{border:1px solid var(--line); border-radius:14px; padding:12px 14px; font-size:13px; color:var(--ink-soft); margin-top:14px;}
   .yellow-banner{background:#FBF3E4; border:1px solid #EAD9B8; color:#7a5a1f; border-radius:14px; padding:12px 14px; font-size:14px; margin:14px 0;}
   @media (prefers-color-scheme: dark){ .yellow-banner{background:#332a1a;border-color:#5a4a2a;color:#e7c98a;} }
@@ -212,10 +253,10 @@
 <!-- 내 기록 오버레이 -->
 <div class="overlay no-print" id="logOverlay">
   <div class="modal">
-    <h2>내 기록 · 연구용 데이터</h2>
-    <p class="caption">응답은 기본적으로 이 기기(브라우저)에 저장됩니다. 연구 동의에 체크한 기록만 서버 API로 보낼 수 있어요. 언제든 내보내거나 전체 삭제할 수 있습니다.</p>
+    <h2>내 기록 · 결과 보기</h2>
+    <p class="caption">각 기록은 결과창 형태로 저장됩니다. 하나를 누르면 상세 결과를 다시 보고, 그 기록만 PDF로 저장할 수 있어요.</p>
     <div id="logStats"></div>
-    <button class="btn small primary" id="exportPdf">📄 PDF로 저장 (내 기록 전체)</button>
+    <button class="btn small primary" id="exportPdf">📄 전체 기록 PDF로 저장</button>
     <button class="btn small" id="exportJson">JSON으로 내보내기</button>
     <button class="btn small" id="exportCsv">CSV로 내보내기 (연구 동의분·분석용)</button>
     <button class="btn small ghost" id="deleteAll" style="color:var(--danger);border-color:var(--danger);">전체 기록 삭제</button>
@@ -269,7 +310,6 @@ function groupLiteraryEmotions(items){
   return grouped;
 }
 async function loadEmotionDatabase(){
-  if(location.hostname.endsWith('github.io')) return;
   try{
     const res = await fetch('/api/emotions', {headers:{'Accept':'application/json'}});
     if(!res.ok) throw new Error('emotion api failed');
@@ -284,30 +324,30 @@ async function loadEmotionDatabase(){
   }
 }
 
-/* ---- 문항뱅크 (감정 단어 대신 상황·생각·행동을 묻는 문구) ---- */
+/* ---- 문항뱅크 (더 구체적인 문구) ---- */
 const FIXED = [
-  {id:'q_valence', text:'오늘 있었던 일을 떠올리면, 웃고 싶기보다 표정이 굳거나 한숨이 먼저 나와요?', boost:NEG, suppress:POS},
-  {id:'q_arousal', text:'가만히 앉아 있어도 심장이 빨리 뛰거나 손·발에 힘이 들어가요?', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
-  {id:'q_cause', text:'누가 한 말이나 방금 생긴 일이 머릿속에서 계속 다시 떠올라요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
+  {id:'q_valence', text:'지금 마음이 편하다기보다, 뭔가 걸리거나 속이 불편한 쪽이에요?', boost:NEG, suppress:POS},
+  {id:'q_arousal', text:'심장이 빨리 뛰거나 몸에 힘이 들어가서, 가만히 앉아 있어도 긴장되는 느낌이에요?', boost:['anxiety','fear','anger','joy','pride','anticipation'], suppress:['sadness','lethargy','calm','loneliness']},
+  {id:'q_cause', text:'방금 무슨 일이 있었거나, 누가 한 말·행동 때문에 이런 기분이 든 거예요?', boost:['anger','resentment','fear','joy','gratitude'], suppress:['lethargy','confusion']},
 ];
 
 const DYNAMIC = [
-  {id:'q_relation', text:'가족, 친구, 선생님 중 누군가가 한 말이나 행동이 계속 신경 쓰여요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
-  {id:'q_warm', text:'누군가가 해 준 말이나 행동을 떠올리면, 고맙다는 말을 해 주고 싶어요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
-  {id:'q_avoid', text:'지금 누가 말을 걸면 대답하기보다 방에 들어가 혼자 있고 싶어요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
-  {id:'q_confront', text:'상대에게 “왜 그렇게 했어?”라고 묻거나 따지고 싶어요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
-  {id:'q_social', text:'다른 사람은 괜찮은데 나만 이상하게 보이거나 손해 본 것 같아요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
-  {id:'q_threat', text:'아직 일어나지 않은 일이 잘못될까 봐 머릿속에서 계속 상상돼요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
-  {id:'q_loss', text:'사라졌거나 놓친 것 때문에 “다시 되돌릴 수 있으면 좋겠다”는 생각이 들어요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
-  {id:'q_block', text:'하려던 일을 누가 막았거나, 내 뜻대로 할 수 없어서 답답해요?', boost:['anger','resentment'], suppress:['calm']},
-  {id:'q_selfeval', text:'그 일을 떠올리면 “내가 뭔가 잘못했나?”라는 생각이 반복돼요?', boost:['shame','sadness'], suppress:['anger','pride']},
-  {id:'q_bodyhigh', text:'숨이 답답하거나 심장이 빨리 뛰어서 몸을 가만히 두기 어려워요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
-  {id:'q_bodylow', text:'해야 할 일이 있어도 몸이 무겁고 시작하기가 어려워요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
-  {id:'q_empty', text:'좋아하던 일을 해도 별 느낌이 없고 시간이 그냥 지나가는 것 같아요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
-  {id:'q_disgust', text:'그 사람이나 상황을 다시 가까이하고 싶지 않아서 피하고 싶어요?', boost:['disgust','anger'], suppress:['calm']},
-  {id:'q_achieve', text:'내가 해낸 일을 떠올리면 누군가에게 보여 주고 싶어요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
-  {id:'q_clarity', text:'생각이 여러 갈래로 섞여서 무엇부터 해야 할지 고르기 어려워요?', boost:['confusion'], suppress:['pride','joy']},
-  {id:'q_hide', text:'누가 “무슨 일 있어?”라고 물어도 사실대로 말하고 싶지 않아요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
+  {id:'q_relation', text:'가족이나 친구처럼, 누군가와 있었던 일 때문에 생긴 기분이에요?', boost:['resentment','loneliness','affection','anger','shame','gratitude'], suppress:['anticipation']},
+  {id:'q_warm', text:'누군가가 나를 도와주거나 챙겨줘서, 마음이 따뜻해진 순간이 있었어요?', boost:['affection','gratitude','joy','calm'], suppress:NEG},
+  {id:'q_avoid', text:'지금은 아무도 안 만나고, 혼자 있고 싶어요?', boost:['sadness','loneliness','shame','lethargy','disgust'], suppress:['anger']},
+  {id:'q_confront', text:'누구한테 따지거나, 잘못된 걸 바로잡고 싶은 마음이 들어요?', boost:['anger','resentment'], suppress:['sadness','lethargy']},
+  {id:'q_social', text:'다른 사람은 괜찮은데 나만 손해 보거나, 사람들 앞에서 내 모습이 나쁘게 보였을까 걱정돼요?', boost:['resentment','shame','loneliness'], suppress:['fear']},
+  {id:'q_threat', text:'앞으로 안 좋은 일이 생길까 봐 걱정돼요?', boost:['anxiety','fear'], suppress:['sadness','lethargy','calm']},
+  {id:'q_loss', text:'소중한 걸 잃었거나, 하고 싶던 걸 못 하게 된 느낌이 있어요?', boost:['sadness','loneliness'], suppress:['joy','pride']},
+  {id:'q_block', text:'하고 싶은 게 막히거나, 방해받은 느낌이에요?', boost:['anger','resentment'], suppress:['calm']},
+  {id:'q_selfeval', text:'“내가 잘못했나”, “내가 부족한가” 하는 생각이 들어요?', boost:['shame','sadness'], suppress:['anger','pride']},
+  {id:'q_bodyhigh', text:'가슴이 답답하거나 심장이 빨리 뛰어서, 안절부절못하겠어요?', boost:['anxiety','fear'], suppress:['lethargy','calm']},
+  {id:'q_bodylow', text:'몸에 힘이 쭉 빠지고, 축 처져서 아무것도 하기 싫어요?', boost:['lethargy','sadness'], suppress:['anxiety','fear','anger']},
+  {id:'q_empty', text:'마음이 텅 빈 것 같고, 뭘 해도 재미없고 허무해요?', boost:['lethargy','sadness','loneliness'], suppress:['joy']},
+  {id:'q_disgust', text:'뭔가가 너무 싫고 징그러워서, 멀리하고 싶어요?', boost:['disgust','anger'], suppress:['calm']},
+  {id:'q_achieve', text:'뭔가를 잘 해내서, 뿌듯하고 자랑스러워요?', boost:['pride','joy','anticipation'], suppress:['sadness','shame','gratitude']},
+  {id:'q_clarity', text:'이 기분이 뭔지 딱 말하기 어렵고, 머릿속이 복잡하고 뿌옇게 느껴져요?', boost:['confusion'], suppress:['pride','joy']},
+  {id:'q_hide', text:'이 기분을 다른 사람한테는 들키고 싶지 않아요?', boost:['shame','resentment','sadness'], suppress:['joy','pride']},
 ];
 const DMAP = Object.fromEntries(DYNAMIC.map(q=>[q.id,q]));
 
@@ -381,7 +421,7 @@ function selectedDetail(){
   return first;
 }
 
-/* ---- 욕구(NVC) 데이터: 감정 뒤의 '바라는 것' 찾기 ---- */
+/* ---- 욕구(NVC) 데이터: 감정 뒤의 관련 욕구 찾기 ---- */
 const NEEDS = {
   safety:{name:'안전·안정', kid:'위험하지 않고 안전하다고 느끼고 싶은 마음이에요.', act:'지금 안전하다고 느껴지는 작은 것 하나를 떠올려볼까요?'},
   certainty:{name:'예측가능성·확신', kid:'무슨 일이 생길지 미리 알아서, 마음을 놓고 싶은 거예요.', act:'무엇이 어떻게 될지, 지금 분명히 아는 것 하나만 적어볼까요?'},
@@ -389,13 +429,18 @@ const NEEDS = {
   respect:{name:'존중·인정', kid:'무시당하지 않고, 소중하게 대접받고 인정받고 싶은 마음이에요.', act:'내가 인정받고 싶은 부분을 한 문장으로 적어볼까요?'},
   fairness:{name:'공정함', kid:'나만 손해 보지 않게, 공평하게 대해지고 싶은 마음이에요.', act:'무엇이 불공평하게 느껴졌는지 사실 그대로 적어볼까요?'},
   understanding:{name:'이해받음·공감', kid:'누가 내 마음을 알아주면 좋겠다는 마음이에요.', act:'지금 마음을 있는 그대로 들어줄 사람이 한 명 떠오르나요?'},
-  connection:{name:'연결·친밀', kid:'누군가와 가깝게 이어져 있고 싶은 마음이에요.', act:'가볍게 안부를 전할 한 사람을 떠올려볼까요?'},
+  connection:{name:'연결감', kid:'누군가와 마음이 이어져 있고, 혼자가 아니라고 느끼고 싶은 마음이에요.', act:'가볍게 안부를 전할 한 사람을 떠올려볼까요?'},
   belonging:{name:'소속·함께함', kid:'어딘가에 속하고, 나도 함께라고 느끼고 싶은 마음이에요.', act:'내가 편하게 속해 있다고 느끼는 자리를 하나 떠올려볼까요?'},
   comfort:{name:'위로·돌봄', kid:'누가 나를 다독여 주고 위로해 주면 좋겠다는 마음이에요.', act:'지금 나에게 건넬 다정한 한 마디를 적어볼까요?'},
   meaning:{name:'의미·목적', kid:'이걸 왜 하는지, 무슨 의미가 있는지 느끼고 싶은 마음이에요.', act:'이 일이 나에게 왜 중요한지 한 가지 이유를 적어볼까요?'},
   competence:{name:'해낼 수 있다는 느낌', kid:'나도 잘 할 수 있다고 느끼고 싶은 마음이에요.', act:'예전에 비슷한 걸 넘겨본 경험을 하나 떠올려볼까요?'},
   rest:{name:'휴식·회복', kid:'그만 쉬고, 힘을 다시 채우고 싶은 마음이에요.', act:'지금 5분이라도 나에게 줄 수 있는 쉼은 무엇일까요?'},
-  acceptance:{name:'자기수용·회복', kid:'실수해도 나를 미워하지 않고, 나를 받아들이고 싶은 마음이에요.', act:'“그럴 수도 있어”라고 나에게 건네보면 어떤가요?'}
+  acceptance:{name:'자기수용·회복', kid:'실수해도 나를 미워하지 않고, 나를 받아들이고 싶은 마음이에요.', act:'“그럴 수도 있어”라고 나에게 건네보면 어떤가요?'},
+  help:{name:'도움', kid:'혼자 하기 어렵거나 버거운 일을 누군가와 함께 해결하고 싶은 마음이에요.', act:'누구에게 어떤 도움을 부탁할 수 있을까요?'},
+  consideration:{name:'배려', kid:'상대가 내 상황, 기분, 어려움을 생각해서 행동해 주기를 바라는 마음이에요.', act:'어떤 배려가 가장 고마웠거나 필요했나요?'},
+  support:{name:'지지', kid:'힘들거나 불안한 순간에 누군가가 내 편이라는 것을 느끼고 싶은 마음이에요.', act:'내 편이 되어 줄 사람이나 말을 하나 떠올려볼까요?'},
+  recognition:{name:'인정', kid:'내 노력, 어려움, 능력 또는 존재를 다른 사람이 알아주기를 바라는 마음이에요.', act:'어떤 노력을 알아봐 주면 좋겠나요?'},
+  stability:{name:'안정감', kid:'어려움이 생겨도 혼자 버려지지 않고 도움을 받을 수 있다고 느끼고 싶은 마음이에요.', act:'무엇이 있으면 조금 더 안심될까요?'}
 };
 const NEED_IDS = Object.keys(NEEDS);
 let NEED_WORDS = Array.isArray(window.NEED_WORD_DICTIONARY) ? window.NEED_WORD_DICTIONARY : [];
@@ -407,14 +452,30 @@ const NEED_HINTS = {
   respect:['존중','인정','칭찬','대접','체면','명예','자존','가치','무시'],
   fairness:['공정','정의','공평','억울','평등','권리','보상','부당'],
   understanding:['이해','공감','알아주','들어주','속마음','수용','소통'],
-  connection:['연결','친밀','사랑','연애','친구','함께','대화','유대'],
+  connection:['연결','친밀','사랑','친구','함께','대화','유대','마음'],
   belonging:['소속','함께','공동체','친구','가족','보금자리','우리'],
   comfort:['위로','돌봄','보살핌','편안','안락','따뜻','달래','다독'],
   meaning:['의미','목적','이상','가치','정체성','자기실현','기여','꿈','보람'],
   competence:['성취','유능','성장','실력','능력','해내','배우','발전','성공','도전'],
   rest:['휴식','회복','잠','쉬','평온','피로','충전','여유','멈추'],
-  acceptance:['자기수용','수용','받아들','용서','회복','실수','자존','있는 그대로','내려놓']
+  acceptance:['자기수용','수용','받아들','용서','회복','실수','자존','있는 그대로','내려놓'],
+  help:['도움','협력','함께 해결','부탁','지원','나눠 맡','도와'],
+  consideration:['배려','챙겨','살펴','생각해','조심','먼저 알아차'],
+  support:['지지','응원','내 편','격려','버팀','함께 견뎌'],
+  recognition:['인정','알아봐','칭찬','노력','가치','존재','고생'],
+  stability:['안정','안심','든든','버려지지','같이 해결','기댈']
 };
+const FORBIDDEN_NEED_WORDS = [
+  ['결','혼'].join(''),
+  ['평','생',' ','함','께'].join(''),
+  ['함','께',' ','있','고',' ','싶','다'].join(''),
+  ['연','애','하','고',' ','싶','다'].join(''),
+  ['사','귀','고',' ','싶','다'].join(''),
+  ['아이를','갖고'].join(' '),
+  ['가정을','꾸리고'].join(' '),
+  ['배','우자'].join(''),
+  ['가','족','과',' ','함','께',' ','있','고'].join('')
+];
 const NEED_WORD_KIND_BONUS = {
   '자연스러운 표현':1.2,
   '단어':0.9,
@@ -452,8 +513,12 @@ function needWordMatches(item, words){
   const haystack = `${item.term} ${item.kid} ${item.section}`;
   return words.reduce((score, word)=>score + (haystack.includes(word) ? 1 : 0), 0);
 }
+function allowedNeedWord(item){
+  const haystack = `${item.term || ''} ${item.kid || ''}`;
+  return !FORBIDDEN_NEED_WORDS.some(word=>haystack.includes(word));
+}
 function needWordCandidates(needId, limit=5){
-  const list=(NEED_WORDS_BY_NEED[needId] || []).slice();
+  const list=(NEED_WORDS_BY_NEED[needId] || []).filter(allowedNeedWord).slice();
   if(!list.length) return [];
   const hints=NEED_HINTS[needId] || [];
   return list.map(item=>{
@@ -467,14 +532,14 @@ function needWordCandidates(needId, limit=5){
   }).sort((a,b)=>b.score-a.score || a.no-b.no).slice(0,limit);
 }
 const EMO_NEEDS = {
-  anxiety:['certainty','safety','comfort'], fear:['safety','comfort','certainty'],
-  anger:['respect','autonomy','fairness'], disgust:['safety','autonomy','respect'],
-  sadness:['comfort','connection','meaning'], lethargy:['rest','meaning','autonomy'],
-  loneliness:['connection','belonging','understanding'], resentment:['understanding','fairness','respect'],
-  shame:['acceptance','respect','belonging'], confusion:['certainty','understanding','rest'],
-  joy:['meaning','connection','competence'], calm:['safety','rest'],
-  affection:['connection','belonging'], pride:['competence','respect'],
-  gratitude:['connection','meaning'], anticipation:['meaning','autonomy','competence']
+  anxiety:['certainty','safety','stability','support','comfort'], fear:['safety','stability','support','help','certainty'],
+  anger:['respect','autonomy','fairness','recognition'], disgust:['safety','autonomy','respect','stability'],
+  sadness:['comfort','connection','support','meaning'], lethargy:['rest','meaning','support','autonomy'],
+  loneliness:['connection','belonging','support','understanding'], resentment:['understanding','fairness','respect','recognition'],
+  shame:['acceptance','respect','support','belonging'], confusion:['certainty','understanding','support','rest'],
+  joy:['meaning','connection','competence','recognition'], calm:['safety','rest','stability','certainty'],
+  affection:['connection','belonging','consideration','support'], pride:['competence','recognition','respect','meaning'],
+  gratitude:['help','consideration','understanding','support','recognition','connection','stability'], anticipation:['meaning','autonomy','competence','support']
 };
 const NEED_Q = [
   {need:'certainty', text:'앞으로 어떤 일이 생길지 순서대로 알려 주면 마음이 놓일 것 같아요?'},
@@ -489,16 +554,364 @@ const NEED_Q = [
   {need:'meaning', text:'이 일을 왜 해야 하는지 이유를 알면 더 견딜 수 있을 것 같아요?'},
   {need:'competence', text:'누군가가 “너는 해낼 수 있어”라고 믿어 주면 힘이 날 것 같아요?'},
   {need:'rest', text:'지금 계속 물어보거나 시키기보다 잠깐 멈추게 해 주면 좋겠어요?'},
-  {need:'acceptance', text:'실수한 뒤에도 “그래도 너는 괜찮은 사람이야”라는 말을 듣고 싶어요?'}
+  {need:'acceptance', text:'실수한 뒤에도 “그래도 너는 괜찮은 사람이야”라는 말을 듣고 싶어요?'},
+  {need:'help', text:'어려운 일을 혼자 하지 않게 누가 함께 도와주면 좋겠어요?'},
+  {need:'consideration', text:'상대가 내 상황을 먼저 생각하고 조심해 주면 좋겠어요?'},
+  {need:'support', text:'힘들 때 누가 내 편이 되어 주거나 응원해 주면 좋겠어요?'},
+  {need:'recognition', text:'내 노력이나 어려움을 누가 알아봐 주면 좋겠어요?'},
+  {need:'stability', text:'문제가 생겨도 혼자 버려지지 않고 같이 해결할 수 있으면 좋겠어요?'}
 ];
 /* 감정 스무고개 답변(yes)을 욕구 사전확률로 (이미 모은 단서를 재활용) */
 const ANSWER_NEED = {
-  q_threat:['certainty','safety'], q_bodyhigh:['safety'], q_relation:['connection','understanding'],
-  q_social:['understanding','fairness'], q_confront:['respect','fairness'], q_block:['autonomy'],
-  q_selfeval:['acceptance'], q_loss:['comfort','meaning','connection'], q_empty:['meaning','rest'],
-  q_avoid:['rest','safety'], q_bodylow:['rest'], q_warm:['connection','belonging'],
-  q_achieve:['competence','respect'], q_hide:['acceptance','understanding']
+  q_threat:['certainty','safety','stability'], q_bodyhigh:['safety','stability'], q_relation:['connection','understanding','support'],
+  q_social:['understanding','fairness','recognition'], q_confront:['respect','fairness','recognition'], q_block:['autonomy','help'],
+  q_selfeval:['acceptance','support'], q_loss:['comfort','meaning','connection','support'], q_empty:['meaning','rest'],
+  q_avoid:['rest','safety','stability'], q_bodylow:['rest','support'], q_warm:['connection','belonging','consideration','help'],
+  q_achieve:['competence','respect','recognition'], q_hide:['acceptance','understanding','support']
 };
+
+const NEED_EXAMPLES = {
+  safety:{met:'안전한 곳에 있거나 누군가가 위험하지 않다고 확인해 주었다.', unmet:'무슨 일이 생길지 몰라 몸과 마음이 계속 긴장했다.'},
+  certainty:{met:'다음 순서와 기준을 알게 되어 마음이 정리되었다.', unmet:'앞으로 어떻게 될지 몰라 계속 걱정이 커졌다.'},
+  autonomy:{met:'내가 직접 고르고 결정할 수 있는 부분이 있었다.', unmet:'내 뜻을 묻지 않고 누군가가 마음대로 정했다.'},
+  respect:{met:'내 말과 존재를 가볍게 여기지 않고 제대로 대해 주었다.', unmet:'무시당하거나 함부로 판단받는 느낌이 들었다.'},
+  fairness:{met:'규칙과 결과가 사람마다 비슷하게 적용되었다.', unmet:'같은 상황인데 나만 손해 보거나 나만 혼나는 것 같았다.'},
+  understanding:{met:'누군가가 내 이야기를 판단하지 않고 끝까지 들어 주었다.', unmet:'내가 왜 그런지 설명할 기회도 없이 판단받았다.'},
+  connection:{met:'누군가와 마음이 이어져 있고 혼자가 아니라는 느낌이 들었다.', unmet:'곁에 사람이 있어도 마음은 혼자인 것처럼 느껴졌다.'},
+  belonging:{met:'그 자리에서 나도 받아들여지고 있다는 느낌이 들었다.', unmet:'나만 빠진 것 같거나 어딘가에 끼지 못한 느낌이 들었다.'},
+  comfort:{met:'힘든 마음을 다독여 주는 말이나 태도를 만났다.', unmet:'힘든데도 아무도 알아주지 않아 더 쓸쓸했다.'},
+  meaning:{met:'이 일이 나에게 왜 중요한지 느껴졌다.', unmet:'왜 해야 하는지 몰라 마음이 텅 비거나 지쳤다.'},
+  competence:{met:'내가 해낼 수 있다는 믿음과 경험이 생겼다.', unmet:'아무리 해도 안 될 것 같아 자신감이 줄었다.'},
+  rest:{met:'잠깐 멈추고 몸과 마음을 회복할 시간이 있었다.', unmet:'계속 해야 해서 쉬거나 숨 돌릴 시간이 부족했다.'},
+  acceptance:{met:'실수해도 나를 완전히 나쁜 사람으로 몰지 않았다.', unmet:'실수 하나 때문에 나 전체가 부족한 사람처럼 느껴졌다.'},
+  help:{met:'버거운 일을 누군가가 나누어 맡거나 같이 해결해 주었다.', unmet:'혼자 감당하기 어려운데 도와주는 사람이 없는 것 같았다.'},
+  consideration:{met:'상대가 내 상황과 마음을 생각해서 조심스럽게 행동해 주었다.', unmet:'내 상태를 생각하지 않고 말이나 행동이 툭 들어왔다.'},
+  support:{met:'어려운 순간에 누군가가 내 편이 되어 주거나 응원해 주었다.', unmet:'힘든데도 내 편이 없는 것처럼 느껴졌다.'},
+  recognition:{met:'내 노력이나 어려움을 누군가가 알아봐 주었다.', unmet:'애쓴 일이 당연한 것처럼 지나가거나 무시되었다.'},
+  stability:{met:'문제가 생겨도 같이 해결할 수 있다는 든든함이 있었다.', unmet:'언제든 버려지거나 무너질 것 같은 불안정함이 있었다.'}
+};
+
+const EMOTION_PROFILES = {
+  anxiety:{
+    title:'불안·걱정',
+    one:'아직 일어나지 않은 일이 잘못될까 봐 마음이 조마조마해지는 감정이에요.',
+    when:['시험, 발표, 약속처럼 결과를 알 수 없는 일이 앞에 있을 때','중요한 사람의 대답이나 반응을 기다릴 때','실수하면 큰일 날 것 같다고 느낄 때','상황이 자주 바뀌어 무엇을 준비해야 할지 모를 때'],
+    why:'마음이 “미리 준비해야 안전할지도 몰라”라고 알려 주려 할 때 생길 수 있어요. 실제 위험이 크지 않아도, 불확실함이 크면 불안이 커질 수 있어요.',
+    thoughts:['“잘못되면 어떡하지?”','“내가 놓친 게 있나?”','“빨리 확실히 알고 싶다.”','“준비가 부족한 것 같아.”','“계속 확인해야 안심될 것 같아.”'],
+    body:['심장이 빨리 뛸 수 있어요.','가슴이나 배가 답답할 수 있어요.','손에 땀이 나거나 몸이 떨릴 수 있어요.','잠이 잘 오지 않을 수 있어요.','가만히 있어도 몸에 힘이 들어갈 수 있어요.'],
+    actions:['계속 확인하거나 검색할 수 있어요.','최악의 상황을 상상할 수 있어요.','해야 할 일을 미루거나 반대로 과하게 준비할 수 있어요.','주변 사람에게 괜찮은지 자꾸 물어볼 수 있어요.','작은 변화에도 깜짝 놀랄 수 있어요.'],
+    important:'불안은 나에게 안전, 준비, 확실함이 중요하다는 신호일 수 있어요. 불안을 없애야 할 적으로만 보지 말고, 무엇을 알고 싶고 무엇이 필요했는지 살펴보면 좋아요.',
+    needs:['certainty','safety','stability','support','comfort'],
+    similar:['두려움은 위험이 바로 앞에 있는 느낌에 더 가깝고, 불안은 아직 오지 않은 일을 미리 걱정하는 느낌에 가까워요.','혼란은 무엇이 뭔지 모르는 상태가 중심이고, 불안은 잘못될까 봐 긴장하는 마음이 중심일 수 있어요.','설렘도 두근거릴 수 있지만, 설렘은 좋은 일이 기대되는 쪽이고 불안은 나쁜 일이 걱정되는 쪽이에요.'],
+    levels:['1단계 · 살짝 신경 쓰여 자꾸 생각난다.','2단계 · 몸이 긴장되고 확인하고 싶어진다.','3단계 · 집중이 잘 안 되고 걱정이 계속 돈다.','4단계 · 숨이 답답하거나 아무것도 못 할 만큼 커질 수 있다.'],
+    check:['내가 지금 가장 걱정하는 “아직 일어나지 않은 일”은 무엇인가요?','확실히 알게 되면 마음이 놓일 정보는 무엇인가요?','내가 실제로 준비할 수 있는 작은 행동은 무엇인가요?','누가 옆에서 도와주면 조금 안심될까요?','내 걱정 중 사실과 상상은 어떻게 나눌 수 있을까요?'],
+    kid:'쉽게 말하면, 내일 시험이 걱정돼서 “망치면 어떡하지?” 하고 머릿속이 바빠지는 마음이에요. 예를 들어 숙제를 냈는데 선생님 반응을 기다리며 계속 휴대폰을 보는 것도 불안일 수 있어요.'
+  },
+  fear:{
+    title:'두려움·공포',
+    one:'지금 위험하거나 다칠 수 있다고 느껴 몸과 마음이 피하려는 감정이에요.',
+    when:['큰 소리나 위협적인 행동을 봤을 때','어두운 길이나 낯선 장소가 위험하게 느껴질 때','누군가에게 혼나거나 공격받을 것 같을 때','몸이나 마음이 실제로 안전하지 않다고 느낄 때'],
+    why:'두려움은 나를 지키기 위해 몸이 빠르게 경보를 울릴 때 생길 수 있어요. 마음은 “지금 멈추거나 도망치거나 도움을 구해야 할 수 있어”라고 알려 주는 거예요.',
+    thoughts:['“여기서 벗어나고 싶다.”','“위험할지도 몰라.”','“누가 도와줬으면 좋겠다.”','“몸이 굳는 것 같아.”','“괜찮다는 확인이 필요해.”'],
+    body:['몸이 굳거나 얼어붙을 수 있어요.','심장이 빠르게 뛰고 숨이 가빠질 수 있어요.','손발이 차가워질 수 있어요.','소리에 예민해질 수 있어요.','배가 아프거나 울렁거릴 수 있어요.'],
+    actions:['그 자리를 피하거나 숨을 수 있어요.','믿을 만한 사람에게 붙거나 연락할 수 있어요.','말이 잘 안 나오거나 얼어붙을 수 있어요.','주변을 계속 살필 수 있어요.','안전한 곳으로 가고 싶어질 수 있어요.'],
+    important:'두려움은 나에게 보호와 안전이 중요하다는 신호일 수 있어요. 이 감정이 크다면 “내가 지금 안전한가?”를 먼저 확인하는 것이 좋아요.',
+    needs:['safety','stability','support','help','certainty'],
+    similar:['불안은 앞으로의 가능성을 걱정하는 느낌이고, 두려움은 지금 또는 곧 닥칠 위험에 반응하는 느낌이에요.','혐오는 싫어서 밀어내고 싶은 느낌이 중심이고, 두려움은 위험해서 피하고 싶은 느낌이 중심이에요.','분노는 맞서고 싶은 힘이 생기지만, 두려움은 피하거나 숨고 싶은 쪽으로 나타날 수 있어요.'],
+    levels:['1단계 · 조금 무섭고 조심하게 된다.','2단계 · 몸이 긴장되고 안전한 곳을 찾는다.','3단계 · 얼어붙거나 피하고 싶어진다.','4단계 · 당장 도움과 보호가 필요하다고 느낄 수 있다.'],
+    check:['내가 위험하다고 느낀 것은 무엇인가요?','지금 실제로 안전한 장소나 사람이 있나요?','몸이 피하라고 말하는 신호가 있나요?','어떤 확인을 받으면 조금 안심될까요?','도움을 요청해야 할 상황일까요?'],
+    kid:'쉽게 말하면, 큰 개가 갑자기 달려와서 몸이 굳고 숨고 싶어지는 마음이에요. 마음이 나를 지키려고 “조심해!”라고 알려 주는 신호일 수 있어요.'
+  },
+  anger:{
+    title:'분노·짜증',
+    one:'내가 중요하게 여기는 것이 막히거나 무시당했다고 느낄 때 올라오는 뜨거운 감정이에요.',
+    when:['내 말을 듣지 않고 마음대로 정했을 때','공평하지 않은 일을 겪었을 때','누군가가 선을 넘거나 무시했을 때','하고 싶은 일이 계속 방해받을 때'],
+    why:'분노는 “이건 그냥 넘기기 어렵다”, “내 기준이나 권리를 지켜야 할 수 있다”는 마음의 신호일 수 있어요. 그 안에는 억울함, 상처, 답답함이 같이 들어 있을 수 있어요.',
+    thoughts:['“이건 아니잖아.”','“왜 내 말은 안 들어?”','“나만 손해 보는 것 같아.”','“당장 바로잡고 싶다.”','“무시당한 것 같아.”'],
+    body:['얼굴이 달아오를 수 있어요.','어깨와 턱에 힘이 들어갈 수 있어요.','목소리가 커질 수 있어요.','심장이 빠르게 뛸 수 있어요.','몸 안에 뜨거운 에너지가 차오를 수 있어요.'],
+    actions:['따지거나 설명하고 싶어질 수 있어요.','말이 날카로워질 수 있어요.','문제를 바로잡으려 할 수 있어요.','문을 세게 닫거나 몸짓이 커질 수 있어요.','화를 참고 있다가 나중에 터질 수 있어요.'],
+    important:'분노는 존중, 공정함, 선택권 같은 중요한 것이 부족했을 수 있다는 신호예요. 화 자체가 나쁜 것은 아니지만, 표현 방식은 안전하게 고르는 게 좋아요.',
+    needs:['respect','fairness','autonomy','recognition','understanding'],
+    similar:['짜증은 작은 불편이 쌓인 느낌일 수 있고, 분노는 더 크게 선을 넘었다고 느낄 때 강해질 수 있어요.','억울함은 “내 사정이 제대로 보이지 않았다”는 마음이 더 크고, 분노는 “바로잡고 싶다”는 힘이 더 클 수 있어요.','혐오는 멀리하고 싶은 마음이 중심이고, 분노는 맞서거나 바꾸고 싶은 마음이 중심이에요.'],
+    levels:['1단계 · 거슬리고 짜증이 난다.','2단계 · 말투가 날카로워지고 따지고 싶다.','3단계 · 계속 생각나고 몸에 힘이 들어간다.','4단계 · 폭발할 것 같아 잠시 멈춤이 필요할 수 있다.'],
+    check:['무엇이 내 기준에서 선을 넘었다고 느껴졌나요?','내가 공평하지 않다고 느낀 부분은 무엇인가요?','상대에게 꼭 전하고 싶은 사실은 무엇인가요?','내가 존중받고 싶었던 부분은 무엇인가요?','지금 안전하게 표현하려면 어떤 말이 좋을까요?'],
+    kid:'쉽게 말하면, 친구 둘이 같은 실수를 했는데 나만 혼나서 “왜 나만 그래?” 하고 속에서 불이 나는 마음이에요.'
+  },
+  disgust:{
+    title:'혐오·거부감',
+    one:'무언가가 너무 싫거나 내 기준에 맞지 않아 멀리하고 싶은 감정이에요.',
+    when:['불쾌한 말이나 행동을 봤을 때','내 몸이나 마음의 선을 침범당했다고 느낄 때','부정직하거나 잔인한 장면을 봤을 때','억지로 받아들이기 어려운 상황에 놓였을 때'],
+    why:'거부감은 내 마음이 “이건 가까이 두기 어렵다”, “거리를 두고 나를 보호해야 할 수 있다”라고 알려 줄 때 생길 수 있어요.',
+    thoughts:['“싫다, 멀리하고 싶다.”','“이건 받아들이기 어렵다.”','“내 기준과 너무 다르다.”','“더 이상 보고 싶지 않다.”','“거리를 둬야겠다.”'],
+    body:['속이 울렁거리거나 얼굴이 찌푸려질 수 있어요.','몸을 뒤로 빼고 싶을 수 있어요.','목이나 배가 불편할 수 있어요.','말수가 줄거나 표정이 굳을 수 있어요.','손을 씻고 싶거나 깨끗하게 정리하고 싶을 수 있어요.'],
+    actions:['자리를 피할 수 있어요.','상대를 멀리하거나 차갑게 대할 수 있어요.','싫다는 표시를 강하게 할 수 있어요.','그 상황을 다시 보지 않으려 할 수 있어요.','내 기준을 분명히 말하고 싶어질 수 있어요.'],
+    important:'거부감은 내 경계선, 안전, 존중이 중요하다는 신호일 수 있어요. 다만 싫다는 느낌이 든다고 해서 상대나 내가 틀렸다고 바로 확정하지 않고, 무엇이 불편했는지 살펴보면 좋아요.',
+    needs:['safety','autonomy','respect','stability'],
+    similar:['두려움은 위험해서 피하고 싶은 느낌이고, 혐오는 싫거나 불쾌해서 밀어내고 싶은 느낌에 가까워요.','분노는 바꾸거나 따지고 싶은 힘이 크고, 혐오는 거리를 두고 싶은 마음이 클 수 있어요.','불편함은 약한 신호이고, 혐오는 더 강한 거부 신호일 수 있어요.'],
+    levels:['1단계 · 찝찝하고 거슬린다.','2단계 · 표정이 굳고 피하고 싶다.','3단계 · 가까이 있기 어렵고 강하게 거절하고 싶다.','4단계 · 몸까지 불편해져 즉시 거리가 필요할 수 있다.'],
+    check:['내가 정확히 무엇을 불쾌하게 느꼈나요?','내 기준이나 경계선이 침범된 부분이 있나요?','거리를 두면 안전해질까요?','상대에게 어떤 선을 말해야 할까요?','이 감정 안에 두려움이나 분노도 섞여 있나요?'],
+    kid:'쉽게 말하면, 누군가 내 물건을 허락 없이 만지고 더럽게 써서 “싫어, 가까이 두고 싶지 않아”라고 느끼는 마음이에요.'
+  },
+  sadness:{
+    title:'슬픔·우울',
+    one:'소중한 것을 잃었거나 마음이 아파서 힘이 아래로 내려앉는 감정이에요.',
+    when:['좋아하던 사람, 장소, 기회와 멀어졌을 때','기대했던 일이 이루어지지 않았을 때','상처받는 말을 들었을 때','혼자 감당하기 어려운 일이 오래 이어질 때'],
+    why:'슬픔은 내 마음이 “이건 나에게 소중했어”, “위로와 시간이 필요해”라고 알려 줄 때 생길 수 있어요. 잃은 것이 작아 보여도 내 마음에는 클 수 있어요.',
+    thoughts:['“마음이 아프다.”','“다시 돌아오면 좋겠다.”','“왜 이렇게 된 걸까?”','“힘이 없다.”','“누가 알아줬으면 좋겠다.”'],
+    body:['눈물이 날 수 있어요.','가슴이 무겁거나 먹먹할 수 있어요.','몸에 힘이 빠질 수 있어요.','말하기가 귀찮아질 수 있어요.','잠이 늘거나 줄 수 있어요.'],
+    actions:['혼자 있고 싶어질 수 있어요.','천천히 움직이거나 아무것도 하기 싫을 수 있어요.','좋았던 일을 자꾸 떠올릴 수 있어요.','누군가에게 위로받고 싶을 수 있어요.','표현하지 못하고 마음속에 담아둘 수 있어요.'],
+    important:'슬픔은 내가 무엇을 사랑했고 무엇을 소중히 여겼는지 알려 줄 수 있어요. 이 감정은 빨리 없애야 하는 문제가 아니라, 마음이 애도하고 회복하는 과정일 수 있어요.',
+    needs:['comfort','connection','support','meaning'],
+    similar:['무기력은 에너지가 거의 없는 상태가 중심이고, 슬픔은 잃음이나 아픔이 중심일 수 있어요.','외로움은 연결이 부족하다는 느낌이 강하고, 슬픔은 상실이나 아쉬움이 더 클 수 있어요.','수치심은 “내가 부족하다”는 생각이 붙고, 슬픔은 “소중한 것이 아프다”는 느낌이 클 수 있어요.'],
+    levels:['1단계 · 아쉽고 마음이 살짝 가라앉는다.','2단계 · 눈물이 나거나 조용히 있고 싶다.','3단계 · 일상에 힘이 줄고 계속 마음이 아프다.','4단계 · 오래 지속되면 도움과 돌봄이 꼭 필요할 수 있다.'],
+    check:['내가 잃었거나 놓친 것은 무엇인가요?','그것이 나에게 왜 소중했나요?','지금 어떤 위로가 있으면 조금 나아질까요?','누가 내 마음을 조용히 들어주면 좋을까요?','이 슬픔이 오래 이어지고 있나요?'],
+    kid:'쉽게 말하면, 친한 친구와 멀어졌거나 아끼던 물건을 잃어서 가슴이 축 내려앉는 마음이에요.'
+  },
+  lethargy:{
+    title:'무기력·권태',
+    one:'몸과 마음의 힘이 줄어 아무것도 하기 싫거나 재미가 잘 느껴지지 않는 감정이에요.',
+    when:['해야 할 일이 너무 많아 지쳤을 때','계속 노력해도 달라지는 것이 없다고 느낄 때','쉬지 못하고 오래 버텼을 때','하던 일이 더 이상 의미 있게 느껴지지 않을 때'],
+    why:'무기력은 마음과 몸이 “힘이 부족해”, “이 방식으로는 더 버티기 어렵다”라고 알려 주는 신호일 수 있어요.',
+    thoughts:['“아무것도 하기 싫다.”','“해도 소용없을 것 같다.”','“재미가 없다.”','“왜 해야 하는지 모르겠다.”','“조금만 쉬고 싶다.”'],
+    body:['몸이 무겁게 느껴질 수 있어요.','아침에 일어나기 어려울 수 있어요.','움직임이 느려질 수 있어요.','머리가 멍할 수 있어요.','작은 일도 크게 힘들 수 있어요.'],
+    actions:['해야 할 일을 미룰 수 있어요.','말수가 줄고 누워 있고 싶을 수 있어요.','좋아하던 것도 귀찮게 느껴질 수 있어요.','핸드폰만 보며 시간을 보낼 수 있어요.','작은 선택도 어렵게 느낄 수 있어요.'],
+    important:'무기력은 휴식, 회복, 의미, 도움의 욕구가 부족했을 수 있다는 신호예요. “게으르다”로 단정하기보다 에너지가 왜 줄었는지 살펴보는 게 좋아요.',
+    needs:['rest','meaning','support','autonomy'],
+    similar:['슬픔은 마음의 아픔이 중심이고, 무기력은 에너지 부족이 중심일 수 있어요.','권태는 지루함과 반복감이 크고, 무기력은 움직일 힘 자체가 부족한 느낌에 가까워요.','혼란은 무엇을 해야 할지 모르겠는 상태이고, 무기력은 알아도 힘이 안 나는 상태일 수 있어요.'],
+    levels:['1단계 · 조금 귀찮고 미루고 싶다.','2단계 · 시작하기가 어렵고 집중이 줄어든다.','3단계 · 좋아하던 것도 재미가 줄어든다.','4단계 · 일상이 무너질 만큼 오래 이어지면 도움을 받는 게 좋다.'],
+    check:['내 몸은 쉬고 싶다고 말하고 있나요?','요즘 너무 오래 버틴 일은 무엇인가요?','이 일이 나에게 어떤 의미가 있었나요?','누가 작은 부분을 도와주면 시작할 수 있을까요?','가장 작게 해볼 수 있는 한 걸음은 무엇인가요?'],
+    kid:'쉽게 말하면, 게임도 숙제도 친구 연락도 다 귀찮고 침대에서 일어나기 힘든 마음이에요. 마음 배터리가 거의 없는 상태일 수 있어요.'
+  },
+  loneliness:{
+    title:'외로움',
+    one:'누군가와 마음이 이어지고 싶은데 혼자인 것처럼 느껴지는 감정이에요.',
+    when:['친구나 가족과 있어도 내 마음을 모른다고 느낄 때','중요한 이야기를 나눌 사람이 없을 때','모임에서 나만 빠진 것 같을 때','힘든 순간에 곁에 사람이 없다고 느낄 때'],
+    why:'외로움은 마음이 “연결이 필요해”, “내 이야기를 나눌 사람이 필요해”라고 알려 줄 때 생길 수 있어요.',
+    thoughts:['“나만 혼자인 것 같다.”','“내 마음을 아는 사람이 없나?”','“누군가 연락해 줬으면 좋겠다.”','“나는 여기 있어도 되는 걸까?”','“말해도 이해받지 못할 것 같다.”'],
+    body:['가슴이 허전하거나 텅 빈 느낌이 들 수 있어요.','몸이 차분히 가라앉을 수 있어요.','한숨이 늘 수 있어요.','목이 메거나 눈물이 날 수 있어요.','잠들기 전 생각이 많아질 수 있어요.'],
+    actions:['연락을 기다리거나 먼저 연락할까 망설일 수 있어요.','SNS를 오래 볼 수 있어요.','사람들을 피하면서도 연결을 바랄 수 있어요.','괜찮은 척할 수 있어요.','작은 관심에도 크게 마음이 움직일 수 있어요.'],
+    important:'외로움은 연결감, 소속감, 이해받음이 중요하다는 신호일 수 있어요. 외로움을 느낀다고 약한 사람이 되는 것은 아니에요.',
+    needs:['connection','belonging','support','understanding'],
+    similar:['슬픔은 잃음이나 아픔이 중심이고, 외로움은 마음의 연결이 부족한 느낌이 중심이에요.','서운함은 특정 사람이 내 마음을 몰라줬다는 느낌이 강하고, 외로움은 더 넓게 혼자인 느낌일 수 있어요.','평온한 혼자 있음은 편하지만, 외로움은 연결을 바라는데 비어 있는 느낌이에요.'],
+    levels:['1단계 · 살짝 허전하고 누가 생각난다.','2단계 · 연락을 기다리거나 소속감이 흔들린다.','3단계 · 사람들 사이에서도 혼자인 것 같다.','4단계 · 오래 깊어지면 지지와 도움을 찾는 것이 필요할 수 있다.'],
+    check:['나는 누구에게 내 마음을 말하고 싶나요?','어떤 자리에서 빠진 것처럼 느꼈나요?','이해받고 싶은 이야기는 무엇인가요?','작게 연결을 시작할 방법은 무엇인가요?','혼자 있고 싶은 마음과 연결되고 싶은 마음 중 무엇이 더 큰가요?'],
+    kid:'쉽게 말하면, 반 친구들이 웃고 떠드는데 나만 투명인간처럼 느껴지는 마음이에요. 누군가 내 마음을 알아주면 좋겠다는 신호일 수 있어요.'
+  },
+  resentment:{
+    title:'억울·서운함',
+    one:'내 사정이나 마음이 제대로 보이지 않아 나만 손해 본 것처럼 느끼는 감정이에요.',
+    when:['내 이야기를 듣지 않고 판단받았을 때','같이 한 일인데 나만 책임지는 것 같을 때','기대했던 배려나 연락이 없었을 때','내 노력이 당연한 것처럼 지나갔을 때'],
+    why:'억울함과 서운함은 이해받음, 공정함, 인정이 부족했을 때 생길 수 있어요. 마음이 “내 입장도 봐 줘”라고 말하는 신호일 수 있어요.',
+    thoughts:['“내 말도 들어봐야지.”','“왜 나만 이렇게 됐지?”','“내가 얼마나 애썼는지 모르는구나.”','“그렇게 말하면 너무 서운해.”','“공평하지 않아.”'],
+    body:['가슴이 답답하거나 목이 메일 수 있어요.','눈물이 나면서도 화가 날 수 있어요.','속이 꽉 막힌 느낌이 들 수 있어요.','말하려면 떨릴 수 있어요.','생각할수록 몸에 힘이 들어갈 수 있어요.'],
+    actions:['상대에게 설명하고 싶어질 수 있어요.','말을 줄이거나 삐친 것처럼 보일 수 있어요.','지난 일을 반복해서 떠올릴 수 있어요.','공평한 기준을 요구할 수 있어요.','고맙다는 말이나 사과를 기다릴 수 있어요.'],
+    important:'이 감정은 내 입장, 노력, 공정함이 중요했다는 것을 알려 줄 수 있어요. 단정하기보다 어떤 부분이 가장 받아들이기 어려웠는지 찾아보면 좋아요.',
+    needs:['understanding','fairness','respect','recognition'],
+    similar:['분노는 바로잡고 싶은 힘이 더 크고, 억울함은 내 사정이 보이지 않았다는 아픔이 더 클 수 있어요.','슬픔은 잃은 것의 아픔이 중심이고, 서운함은 관계 안에서 기대가 빗나간 느낌이 중심이에요.','수치심은 “내가 문제인가”로 향하고, 억울함은 “상황이 부당하다”로 향할 수 있어요.'],
+    levels:['1단계 · 조금 섭섭하고 마음에 걸린다.','2단계 · 계속 생각나고 설명하고 싶다.','3단계 · 화와 눈물이 함께 올라올 수 있다.','4단계 · 관계를 피하거나 강하게 따지고 싶을 수 있다.'],
+    check:['내 이야기를 듣지 않고 판단한 부분이 있었나요?','내가 손해 봤다고 느낀 것은 무엇인가요?','상대가 알아줬으면 했던 내 노력은 무엇인가요?','어떤 기준이 공평하다고 느껴지나요?','사과, 설명, 인정 중 무엇이 가장 필요했나요?'],
+    kid:'쉽게 말하면, 같이 장난쳤는데 나만 혼나서 “내 얘기도 들어줘야지!” 하고 속상한 마음이에요.'
+  },
+  shame:{
+    title:'수치·죄책',
+    one:'내가 잘못했거나 부족한 사람처럼 느껴져 숨고 싶어지는 감정이에요.',
+    when:['실수했는데 사람들이 알게 됐을 때','누군가에게 상처를 준 것 같을 때','기대에 못 미쳤다고 느낄 때','비교당하거나 창피한 말을 들었을 때'],
+    why:'수치심과 죄책감은 내가 좋은 사람이고 싶고, 관계를 회복하고 싶고, 받아들여지고 싶을 때 생길 수 있어요. 다만 실수와 나 전체를 같은 것으로 보면 너무 아파질 수 있어요.',
+    thoughts:['“내가 왜 그랬지?”','“사람들이 나를 이상하게 볼 거야.”','“숨고 싶다.”','“나는 부족한 사람인가 봐.”','“다시 기회가 있을까?”'],
+    body:['얼굴이 뜨거워질 수 있어요.','고개를 숙이고 싶을 수 있어요.','가슴이 쿵 내려앉을 수 있어요.','몸이 작아지는 느낌이 들 수 있어요.','속이 무겁거나 답답할 수 있어요.'],
+    actions:['숨거나 말을 줄일 수 있어요.','사과하고 싶지만 망설일 수 있어요.','자기비난을 반복할 수 있어요.','실수를 감추려 할 수 있어요.','완벽하게 하려고 지나치게 애쓸 수 있어요.'],
+    important:'이 감정은 회복, 책임, 자기수용, 존중이 중요하다는 신호일 수 있어요. “내가 나쁜 사람”이라고 단정하기보다 “내가 한 행동 중 무엇을 고치면 좋을까?”로 나눠 보는 것이 좋아요.',
+    needs:['acceptance','respect','support','belonging'],
+    similar:['죄책감은 “내 행동이 누군가에게 영향을 줬다”에 가깝고, 수치심은 “나 자체가 문제다”처럼 느껴질 수 있어요.','불안은 앞으로 들킬까 걱정하는 느낌이고, 수치심은 이미 내가 부족해 보인다는 느낌이 클 수 있어요.','슬픔은 마음의 아픔이 중심이고, 수치심은 숨고 싶은 마음이 더 클 수 있어요.'],
+    levels:['1단계 · 민망하고 얼굴이 뜨겁다.','2단계 · 숨고 싶고 자꾸 후회된다.','3단계 · 나 자신을 심하게 비난하게 된다.','4단계 · 관계와 일상을 피할 만큼 커질 수 있어 도움과 회복이 필요하다.'],
+    check:['내가 한 행동과 나 자신을 구분할 수 있나요?','정말 사과하거나 고쳐야 할 부분은 무엇인가요?','내가 너무 크게 나를 비난하고 있지는 않나요?','믿을 만한 사람이 있다면 뭐라고 말해 줄까요?','다시 기회를 만들 작은 행동은 무엇인가요?'],
+    kid:'쉽게 말하면, 발표하다가 틀려서 “다들 나를 이상하게 보면 어떡하지?” 하고 숨고 싶은 마음이에요.'
+  },
+  confusion:{
+    title:'혼란·막막함',
+    one:'무엇을 느끼고 무엇을 해야 할지 잘 정리되지 않아 머릿속이 뒤죽박죽인 감정이에요.',
+    when:['정보가 너무 많거나 서로 다를 때','선택지가 많아 결정하기 어려울 때','내 마음도 상대 마음도 잘 모르겠을 때','갑자기 큰 일이 생겨 순서를 잡기 어려울 때'],
+    why:'혼란은 마음이 “잠깐 멈추고 정리해야 해”, “확실한 정보가 더 필요해”라고 알려 줄 때 생길 수 있어요.',
+    thoughts:['“뭐가 맞는지 모르겠다.”','“어디서부터 해야 하지?”','“내 마음도 잘 모르겠다.”','“생각이 꼬인다.”','“누가 정리해 줬으면 좋겠다.”'],
+    body:['머리가 멍하거나 무거울 수 있어요.','가슴이 답답할 수 있어요.','말이 잘 정리되지 않을 수 있어요.','집중이 흐려질 수 있어요.','몸은 피곤한데 마음은 바쁠 수 있어요.'],
+    actions:['결정을 미룰 수 있어요.','같은 이야기를 여러 번 반복할 수 있어요.','메모하거나 정리하고 싶어질 수 있어요.','누군가에게 설명을 부탁할 수 있어요.','아무 선택도 하지 못하고 멈출 수 있어요.'],
+    important:'혼란은 명료함, 이해, 휴식이 필요할 수 있다는 신호예요. 바로 정답을 내리기보다 아는 것과 모르는 것을 나누면 마음이 조금 가벼워질 수 있어요.',
+    needs:['certainty','understanding','support','rest'],
+    similar:['불안은 잘못될까 봐 긴장하는 마음이 크고, 혼란은 무엇이 무엇인지 정리되지 않는 느낌이 커요.','무기력은 힘이 없는 느낌이고, 혼란은 머릿속이 복잡한 느낌에 가까워요.','설렘도 정신없을 수 있지만, 설렘은 좋은 기대가 섞여 있을 수 있어요.'],
+    levels:['1단계 · 조금 헷갈리고 다시 확인하고 싶다.','2단계 · 선택이 어렵고 생각이 꼬인다.','3단계 · 머리가 멍해져 행동이 멈춘다.','4단계 · 큰 결정을 혼자 내리기 어려워 도움과 정리가 필요하다.'],
+    check:['지금 내가 확실히 아는 것은 무엇인가요?','아직 모르는 것은 무엇인가요?','지금 당장 정해야 하는 것과 나중에 정해도 되는 것은 무엇인가요?','누구에게 설명을 부탁하면 좋을까요?','한 줄로 정리하면 지금 문제는 무엇인가요?'],
+    kid:'쉽게 말하면, 숙제, 친구 문제, 일정이 한꺼번에 와서 “뭐부터 하지?” 하고 머리가 하얘지는 마음이에요.'
+  },
+  joy:{
+    title:'기쁨·즐거움',
+    one:'좋은 일이 있거나 마음에 맞는 순간을 만나 신나고 밝아지는 감정이에요.',
+    when:['재미있는 일을 하거나 좋아하는 사람과 웃을 때','바라던 일이 이루어졌을 때','새로운 경험이 즐겁게 느껴질 때','내가 살아 있다는 느낌이 선명할 때'],
+    why:'기쁨은 나에게 의미, 재미, 연결, 성장이 채워졌을 수 있다는 신호예요. 마음이 “이건 나에게 좋아”, “이 방향을 기억해”라고 알려 줄 수 있어요.',
+    thoughts:['“좋다!”','“이 순간이 계속 기억나면 좋겠다.”','“또 해보고 싶다.”','“나답게 웃고 있다.”','“이 사람들과 있으면 즐겁다.”'],
+    body:['얼굴에 미소가 날 수 있어요.','몸이 가볍게 느껴질 수 있어요.','말이 많아지거나 웃음이 날 수 있어요.','가슴이 환해지는 느낌이 들 수 있어요.','에너지가 올라올 수 있어요.'],
+    actions:['웃거나 뛰고 싶어질 수 있어요.','누군가에게 이야기하고 싶어질 수 있어요.','그 일을 다시 하고 싶어질 수 있어요.','사진이나 기록으로 남기고 싶어질 수 있어요.','주변 사람에게도 좋은 기분을 나누고 싶을 수 있어요.'],
+    important:'기쁨은 내 삶에서 무엇이 나를 살게 하고 즐겁게 하는지 알려 줄 수 있어요. 이미 채워진 소중한 욕구를 발견하는 단서일 수 있어요.',
+    needs:['meaning','connection','competence','recognition'],
+    similar:['설렘은 좋은 일이 오기 전의 두근거림이고, 기쁨은 좋은 일을 겪는 중이거나 겪은 뒤의 즐거움에 가까워요.','자부심은 내가 해낸 것에 대한 뿌듯함이 중심이고, 기쁨은 더 넓은 즐거움이에요.','평안은 조용히 편한 느낌이고, 기쁨은 에너지가 더 밝게 올라올 수 있어요.'],
+    levels:['1단계 · 살짝 기분이 좋아진다.','2단계 · 웃음이 나고 말하고 싶어진다.','3단계 · 몸까지 가볍고 신난다.','4단계 · 벅차고 오래 기억하고 싶은 순간이 된다.'],
+    check:['무엇이 나를 가장 즐겁게 했나요?','누구와 어떤 순간이 좋았나요?','이 기쁨이 알려주는 내 취향이나 가치는 무엇인가요?','어떤 욕구가 채워졌을 수 있나요?','이 순간을 어떻게 기억하고 싶나요?'],
+    kid:'쉽게 말하면, 친구와 크게 웃거나 좋아하던 일이 잘돼서 마음이 반짝 켜지는 느낌이에요.'
+  },
+  calm:{
+    title:'평안·안도',
+    one:'걱정이나 긴장이 줄어 마음이 편하게 놓이는 감정이에요.',
+    when:['걱정하던 일이 괜찮게 지나갔을 때','안전한 장소나 사람 곁에 있다고 느낄 때','해야 할 일을 마치고 숨을 돌릴 때','몸과 마음이 쉬어도 된다고 느낄 때'],
+    why:'평안과 안도는 안전, 휴식, 예측가능성이 채워졌을 수 있다는 신호예요. 마음이 “지금은 조금 내려놓아도 괜찮아”라고 말하는 것일 수 있어요.',
+    thoughts:['“이제 괜찮다.”','“숨을 돌릴 수 있겠다.”','“걱정을 조금 내려놓아도 되겠다.”','“여기는 안전한 것 같다.”','“지금 이 느낌을 지키고 싶다.”'],
+    body:['숨이 천천히 쉬어질 수 있어요.','어깨와 턱의 힘이 풀릴 수 있어요.','가슴이 편안해질 수 있어요.','몸이 따뜻하거나 느슨해질 수 있어요.','졸리거나 쉬고 싶어질 수 있어요.'],
+    actions:['천천히 말하고 움직일 수 있어요.','주변을 부드럽게 바라볼 수 있어요.','쉬거나 정리하고 싶어질 수 있어요.','감정을 차분히 생각할 수 있어요.','다음 일을 계획할 힘이 생길 수 있어요.'],
+    important:'평안은 내게 어떤 환경과 관계가 안전하게 느껴지는지 알려 줄 수 있어요. 이미 채워진 안전감과 회복감을 잘 기억해 두면 다음에도 도움이 될 수 있어요.',
+    needs:['safety','rest','stability','certainty'],
+    similar:['기쁨은 밝고 올라가는 에너지가 크고, 평안은 조용히 안정되는 느낌이에요.','안도는 걱정이 끝난 뒤의 편안함에 가깝고, 평안은 더 넓고 오래 머무는 안정감일 수 있어요.','무기력은 힘이 빠져 가라앉는 느낌이고, 평안은 쉬어도 괜찮다는 편안함이 있어요.'],
+    levels:['1단계 · 조금 마음이 놓인다.','2단계 · 숨이 편해지고 몸의 힘이 풀린다.','3단계 · 생각이 차분해지고 안정된다.','4단계 · 깊이 쉬어도 된다는 든든함이 생긴다.'],
+    check:['무엇 때문에 마음이 놓였나요?','어떤 사람이나 장소가 안전하게 느껴졌나요?','내 몸에서 긴장이 풀린 부분은 어디인가요?','이 평안이 알려주는 필요한 환경은 무엇인가요?','다음에도 이 느낌을 만들려면 무엇이 도움이 될까요?'],
+    kid:'쉽게 말하면, 무서운 검사가 끝나고 결과가 괜찮아서 “휴, 이제 괜찮다” 하고 숨이 편해지는 마음이에요.'
+  },
+  affection:{
+    title:'애정·유대',
+    one:'누군가가 소중하고 마음이 따뜻하게 이어져 있다고 느끼는 감정이에요.',
+    when:['상대가 나를 잘 알아주거나 챙겨 줄 때','함께 웃거나 편안한 시간을 보낼 때','상대의 좋은 점이 눈에 들어올 때','멀리 있어도 그 사람이 잘 지내길 바랄 때'],
+    why:'애정은 연결감, 소속감, 배려, 지지가 채워졌거나 중요하다는 신호일 수 있어요. 꼭 특정 관계 형태를 정해야 하는 마음은 아니고, 마음의 따뜻한 연결을 느끼는 상태일 수 있어요.',
+    thoughts:['“이 사람이 소중하다.”','“마음이 따뜻하다.”','“잘 지냈으면 좋겠다.”','“내 마음을 전하고 싶다.”','“이 관계를 조심스럽게 아끼고 싶다.”'],
+    body:['가슴이 따뜻해질 수 있어요.','표정이 부드러워질 수 있어요.','상대를 보면 미소가 날 수 있어요.','몸의 긴장이 줄 수 있어요.','마음이 몽글몽글해질 수 있어요.'],
+    actions:['다정한 말을 건네고 싶어질 수 있어요.','상대를 챙기고 싶어질 수 있어요.','좋은 것을 나누고 싶어질 수 있어요.','상대 이야기를 더 듣고 싶어질 수 있어요.','마음을 표현하지 못하고 조용히 간직할 수도 있어요.'],
+    important:'애정은 나에게 연결, 배려, 신뢰가 소중하다는 것을 알려 줄 수 있어요. 감정이 있다고 해서 반드시 어떤 행동을 해야 하는 것은 아니며, 내 마음과 상대의 마음을 함께 존중하는 것이 좋아요.',
+    needs:['connection','belonging','consideration','support'],
+    similar:['감사는 누군가의 도움이나 배려를 고맙게 느끼는 마음이고, 애정은 상대 자체가 소중하게 느껴지는 마음에 가까워요.','기쁨은 즐거운 순간의 밝음이 중심이고, 애정은 관계의 따뜻함이 중심일 수 있어요.','외로움은 연결이 부족한 느낌이고, 애정은 연결이 있거나 소중하다고 느끼는 마음이에요.'],
+    levels:['1단계 · 호감과 따뜻함이 생긴다.','2단계 · 상대가 더 소중하게 느껴진다.','3단계 · 챙기고 표현하고 싶어진다.','4단계 · 깊은 유대감 때문에 벅차거나 조심스러울 수 있다.'],
+    check:['상대의 어떤 행동이나 모습이 따뜻하게 느껴졌나요?','그 사람과 있을 때 내 마음은 어떻게 달라지나요?','이 감정이 알려주는 소중한 관계의 모습은 무엇인가요?','내 마음을 표현한다면 어떤 말이 안전할까요?','상대의 마음과 경계도 함께 존중하고 있나요?'],
+    kid:'쉽게 말하면, 누군가를 보면 마음이 따뜻해지고 “이 사람은 내게 소중해”라고 느끼는 마음이에요. 친구가 힘들 때 챙겨주고 싶은 마음도 애정일 수 있어요.'
+  },
+  pride:{
+    title:'성취·자부심',
+    one:'내가 애쓴 일을 해냈다고 느껴 스스로가 뿌듯하고 당당해지는 감정이에요.',
+    when:['어려운 일을 끝까지 해냈을 때','연습한 만큼 실력이 늘었을 때','누군가가 내 노력을 알아봐 줬을 때','내 기준에서 의미 있는 선택을 했을 때'],
+    why:'자부심은 유능감, 인정, 존중, 의미가 채워졌을 수 있다는 신호예요. 마음이 “내가 해낸 과정도 중요해”라고 알려 줄 수 있어요.',
+    thoughts:['“내가 해냈다.”','“포기하지 않길 잘했다.”','“조금 성장한 것 같다.”','“내 노력이 의미 있었다.”','“다음에도 해볼 수 있겠다.”'],
+    body:['어깨가 펴질 수 있어요.','미소가 나거나 목소리에 힘이 생길 수 있어요.','몸이 가볍게 느껴질 수 있어요.','가슴이 벅찰 수 있어요.','에너지가 올라올 수 있어요.'],
+    actions:['결과를 보여주고 싶어질 수 있어요.','자랑하거나 나누고 싶어질 수 있어요.','다음 목표를 세우고 싶어질 수 있어요.','도와준 사람에게 고마움을 느낄 수 있어요.','내가 한 과정을 기록하고 싶어질 수 있어요.'],
+    important:'자부심은 내가 어떤 노력과 성장을 소중하게 여기는지 알려 줄 수 있어요. 다른 사람보다 우월하다는 뜻이 아니라, 내가 걸어온 과정을 인정하는 마음일 수 있어요.',
+    needs:['competence','recognition','respect','meaning'],
+    similar:['기쁨은 즐거움이 중심이고, 자부심은 내가 해낸 과정과 성장에 대한 뿌듯함이 중심이에요.','감사는 다른 사람의 도움을 고맙게 느끼는 마음이고, 자부심은 내 노력의 의미를 알아차리는 마음이에요.','우월감은 남과 비교해 높게 느끼는 쪽이고, 건강한 자부심은 내 성장을 인정하는 쪽이에요.'],
+    levels:['1단계 · 작게 뿌듯하다.','2단계 · 내가 해낸 일이 분명히 기쁘다.','3단계 · 자신감이 생기고 말하고 싶어진다.','4단계 · 오래 기억하고 싶은 중요한 성취가 된다.'],
+    check:['내가 무엇을 해냈나요?','그 과정에서 가장 애쓴 부분은 무엇인가요?','누가 내 노력을 알아봐 주면 좋을까요?','이 경험이 나에게 어떤 의미가 있나요?','다음에도 기억하고 싶은 나의 힘은 무엇인가요?'],
+    kid:'쉽게 말하면, 어려운 문제를 계속 풀어서 결국 맞혔을 때 “나 진짜 해냈다!” 하고 어깨가 펴지는 마음이에요.'
+  },
+  gratitude:{
+    title:'감동·감사',
+    one:'나를 위해 누군가가 시간이나 마음을 써주었다고 느낄 때 생기는 고마운 마음이에요.',
+    when:['힘든 일을 누군가가 함께 해결해 주었을 때','말하지 않았는데도 내 상황을 알아차리고 챙겨 주었을 때','모두가 외면할 때 한 사람이 내 편이 되어 주었을 때','내 노력이나 어려움을 알아보고 따뜻하게 말해 주었을 때','실수했는데 비난하지 않고 다시 기회를 주었을 때'],
+    why:'감사는 단순히 도움을 받았기 때문에만 생기지는 않을 수 있어요. 그 행동을 통해 “이 사람이 나를 생각해 주었구나”, “나는 혼자가 아니구나”라고 느껴져서 생길 수 있어요.',
+    thoughts:['“나를 생각해 주었구나.”','“혼자 해결하지 않아도 되는구나.”','“내 어려움을 알아봐 줬어.”','“정말 고맙다.”','“나도 좋은 마음을 돌려주고 싶다.”','“이 도움을 오래 기억하고 싶다.”'],
+    body:['가슴이나 마음이 따뜻해질 수 있어요.','긴장했던 몸에 힘이 풀릴 수 있어요.','가슴이 뭉클해질 수 있어요.','목이 메거나 눈물이 날 것 같을 수 있어요.','자연스럽게 미소가 나올 수 있어요.'],
+    actions:['상대방에게 고맙다고 말하고 싶어질 수 있어요.','받은 도움을 다른 방식으로 돌려주고 싶어질 수 있어요.','상대방을 더 믿거나 가깝게 느낄 수 있어요.','그 행동을 오래 기억할 수 있어요.','감사한 마음을 표현하지 못하고 마음속으로만 간직할 수도 있어요.'],
+    important:'감사한 마음은 나에게 어떤 행동과 관계가 중요했는지 알려 줄 수 있어요. 누군가가 내 이야기를 들어줘서 감사했다면 이해받음과 공감이, 어려운 일을 함께 처리해 줘서 감사했다면 도움과 지지가 채워졌을 수 있어요.',
+    needs:['help','consideration','support','connection','recognition'],
+    similar:['감동은 꼭 내가 도움을 받지 않아도 아름답거나 의미 있는 장면을 보고 마음이 움직이는 감정일 수 있어요. 감사는 보통 누군가 또는 무엇인가 덕분이라는 고마움이 들어 있어요.','존경은 상대의 태도나 능력을 훌륭하게 보고 본받고 싶은 마음이고, 감사는 상대가 나에게 준 도움이나 배려를 고맙게 느끼는 마음이에요.','큰 도움을 받으면 “고맙지만 부담을 준 것 같아”라는 미안함이 함께 섞일 수도 있어요.'],
+    levels:['1단계 · 작은 친절에 가볍게 고마움을 느낀다.','2단계 · 상대의 마음과 노력을 분명히 알아차린다.','3단계 · 오래 기억하고 싶을 만큼 깊이 고맙다.','4단계 · 어떻게 표현해야 할지 모를 만큼 벅차고 뭉클할 수 있다.'],
+    check:['그 사람이 해준 행동 중 무엇이 가장 고마웠나요?','어려운 일을 대신하거나 함께 해결해 준 것이 고마웠나요?','내 마음과 상황을 이해해 준 것이 고마웠나요?','힘들 때 내 편이 되어 준 것이 고마웠나요?','내 노력이나 가치를 알아봐 준 것이 고마웠나요?','그 행동을 통해 혼자가 아니라는 느낌을 받았나요?'],
+    kid:'쉽게 말하면, 누군가가 나를 도와주거나 생각해 주어서 “이 사람이 나를 소중하게 생각해 주었구나”라고 느끼며 마음이 따뜻해지는 것이 감사예요. 예를 들어 힘든 숙제를 친구가 같이 봐 주고 “괜찮아, 같이 해보자”라고 말해 준 순간일 수 있어요.'
+  },
+  anticipation:{
+    title:'설렘·기대',
+    one:'좋은 일이 생길 것 같아 마음이 두근거리고 앞으로가 궁금해지는 감정이에요.',
+    when:['기다리던 만남이나 행사가 다가올 때','새로운 도전이나 기회가 생겼을 때','좋은 결과를 상상할 수 있을 때','내가 원하는 방향으로 일이 움직일 것 같을 때'],
+    why:'설렘은 의미, 선택, 성장, 지지가 채워졌거나 곧 채워질 수 있다고 마음이 느낄 때 생길 수 있어요.',
+    thoughts:['“빨리 그날이 왔으면 좋겠다.”','“잘되면 정말 좋겠다.”','“어떤 일이 생길까?”','“나도 해보고 싶다.”','“조금 긴장되지만 기대된다.”'],
+    body:['심장이 기분 좋게 뛸 수 있어요.','몸이 가벼워질 수 있어요.','웃음이 날 수 있어요.','잠들기 전 상상이 많아질 수 있어요.','에너지가 올라올 수 있어요.'],
+    actions:['계획을 세우고 싶어질 수 있어요.','관련된 것을 찾아보거나 준비할 수 있어요.','누군가에게 이야기하고 싶어질 수 있어요.','상상하며 기분 좋아질 수 있어요.','기대가 커서 조금 불안해질 수도 있어요.'],
+    important:'설렘은 내 마음이 어떤 미래를 원하고 어떤 가능성을 소중하게 여기는지 알려 줄 수 있어요. 좋은 기대 안에도 약간의 긴장이 섞일 수 있어요.',
+    needs:['meaning','autonomy','competence','support'],
+    similar:['불안도 두근거릴 수 있지만, 불안은 잘못될까 봐 걱정하는 쪽이고 설렘은 잘될 수도 있다는 기대가 섞여 있어요.','기쁨은 이미 즐거운 일이 생긴 뒤의 감정에 가깝고, 설렘은 앞으로 올 일을 기다리는 마음에 가까워요.','자부심은 해낸 뒤의 뿌듯함이고, 설렘은 해보기 전의 기대감이에요.'],
+    levels:['1단계 · 살짝 기대되고 웃음이 난다.','2단계 · 자꾸 상상하고 준비하고 싶다.','3단계 · 몸이 두근거리고 에너지가 올라온다.','4단계 · 너무 기대돼서 잠이 안 오거나 긴장도 함께 올 수 있다.'],
+    check:['내가 가장 기대하는 장면은 무엇인가요?','그 일이 나에게 왜 중요하나요?','내가 선택하고 준비할 수 있는 부분은 무엇인가요?','누가 응원해 주면 더 든든할까요?','기대와 걱정이 함께 있다면 각각 무엇인가요?'],
+    kid:'쉽게 말하면, 내일 소풍을 앞두고 가방을 여러 번 확인하며 “빨리 내일이 오면 좋겠다” 하고 두근거리는 마음이에요.'
+  }
+};
+
+function uniqueIds(ids){
+  return [...new Set((ids || []).filter(id=>NEEDS[id]))];
+}
+function profileForEmotion(emotionId){
+  const emotion = EMAP[emotionId] || {};
+  return EMOTION_PROFILES[emotionId] || {
+    title:emotion.name || '감정',
+    one:emotion.kid || '지금 마음이 보내는 신호일 수 있어요.',
+    when:['비슷한 일이 있었을 때 느껴질 수 있어요.'],
+    why:'정확한 이유는 사람마다 다를 수 있어요. 어떤 상황에서 커졌는지 천천히 확인해 보세요.',
+    thoughts:['“내 마음이 왜 이럴까?”'],
+    body:['몸의 느낌은 사람마다 다를 수 있어요.'],
+    actions:['표현하지 않고 마음속에 둘 수도 있어요.'],
+    important:'이 감정은 나에게 중요한 것이 있다는 신호일 수 있어요.',
+    needs:EMO_NEEDS[emotionId] || [],
+    similar:['비슷한 감정과 섞여 있을 수 있어요.'],
+    levels:['1단계 · 살짝 느껴진다.','2단계 · 분명히 알아차린다.','3단계 · 행동과 생각에 영향을 준다.','4단계 · 도움이 필요할 만큼 커질 수 있다.'],
+    check:['이 설명 중 내 마음과 가장 비슷한 부분은 무엇인가요?'],
+    kid:emotion.kid || '쉽게 말하면, 내 마음이 지금 중요한 신호를 보내고 있는 거예요.'
+  };
+}
+function relatedNeedIds(emotionId, rankedNeeds){
+  const profile = profileForEmotion(emotionId);
+  const rankedIds = (rankedNeeds || []).map(item=>item.id);
+  return uniqueIds([...(profile.needs || []), ...rankedIds, ...(EMO_NEEDS[emotionId] || [])]).slice(0,5);
+}
+function listHTML(items){
+  return `<ul>${(items || []).map(item=>`<li>${safeText(item)}</li>`).join('')}</ul>`;
+}
+function needCardsHTML(needIds, positive){
+  return `<div class="need-grid">${needIds.map(id=>{
+    const need=NEEDS[id], example=NEED_EXAMPLES[id] || {};
+    const label=positive ? '채워졌을 수 있는 예시' : '부족했을 수 있는 예시';
+    const exampleText=positive ? example.met : example.unmet;
+    return `<div class="need-card"><b>${safeText(need.name)}</b><span>${safeText(need.kid)}</span>${exampleText?`<em>${label} · ${safeText(exampleText)}</em>`:''}</div>`;
+  }).join('')}</div>`;
+}
+function checkOptionsHTML(items){
+  return `<div class="check-options">${(items || []).map(item=>`<div class="check-option">${safeText(item)}</div>`).join('')}</div>`;
+}
+function profileHTML(emo, detail, rankedNeeds){
+  const profile=profileForEmotion(emo.id);
+  const positive=emo.v>0;
+  const needIds=relatedNeedIds(emo.id, rankedNeeds);
+  const needsTitle=positive ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구';
+  const importantTitle=positive ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
+  const needIntro=positive
+    ? '이 감정은 아래 욕구들이 이미 채워졌을 가능성을 알려 줄 수 있어요. 꼭 하나만 맞는 것은 아니니, 내 상황과 가까운 것을 골라 보세요.'
+    : '이 감정은 아래 욕구들이 부족했을 가능성을 알려 줄 수 있어요. 꼭 하나로 정해지는 것은 아니니, 내 상황과 가까운 것을 골라 보세요.';
+  return `<div class="profile">
+    <h3>감정 프로필 · ${safeText(detail ? detail.term : profile.title)}</h3>
+    <h4>한 줄 정의</h4>
+    <p><b>${safeText(profile.one)}</b></p>
+    <h4>언제 생기는 감정인지</h4>
+    ${listHTML(profile.when)}
+    <h4>왜 생기는지(원인)</h4>
+    <p>${safeText(profile.why)}</p>
+    <h4>머릿속에서 자주 드는 생각</h4>
+    ${listHTML(profile.thoughts)}
+    <h4>몸에서 나타날 수 있는 반응</h4>
+    ${listHTML(profile.body)}
+    <h4>행동으로 어떻게 나타나는지</h4>
+    ${listHTML(profile.actions)}
+    <h4>${importantTitle}</h4>
+    <p>${safeText(profile.important)}</p>
+    <h4>${needsTitle}</h4>
+    <p class="soft-note">${needIntro}</p>
+    ${needCardsHTML(needIds, positive)}
+    <h4>비슷한 감정과의 차이</h4>
+    ${listHTML(profile.similar)}
+    <h4>감정의 강도별 모습</h4>
+    ${listHTML(profile.levels)}
+    <h4>🧒 쉽게 말하면</h4>
+    <p>${safeText(profile.kid)}</p>
+    <h4>스스로 확인하는 질문</h4>
+    ${checkOptionsHTML(profile.check)}
+  </div>`;
+}
 
 /* ---- 가중치·파라미터 (고시_추론엔진_가중치설정 v1.1) ---- */
 const P_BOOST=0.88, P_SUPPRESS=0.12, P_NEUTRAL=0.5;
@@ -560,7 +973,7 @@ function resetState(){
     excluded:new Set(), hardCap:HARD_CAP, requeries:0,
     confirmedEmotion:null, needCand:null, needScore:null, askedNeed:new Set(),
     needSteps:0, needAnswers:[], needTop:null, needConfirmed:null,
-    detailEmotion:null
+    detailEmotion:null, relatedNeeds:null
   };
 }
 function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
@@ -680,7 +1093,7 @@ function renderIntensity(){
 /* ---------- 결과: 3단계 (감정 → 욕구 → 최종) ---------- */
 function finishToResult(){ S.phase='result'; S.finishedAt=new Date().toISOString(); saveSession(); renderEmotionResult(); }
 
-/* 1단계: 감정 결과 (후보 확인 → 그 감정이 바라는 것으로 자동 진행) */
+/* 1단계: 감정 결과 (후보 확인 → 그 감정이 알려주는 것으로 자동 진행) */
 function renderEmotionResult(){
   const post = softmax(S.logscore);
   const r = ranked(post);
@@ -704,7 +1117,7 @@ function renderEmotionResult(){
     ${bars}
     ${clues.length?`<div style="margin-top:12px"><div class="caption">모은 단서</div><div class="chips">${clues.map(c=>`<span class="chip">${c}</span>`).join('')}</div></div>`:''}
     <div class="no-print" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
-      <div class="caption">이 중 가장 가까운 감정을 골라 주세요. 그 감정이 <b>무엇을 바라는지</b> 이어서 함께 찾아볼게요.</div>
+      <div class="caption">이 중 가장 가까운 감정을 골라 주세요. 그 감정이 <b>무엇을 알려주는지</b> 이어서 함께 찾아볼게요.</div>
       <div class="confirm-opts" id="confirmOpts">
         ${top3.map(x=>{
           const detail = detailCandidates(x.id, 1)[0];
@@ -783,10 +1196,11 @@ function startNeedFlow(emotionId){
 function renderNeedQuestion(q){
   S.qStart=performance.now();
   const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
-  const lead = pleasant ? '이 좋은 느낌이 어디서 왔는지 함께 찾고 있어요.' : '이 감정이 무엇을 바라는지 함께 찾고 있어요.';
+  const lead = pleasant ? '이 좋은 느낌에서 어떤 소중한 것이 채워졌을 수 있는지 함께 살펴봐요.' : '이 감정 뒤에 어떤 욕구가 부족했을 수 있는지 함께 살펴봐요.';
+  const stepTitle = pleasant ? `2단계 · ${emo.name}가 알려주는 것` : `2단계 · ${emo.name} 뒤의 욕구`;
   app.innerHTML=`
   <section class="card">
-    <div class="no-print"><div class="clue-count">2단계 · ${emo.name}가 바라는 것</div></div>
+    <div class="no-print"><div class="clue-count">${stepTitle}</div></div>
     <p class="caption" style="margin-top:2px">${lead}</p>
     <h2>${q.text}</h2>
     <div class="yesno"><button class="btn" data-a="yes">네</button><button class="btn" data-a="no">아니요</button></div>
@@ -815,51 +1229,47 @@ function josa(w,a,b){ return hasBatchim(w)?a:b; }
 function renderFinalResult(){
   const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
   const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
-  const topN=rn[0]; const need=NEEDS[topN.id]; S.needTop=topN.id;
+  const topN=rn[0] || null;
+  const relatedNeeds = relatedNeedIds(emo.id, rn);
+  const topNeedId = topN ? topN.id : relatedNeeds[0];
+  const need=NEEDS[topNeedId];
+  S.needTop=topNeedId;
+  S.relatedNeeds=relatedNeeds;
   const detailOptions = detailCandidates(emo.id, 5);
-  const needWords = needWordCandidates(topN.id, 5);
   if(!S.detailEmotion) S.detailEmotion = detailOptions[0] || null;
   const detail = selectedDetail();
-  const second = (rn[1] && (topN.p-rn[1].p)<0.18) ? rn[1] : null;
   const emoJ = josa(emo.name,'은','는');
-  const needJ = josa(need.name,'이','가');
-  const secondNote = second ? ` (‘${NEEDS[second.id].name}’도 함께일 수 있어요.)` : '';
+  const relatedNeedNames = relatedNeeds.map(id=>NEEDS[id].name).join(', ');
+  const resultTitle = pleasant ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
+  const insightTitle = pleasant ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구';
   const nvc = pleasant
-    ? `지금의 <b style="color:${emo.color}">${emo.name}</b>${emoJ} <b>${need.name}</b>${needJ} <b>채워져서</b> 온 것 같아요.${secondNote}`
-    : `지금 당신의 <b style="color:${emo.color}">${emo.name}</b>${emoJ} <b>${need.name}</b>${needJ} <b>채워지길 바라는</b> 신호일 수 있어요.${secondNote}`;
+    ? `지금의 <b style="color:${emo.color}">${safeText(emo.name)}</b>${emoJ} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 채워졌을 때 생겼을 수 있어요. 어떤 것이 맞는지는 아래 질문으로 천천히 골라 보세요.`
+    : `지금 당신의 <b style="color:${emo.color}">${safeText(emo.name)}</b>${emoJ} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 부족했을 때 보내는 신호일 수 있어요. 어떤 것이 맞는지는 아래 질문으로 천천히 골라 보세요.`;
   const showYellow = S.intensity>=3 && (emo.group==='부정' || emo.group==='사회');
   updateSession();
   app.innerHTML=`
   <section class="card" id="finalCard">
     <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 결과</div>
     <div class="clue-count no-print">3단계 · 결과</div>
-    <h2>이 감정이 바라는 것</h2>
-    <div class="barrow"><div class="top"><span class="em" style="color:${emo.color}">${detail?safeText(detail.term):emo.name}</span>${S.intensity!=null?`<span class="pct">세기 ${S.intensity}/4</span>`:''}</div><div class="bar"><i style="width:100%;background:${emo.color}"></i></div><div class="caption">큰 감정 분류 · ${emo.name}</div></div>
+    <h2>${resultTitle}</h2>
+    <div class="barrow"><div class="top"><span class="em" style="color:${emo.color}">${safeText(detail?detail.term:emo.name)}</span>${S.intensity!=null?`<span class="pct">세기 ${S.intensity}/4</span>`:''}</div><div class="bar"><i style="width:100%;background:${emo.color}"></i></div><div class="caption">큰 감정 분류 · ${safeText(emo.name)}</div></div>
     ${detail?`<div class="detailbox">
       <h3>사전 속 더 정확한 감정 말</h3>
       <p id="detailBoxTerm"><b>${safeText(detail.term)}</b></p>
       <p id="detailBoxKid">${safeText(detail.kid)}</p>
-      ${detailOptions.length>1?`<div class="detail-options">${detailOptions.map(d=>`<button class="btn detail-option ${d.id===detail.id?'active':''}" data-detail="${d.id}"><strong>${safeText(d.term)}</strong><span>${safeText(d.kid)}</span></button>`).join('')}</div>`:''}
+      ${detailOptions.length>1?`<div class="detail-options">${detailOptions.map(d=>`<button class="btn detail-option ${d.id===detail.id?'active':''}" data-detail="${safeText(d.id)}"><strong>${safeText(d.term)}</strong><span>${safeText(d.kid)}</span></button>`).join('')}</div>`:''}
     </div>`:''}
-    <div class="insight"><h3>${pleasant?'채워진 욕구':'바라는 것 (욕구)'}</h3><p>${nvc}</p></div>
-    ${needWords.length?`<div class="needwords">
-      <h3>욕구 단어</h3>
-      <div class="need-word-list">${needWords.map(word=>`<div class="need-word"><b>${safeText(word.term)}</b><span>${safeText(word.kid)}</span></div>`).join('')}</div>
-    </div>`:''}
-    <div class="kidbox"><h3>🧒 쉽게 말하면</h3>
-      <p><b id="kidEmotionName" style="color:${emo.color}">감정 · ${detail?safeText(detail.term):emo.name}</b><br><span id="kidEmotionText">${detail?safeText(detail.kid):emo.kid}</span></p>
-      <p style="margin-top:7px"><b>바라는 것 · ${need.name}</b><br>${need.kid}</p>
-      <p style="margin-top:7px">감정은 마음이 보내는 신호이고, 욕구는 그 신호 뒤에서 “나에게 이게 필요해”라고 말하는 마음이에요.</p>
-    </div>
-    <div class="insight" style="background:transparent;border:1px solid var(--line)"><h3 style="color:var(--accent)">지금 해볼 수 있는 것</h3><p>${need.act}</p></div>
+    <div class="insight"><h3>${insightTitle}</h3><p>${nvc}</p></div>
+    ${profileHTML(emo, detail, rn)}
+    ${need?`<div class="insight" style="background:transparent;border:1px solid var(--line)"><h3 style="color:var(--accent)">지금 해볼 수 있는 작은 확인</h3><p>${safeText(need.act)}</p></div>`:''}
     ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
     <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
     <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
     <div class="no-print" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;">
-      <div class="caption">이 '바라는 것'이 지금 내 마음과 비슷해요? <span style="color:var(--ink-soft)">(기록을 더 정확하게 만드는 데 도움이 돼요)</span></div>
+      <div class="caption">아래 욕구 중 내 마음과 가까운 것을 골라 주세요. 여러 개가 함께 맞을 수도 있어요. <span style="color:var(--ink-soft)">(기록을 더 정확하게 만드는 데 도움이 돼요)</span></div>
       <div class="confirm-opts" id="needConfirm">
-        <button class="btn small" data-need="${topN.id}">네, 맞아요</button>
-        ${S.needCand.filter(id=>id!==topN.id).map(id=>`<button class="btn small ghost" data-need="${id}">아니요 · ‘${NEEDS[id].name}’에 가까워요</button>`).join('')}
+        ${relatedNeeds.map(id=>`<button class="btn small ${id===topNeedId?'':'ghost'}" data-need="${safeText(id)}">${safeText(NEEDS[id].name)}에 가까워요</button>`).join('')}
+        <button class="btn small ghost" data-need="">아직 잘 모르겠어요</button>
       </div>
       <div id="needThanks" class="caption hidden" style="color:var(--calm);margin-top:8px;">기록했어요. 고마워요 🙏</div>
     </div>
@@ -870,7 +1280,7 @@ function renderFinalResult(){
     <button class="btn ghost small no-print" id="openLog2">내 기록·데이터 보기</button>
   </section>`;
   app.querySelectorAll('[data-need]').forEach(b=>b.onclick=()=>{
-    S.needConfirmed=b.dataset.need; updateSession();
+    S.needConfirmed=b.dataset.need || null; updateSession();
     document.getElementById('needConfirm').classList.add('hidden');
     document.getElementById('needThanks').classList.remove('hidden');
   });
@@ -878,10 +1288,8 @@ function renderFinalResult(){
     const next = detailOptions.find(item=>item.id===button.dataset.detail);
     if(!next) return;
     S.detailEmotion = next; updateSession();
-    document.getElementById('detailBoxTerm').innerHTML = `<b>${next.term}</b>`;
+    document.getElementById('detailBoxTerm').innerHTML = `<b>${safeText(next.term)}</b>`;
     document.getElementById('detailBoxKid').textContent = next.kid;
-    document.getElementById('kidEmotionName').textContent = `감정 · ${next.term}`;
-    document.getElementById('kidEmotionText').textContent = next.kid;
     app.querySelectorAll('[data-detail]').forEach(item=>item.classList.toggle('active', item.dataset.detail===next.id));
   });
   document.getElementById('pdfBtn').onclick=()=>window.print();
@@ -901,8 +1309,12 @@ function sessionRecord(){
   const finalNeedId = S.needConfirmed || S.needTop || null;
   const emoInfo = finalEmotionId ? EMAP[finalEmotionId] : null;
   const needInfo = finalNeedId ? NEEDS[finalNeedId] : null;
-  const needName = needInfo ? needInfo.name : (topEmotionId ? (EMAP[topEmotionId]||{}).need : null);
+  const needName = needInfo ? needInfo.name : null;
   const detail = S.detailEmotion || null;
+  const needPost = S.needScore && S.needCand ? needSoftmax(S.needScore, S.needCand) : null;
+  const rankedNeeds = needPost ? needRanked(needPost, S.needCand) : [];
+  const relatedNeedIdsForRecord = S.relatedNeeds || (finalEmotionId ? relatedNeedIds(finalEmotionId, rankedNeeds) : []);
+  const relatedNeedInfos = relatedNeedIdsForRecord.map(id=>NEEDS[id]).filter(Boolean);
   const needWords = finalNeedId ? needWordCandidates(finalNeedId, 5) : [];
   return {
     sessionId:S.sessionId, startedAt:S.startedAt, finishedAt:S.finishedAt||null,
@@ -919,6 +1331,9 @@ function sessionRecord(){
     detailEmotionSection: detail ? detail.section : null,
     detailEmotionCore: detail ? detail.core : null,
     needName: needName, needKid: needInfo ? needInfo.kid : null,
+    relatedNeedIds: relatedNeedIdsForRecord,
+    relatedNeedNames: relatedNeedInfos.map(need=>need.name),
+    relatedNeedKids: relatedNeedInfos.map(need=>need.kid),
     needWordIds: needWords.map(word=>word.id),
     needWordTerms: needWords.map(word=>word.term),
     confidence: confidenceOf(post).level, excluded: Array.from(S.excluded||[]),
@@ -952,7 +1367,7 @@ function exportJSON(){
 }
 function exportCSV(){
   const data=loadLogs().filter(s=>s.consentResearch);
-  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','needWordTerms','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
+  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','relatedNeedNames','relatedNeedKids','needWordTerms','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
   const rows=data.map(record=>{
     const topResult=(record.posteriorFinal||[])[0];
     const emotionInfo=logEmotionInfo(record, topResult);
@@ -961,7 +1376,7 @@ function exportCSV(){
       record.sessionId, record.startedAt, record.questionCount, record.intensity,
       record.top1, (record.top3||[]).join('|'), emotionInfo.name, emotionInfo.kid,
       record.detailEmotionTerm, record.detailEmotionKid, record.detailEmotionSection,
-      needInfo.name, needInfo.kid, (record.needWordTerms||[]).join('|'), record.confidence, record.userConfirmed,
+      needInfo.name, needInfo.kid, (record.relatedNeedNames||[]).join('|'), (record.relatedNeedKids||[]).join('|'), (record.needWordTerms||[]).join('|'), record.confidence, record.userConfirmed,
       record.userConfirmMatch, record.openWord, record.crisis
     ].map(value=>`"${(value==null?'':String(value)).replace(/"/g,'""')}"`).join(',');
   });
@@ -989,17 +1404,214 @@ function logNeedInfo(record, emotionInfo){
   const needId=record.needConfirmed || record.needTop || null;
   const need=needId ? NEEDS[needId] : null;
   const emotion=emotionInfo && emotionInfo.id ? EMAP[emotionInfo.id] : null;
+  const fallbackRelated = emotionInfo && emotionInfo.id ? relatedNeedIds(emotionInfo.id, []) : [];
+  const relatedIds = Array.isArray(record.relatedNeedIds) && record.relatedNeedIds.length ? record.relatedNeedIds.filter(id=>NEEDS[id]) : fallbackRelated;
+  const relatedNeedInfos = relatedIds.map(id=>NEEDS[id]).filter(Boolean);
   return {
     id:needId,
-    name:record.needName || record.need || (need ? need.name : (emotion ? emotion.need : '')),
-    kid:record.needKid || (need ? need.kid : '')
+    name:record.needName || record.need || (need ? need.name : ''),
+    kid:record.needKid || (need ? need.kid : ''),
+    relatedIds,
+    relatedNeedNames:Array.isArray(record.relatedNeedNames) && record.relatedNeedNames.length ? record.relatedNeedNames : relatedNeedInfos.map(item=>item.name),
+    relatedNeedKids:Array.isArray(record.relatedNeedKids) && record.relatedNeedKids.length ? record.relatedNeedKids : relatedNeedInfos.map(item=>item.kid),
+    positive:!!(emotion && emotion.v>0)
   };
 }
 function kidLinesHTML(emotionInfo, needInfo){
   const lines=[];
   if(emotionInfo && emotionInfo.kid) lines.push(`<b>감정 · ${safeText(emotionInfo.name)}</b><br>${safeText(emotionInfo.kid)}`);
-  if(needInfo && needInfo.kid) lines.push(`<b>바라는 것 · ${safeText(needInfo.name)}</b><br>${safeText(needInfo.kid)}`);
+  if(needInfo && needInfo.relatedNeedNames && needInfo.relatedNeedNames.length){
+    const label = needInfo.positive ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구';
+    lines.push(`<b>${label}</b><br>${needInfo.relatedNeedNames.map(safeText).join(' · ')}`);
+  }else if(needInfo && needInfo.kid){
+    lines.push(`<b>관련 욕구 · ${safeText(needInfo.name)}</b><br>${safeText(needInfo.kid)}`);
+  }
   return lines;
+}
+function logItems(logs){
+  return logs.map((record,index)=>({record, key:record.sessionId || `record_${index}`}));
+}
+function sortedLogItems(logs){
+  return logItems(logs).sort((left,right)=> new Date(right.record.startedAt||0) - new Date(left.record.startedAt||0));
+}
+function findLogRecord(key){
+  return logItems(loadLogs()).find(item=>item.key===key)?.record || null;
+}
+function logTopThree(record){
+  const candidates = Array.isArray(record.posteriorFinal) ? record.posteriorFinal.filter(item=>item && item.emotion).slice(0,3) : [];
+  if(candidates.length) return candidates;
+  const fallbackId = record.confirmedEmotion || record.userConfirmed || record.top1 || null;
+  return fallbackId ? [{emotion:fallbackId, p:1}] : [];
+}
+function logSelectedPercent(topThree, emotionInfo){
+  const selected = topThree.find(candidate=>candidate.emotion===emotionInfo.id) || topThree[0];
+  return selected ? Math.round((selected.p || 0) * 100) : 0;
+}
+function logNeedWords(record, needInfo){
+  const words = needInfo && needInfo.id ? needWordCandidates(needInfo.id, 5) : [];
+  if(words.length) return words;
+  return (record.needWordTerms || []).slice(0,5).map((term,index)=>({id:`record_need_${index}`, term, kid:''})).filter(allowedNeedWord);
+}
+function logInsightHTML(emotionInfo, needInfo){
+  if(!needInfo || (!needInfo.name && !(needInfo.relatedNeedNames||[]).length)) return '';
+  const emotion = emotionInfo && emotionInfo.id ? EMAP[emotionInfo.id] : null;
+  const rawEmotionName = emotionInfo.coreName || emotionInfo.name || '이 감정';
+  const rawNeedName = (needInfo.relatedNeedNames && needInfo.relatedNeedNames.length) ? needInfo.relatedNeedNames.join(', ') : needInfo.name;
+  const color = emotion ? emotion.color : 'var(--primary)';
+  const emoJ = josa(rawEmotionName,'은','는');
+  const text = emotion && emotion.v>0
+    ? `지금의 <b style="color:${color}">${safeText(rawEmotionName)}</b>${emoJ} <b>${safeText(rawNeedName)}</b> 같은 욕구가 <b>채워졌을 때</b> 생겼을 수 있어요.`
+    : `지금 당신의 <b style="color:${color}">${safeText(rawEmotionName)}</b>${emoJ} <b>${safeText(rawNeedName)}</b> 같은 욕구가 <b>부족했을 때</b> 보내는 신호일 수 있어요.`;
+  return `<div class="insight"><h3>${emotion && emotion.v>0?'채워졌을 수 있는 욕구':'채워지지 않았을 수 있는 욕구'}</h3><p>${text}</p></div>`;
+}
+function logKidBoxHTML(emotionInfo, needInfo){
+  const kidLines = kidLinesHTML(emotionInfo, needInfo);
+  if(!kidLines.length) return '';
+  return `<div class="kidbox"><h3>🧒 쉽게 말하면</h3>
+    <p>${kidLines.join('<br><br>')}</p>
+    <p style="margin-top:7px">감정은 마음이 보내는 신호이고, 욕구는 그 신호 뒤에서 “나에게 이게 필요해”라고 말하는 마음이에요.</p>
+  </div>`;
+}
+function logNeedWordsHTML(record, needInfo){
+  const words = logNeedWords(record, needInfo);
+  if(!words.length) return '';
+  return `<div class="needwords">
+    <h3>욕구 단어</h3>
+    <div class="need-word-list">${words.map(word=>`<div class="need-word"><b>${safeText(word.term)}</b>${word.kid?`<span>${safeText(word.kid)}</span>`:''}</div>`).join('')}</div>
+  </div>`;
+}
+function logActionHTML(needInfo){
+  const need = needInfo && needInfo.id ? NEEDS[needInfo.id] : null;
+  if(!need || !need.act) return '';
+  return `<div class="insight" style="background:transparent;border:1px solid var(--line)"><h3 style="color:var(--accent)">지금 해볼 수 있는 작은 확인</h3><p>${safeText(need.act)}</p></div>`;
+}
+function logMetaHTML(record){
+  const bits = [];
+  if(record.questionCount!=null) bits.push(`${record.questionCount}문답`);
+  if(record.intensity!=null) bits.push(`세기 ${record.intensity}/4`);
+  if(record.confidence) bits.push(`잘 맞는 정도 ${record.confidence}`);
+  if(record.userConfirmMatch==='top1') bits.push('첫 후보 선택');
+  else if(record.userConfirmMatch==='top3') bits.push('후보 중 선택');
+  return bits.length ? `<div class="log-detail-meta">${bits.map(bit=>`<span>${safeText(bit)}</span>`).join('')}</div>` : '';
+}
+function logTopThreeHTML(topThree){
+  if(topThree.length<2) return '';
+  return `<div class="log-top3"><h3>감정 후보</h3>
+    ${topThree.map(candidate=>{
+      const emotion=EMAP[candidate.emotion];
+      const pct=Math.round((candidate.p || 0)*100);
+      return `<div class="barrow"><div class="top"><span class="em" style="color:${emotion?emotion.color:'#777'}">${safeText(emName(candidate.emotion))}</span><span class="pct">${pct}%</span></div><div class="bar"><i style="width:${Math.max(4,pct)}%;background:${emotion?emotion.color:'#c9c6c0'}"></i></div></div>`;
+    }).join('')}
+  </div>`;
+}
+function answerText(answer){
+  const labels = {yes:'네', no:'아니요', skip:'잘 모르겠어요'};
+  return labels[answer] || answer || '-';
+}
+function questionTextById(qid){
+  if(qid==='q_intensity') return '감정의 세기';
+  const question = FIXED.find(item=>item.id===qid) || DYNAMIC.find(item=>item.id===qid);
+  return question ? question.text : qid;
+}
+function logAnswersHTML(record){
+  const rows = [];
+  for(const answer of record.answers || []){
+    rows.push(`${questionTextById(answer.qid)} — ${answerText(answer.answer)}`);
+  }
+  for(const answer of record.needAnswers || []){
+    const question = NEED_Q.find(item=>item.need===answer.need);
+    const need = NEEDS[answer.need];
+    rows.push(`${question ? question.text : (need ? need.name : answer.need)} — ${answerText(answer.answer)}`);
+  }
+  if(!rows.length) return '';
+  return `<div class="log-answer-list"><h3>상세 문답</h3><ol>${rows.map(row=>`<li>${safeText(row)}</li>`).join('')}</ol></div>`;
+}
+function buildLogResultCard(record, key){
+  if(record.crisis){
+    return `<div class="log-result-card" role="button" tabindex="0" data-log-open="${safeText(key)}">
+      <div class="clue-count">기록 결과 · ${safeText(fmtDate(record.startedAt))}</div>
+      <div class="log-safe"><h3>안전 확인</h3><p class="caption">안전 확인으로 마친 기록이에요.</p></div>
+      <div class="log-card-action">상세 결과 보기 · PDF 저장</div>
+    </div>`;
+  }
+  const topThree=logTopThree(record);
+  const topResult=topThree[0];
+  const emotionInfo=logEmotionInfo(record, topResult);
+  const emotion=emotionInfo.id ? EMAP[emotionInfo.id] : null;
+  const needInfo=logNeedInfo(record, emotionInfo);
+  const pct=logSelectedPercent(topThree, emotionInfo);
+  return `<div class="log-result-card" role="button" tabindex="0" data-log-open="${safeText(key)}">
+    <div class="clue-count">기록 결과 · ${safeText(fmtDate(record.startedAt))}</div>
+    <h2>${safeText(emotionInfo.name || '-')}</h2>
+    <div class="barrow"><div class="top"><span class="em" style="color:${emotion?emotion.color:'#777'}">${safeText(emotionInfo.name || '-')}</span>${record.intensity!=null?`<span class="pct">세기 ${safeText(record.intensity)}/4</span>`:`<span class="pct">${pct}%</span>`}</div><div class="bar"><i style="width:100%;background:${emotion?emotion.color:'#c9c6c0'}"></i></div><div class="caption">큰 감정 분류 · ${safeText(emotionInfo.coreName || emName(emotionInfo.id))}</div></div>
+    ${logInsightHTML(emotionInfo, needInfo)}
+    ${logKidBoxHTML(emotionInfo, needInfo)}
+    <div class="log-card-action">상세 결과 보기 · PDF 저장</div>
+  </div>`;
+}
+function buildLogListHTML(logs){
+  const items=sortedLogItems(logs);
+  if(!items.length) return '<div class="log-empty">아직 저장된 기록이 없어요. 감정 탐색을 마치면 기록 결과창이 여기에 하나씩 쌓입니다.</div>';
+  return `<div class="log-list"><h3>기록 결과창</h3>${items.map(item=>buildLogResultCard(item.record, item.key)).join('')}</div>`;
+}
+function buildLogDetailHTML(record){
+  if(record.crisis){
+    return `<section class="card" id="logDetailCard">
+      <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 기록 결과</div>
+      <div class="clue-count no-print">기록 상세 결과</div>
+      <h2>안전 확인으로 마친 기록</h2>
+      ${logMetaHTML(record)}
+      <div class="log-safe"><h3>안전 확인</h3><p>이 기록은 안전 확인으로 마친 세션입니다.</p></div>
+      <div class="notice">이 기록은 감정 이해·자기기록을 돕는 참고용이며, 의료적 진단·치료를 대신하지 않습니다.</div>
+      <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
+      <div class="no-print btn-row" style="margin-top:16px;">
+        <button class="btn primary" id="recordPdfBtn">📄 이 기록 PDF로 저장</button>
+        <button class="btn" id="recordBackBtn">기록 목록</button>
+      </div>
+      <button class="btn ghost small no-print" id="recordHomeBtn">처음으로</button>
+    </section>`;
+  }
+  const topThree=logTopThree(record);
+  const topResult=topThree[0];
+  const emotionInfo=logEmotionInfo(record, topResult);
+  const emotion=emotionInfo.id ? EMAP[emotionInfo.id] : null;
+  const needInfo=logNeedInfo(record, emotionInfo);
+  const detailTerm=record.detailEmotionTerm || emotionInfo.name || emName(emotionInfo.id);
+  const detailKid=record.detailEmotionKid || emotionInfo.kid || '';
+  const detailForProfile = detailTerm ? {term:detailTerm, kid:detailKid} : null;
+  const title = emotion && emotion.v>0 ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
+  return `<section class="card" id="logDetailCard">
+    <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 기록 결과</div>
+    <div class="clue-count no-print">기록 상세 결과</div>
+    <h2>${title}</h2>
+    <p class="caption">${safeText(fmtDate(record.startedAt))}</p>
+    ${logMetaHTML(record)}
+    <div class="barrow"><div class="top"><span class="em" style="color:${emotion?emotion.color:'#777'}">${safeText(detailTerm)}</span>${record.intensity!=null?`<span class="pct">세기 ${safeText(record.intensity)}/4</span>`:''}</div><div class="bar"><i style="width:100%;background:${emotion?emotion.color:'#c9c6c0'}"></i></div><div class="caption">큰 감정 분류 · ${safeText(emotionInfo.coreName || emName(emotionInfo.id))}</div></div>
+    ${detailKid?`<div class="detailbox"><h3>사전 속 더 정확한 감정 말</h3><p><b>${safeText(detailTerm)}</b></p><p>${safeText(detailKid)}</p></div>`:''}
+    ${logInsightHTML(emotionInfo, needInfo)}
+    ${emotion?profileHTML(emotion, detailForProfile, (needInfo.relatedIds||[]).map(id=>({id,p:0}))):''}
+    ${logKidBoxHTML(emotionInfo, needInfo)}
+    ${logActionHTML(needInfo)}
+    ${logTopThreeHTML(topThree)}
+    ${logAnswersHTML(record)}
+    <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
+    <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
+    <div class="no-print btn-row" style="margin-top:16px;">
+      <button class="btn primary" id="recordPdfBtn">📄 이 기록 PDF로 저장</button>
+      <button class="btn" id="recordBackBtn">기록 목록</button>
+    </div>
+    <button class="btn ghost small no-print" id="recordHomeBtn">처음으로</button>
+  </section>`;
+}
+function showLogDetail(key){
+  const record=findLogRecord(key);
+  if(!record){ openLogModal(); return; }
+  logOverlay.classList.remove('on');
+  app.innerHTML=buildLogDetailHTML(record);
+  document.getElementById('recordPdfBtn').onclick=()=>window.print();
+  document.getElementById('recordBackBtn').onclick=openLogModal;
+  document.getElementById('recordHomeBtn').onclick=()=>{ resetState(); renderIntro(); };
+  try{ window.scrollTo(0,0); }catch(e){}
 }
 function buildReportHTML(logs){
   if(!logs.length) return '<div class="rp"><h1>🔍 감정 탐정 · 내 기록</h1><p class="rp-empty">아직 저장된 기록이 없어요. 감정 탐색을 한 번 해보면 여기에 남아요.</p></div>';
@@ -1034,7 +1646,7 @@ function buildReportHTML(logs){
       <div class="rc-head"><span class="rc-dot" style="background:${emotion?emotion.color:'#c9c6c0'}"></span><span class="rc-emo">${safeText(emotionInfo.name||'-')}</span><span class="rc-pct">${selectedPercent}%</span></div>
       <div class="rc-bar">${seg}</div>
       ${others?`<div class="rc-others">그다음 · ${safeText(others)}</div>`:''}
-      ${needInfo.name?`<div class="rc-need">💛 바라는 것 · <b>${safeText(needInfo.name)}</b></div>`:''}
+      ${(needInfo.relatedNeedNames||[]).length?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.relatedNeedNames.join(' · '))}</b></div>`:(needInfo.name?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.name)}</b></div>`:'')}
       ${kidLines.length?`<div class="rc-kid"><b>쉽게 말하면</b><br>${kidLines.join('<br><br>')}</div>`:''}
       ${sub.length?`<div class="rc-sub">${safeText(sub.join(' · '))}</div>`:''}
     </div>`;
@@ -1076,7 +1688,7 @@ function buildLogPreviewCard(record){
   const kidLines=kidLinesHTML(emotionInfo, needInfo);
   return `<div class="log-card">
     <div class="log-title"><span>${safeText(fmtDate(record.startedAt))}</span><span>${safeText(emotionInfo.name||'-')}</span></div>
-    ${needInfo.name?`<p class="caption" style="margin:6px 0 0;">바라는 것 · <b>${safeText(needInfo.name)}</b></p>`:''}
+    ${(needInfo.relatedNeedNames||[]).length?`<p class="caption" style="margin:6px 0 0;">관련 욕구 · <b>${safeText(needInfo.relatedNeedNames.join(' · '))}</b></p>`:(needInfo.name?`<p class="caption" style="margin:6px 0 0;">관련 욕구 · <b>${safeText(needInfo.name)}</b></p>`:'')}
     ${kidLines.length?`<div class="log-kid"><b>쉽게 말하면</b><br>${kidLines.join('<br><br>')}</div>`:''}
   </div>`;
 }
@@ -1105,7 +1717,16 @@ function openLogModal(){
     <div class="kv"><span>연구 동의 세션</span><b>${consented.length}건</b></div>
     <div class="kv"><span>평균 질문 수</span><b>${avgQ}문</b></div>
     <div class="kv"><span>첫 후보와 일치</span><b>${top1Match}/${confirmed}건</b></div>
-    ${buildLogRecentHTML(logs)}`;
+    ${buildLogListHTML(logs)}`;
+  document.querySelectorAll('[data-log-open]').forEach(card=>{
+    card.onclick=()=>showLogDetail(card.dataset.logOpen);
+    card.onkeydown=(event)=>{
+      if(event.key==='Enter' || event.key===' '){
+        event.preventDefault();
+        showLogDetail(card.dataset.logOpen);
+      }
+    };
+  });
   logOverlay.classList.add('on');
 }
 document.getElementById('logClose').onclick=()=>logOverlay.classList.remove('on');

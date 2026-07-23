@@ -7234,20 +7234,6 @@ window.NEED_WORD_DICTIONARY = [
     ]
   },
   {
-    "id": "need_0558",
-    "no": 558,
-    "term": "함께 있고 싶다",
-    "kid": "좋아하거나 믿는 사람과 같은 시간과 공간을 보내고 싶다.",
-    "kind": "자연스러운 표현",
-    "section": "사랑·연애·친밀함",
-    "sectionNo": 10,
-    "needs": [
-      "connection",
-      "comfort",
-      "belonging"
-    ]
-  },
-  {
     "id": "need_0559",
     "no": 559,
     "term": "손을 잡고 싶다",
@@ -7435,19 +7421,6 @@ window.NEED_WORD_DICTIONARY = [
     ]
   },
   {
-    "id": "need_0573",
-    "no": 573,
-    "term": "연애하고 싶다",
-    "kid": "좋아하는 사람과 서로 사랑하는 관계를 맺고 싶다.",
-    "kind": "자연스러운 표현",
-    "section": "사랑·연애·친밀함",
-    "sectionNo": 10,
-    "needs": [
-      "connection",
-      "comfort"
-    ]
-  },
-  {
     "id": "need_0574",
     "no": 574,
     "term": "데이트하고 싶다",
@@ -7579,35 +7552,6 @@ window.NEED_WORD_DICTIONARY = [
     "needs": [
       "connection",
       "comfort"
-    ]
-  },
-  {
-    "id": "need_0584",
-    "no": 584,
-    "term": "결혼하고 싶다",
-    "kid": "사랑하는 사람과 부부가 되어 함께 살고 싶다.",
-    "kind": "자연스러운 표현",
-    "section": "사랑·연애·친밀함",
-    "sectionNo": 10,
-    "needs": [
-      "connection",
-      "comfort",
-      "belonging"
-    ]
-  },
-  {
-    "id": "need_0585",
-    "no": 585,
-    "term": "평생 함께하고 싶다",
-    "kid": "사랑하는 사람과 삶이 끝날 때까지 관계를 지키고 싶다.",
-    "kind": "자연스러운 표현",
-    "section": "사랑·연애·친밀함",
-    "sectionNo": 10,
-    "needs": [
-      "connection",
-      "comfort",
-      "safety",
-      "belonging"
     ]
   },
   {
@@ -7910,20 +7854,6 @@ window.NEED_WORD_DICTIONARY = [
     "term": "형제애",
     "kid": "형제자매처럼 서로 아끼고 돕는 마음.",
     "kind": "단어",
-    "section": "가족·돌봄·보금자리",
-    "sectionNo": 11,
-    "needs": [
-      "belonging",
-      "comfort",
-      "connection"
-    ]
-  },
-  {
-    "id": "need_0608",
-    "no": 608,
-    "term": "가족과 함께 있고 싶다",
-    "kid": "가족과 같은 곳에서 시간을 보내며 가까움을 느끼고 싶다.",
-    "kind": "자연스러운 표현",
     "section": "가족·돌봄·보금자리",
     "sectionNo": 11,
     "needs": [
@@ -8844,20 +8774,6 @@ window.NEED_WORD_DICTIONARY = [
     "term": "외로움 해소 욕구",
     "kid": "혼자인 느낌을 줄이고 사람과 연결되고 싶은 욕구.",
     "kind": "전문·분류 용어",
-    "section": "친구·소속·사회적 연결",
-    "sectionNo": 12,
-    "needs": [
-      "connection",
-      "belonging",
-      "understanding"
-    ]
-  },
-  {
-    "id": "need_0673",
-    "no": 673,
-    "term": "친구를 사귀고 싶다",
-    "kid": "서로 믿고 즐겁게 지낼 사람과 관계를 맺고 싶다.",
-    "kind": "자연스러운 표현",
     "section": "친구·소속·사회적 연결",
     "sectionNo": 12,
     "needs": [
