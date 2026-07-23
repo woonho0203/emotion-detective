@@ -125,6 +125,17 @@
   .check-options{display:grid; gap:7px; margin-top:7px;}
   .check-option{border:1px solid var(--line); border-radius:12px; padding:8px 10px; font-size:14px; line-height:1.5; background:var(--surface);}
   .soft-note{color:var(--ink-soft); font-size:14px; line-height:1.6; margin-top:8px;}
+  .result-section{border-top:1px solid var(--line); padding-top:16px; margin-top:18px;}
+  .result-section h3{font-size:18px; margin:0 0 8px; color:var(--primary);}
+  .result-section h4{font-size:15px; margin:14px 0 5px; color:var(--primary);}
+  .result-section ul{margin:8px 0 0; padding-left:20px;}
+  .result-section li{font-size:14px; line-height:1.6; margin:4px 0;}
+  .flow-box{display:grid; gap:8px; margin-top:10px;}
+  .flow-box div{border:1px solid var(--line); border-radius:13px; padding:9px 11px; font-size:14px; line-height:1.55; background:var(--surface);}
+  .flow-box div:not(:last-child)::after{content:"↓"; display:block; color:var(--accent); font-weight:800; margin-top:6px;}
+  .result-confirm{display:grid; gap:8px; margin-top:10px;}
+  .result-confirm .btn{margin-top:0;}
+  .result-confirm .btn.active{background:var(--primary-soft); border-color:var(--primary); color:var(--ink);}
   .log-recent{margin:14px 0 4px;}
   .log-recent h3{font-size:15px; margin:0 0 8px; color:var(--primary);}
   .log-card{border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-top:8px;}
@@ -882,8 +893,8 @@ function profileHTML(emo, detail, rankedNeeds){
   const needsTitle=positive ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구';
   const importantTitle=positive ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
   const needIntro=positive
-    ? '이 감정은 아래 욕구들이 이미 채워졌을 가능성을 알려 줄 수 있어요. 꼭 하나만 맞는 것은 아니니, 내 상황과 가까운 것을 골라 보세요.'
-    : '이 감정은 아래 욕구들이 부족했을 가능성을 알려 줄 수 있어요. 꼭 하나로 정해지는 것은 아니니, 내 상황과 가까운 것을 골라 보세요.';
+    ? '이 감정은 아래 욕구들이 이미 채워졌을 가능성을 알려 줄 수 있어요. 꼭 하나만 맞는 것은 아니니, 내 상황과 천천히 비교해 보세요.'
+    : '이 감정은 아래 욕구들이 부족하거나 위협받았을 가능성을 알려 줄 수 있어요. 꼭 하나로 정해지는 것은 아니니, 내 상황과 천천히 비교해 보세요.';
   return `<div class="profile">
     <h3>감정 프로필 · ${safeText(detail ? detail.term : profile.title)}</h3>
     <h4>한 줄 정의</h4>
@@ -913,45 +924,258 @@ function profileHTML(emo, detail, rankedNeeds){
     ${checkOptionsHTML(profile.check)}
   </div>`;
 }
-function needActionInnerHTML(needId){
-  const need=NEEDS[needId];
-  if(!need) return '<h3 style="color:var(--accent)">지금 해볼 수 있는 작은 확인</h3><p>아직 딱 고르기 어렵다면, 내 마음과 가까운 설명을 천천히 다시 읽어봐도 괜찮아요.</p>';
-  return `<h3 style="color:var(--accent)">지금 해볼 수 있는 작은 확인</h3><p>${safeText(need.act)}</p>`;
+const ANSWER_EVIDENCE = {
+  q_valence:'속이 편하지 않고 마음 한쪽이 걸리는 예시와 비슷하다고 답했어요.',
+  q_arousal:'심장이 빨리 뛰거나 몸에 힘이 들어가는 예시와 비슷하다고 답했어요.',
+  q_cause:'어떤 말이나 일이 마음을 바꾼 것 같다고 답했어요.',
+  q_relation:'사람과 있었던 일이 마음에 크게 남은 것 같다고 답했어요.',
+  q_warm:'누군가의 도움이나 배려 때문에 마음이 따뜻한 예시와 비슷하다고 답했어요.',
+  q_avoid:'혼자 조용히 있고 싶은 예시와 비슷하다고 답했어요.',
+  q_confront:'“이건 아니야” 하고 말하고 싶은 예시와 비슷하다고 답했어요.',
+  q_social:'사람들 사이에서 마음이 콕 찔리는 예시와 비슷하다고 답했어요.',
+  q_threat:'앞일이 계속 신경 쓰이고 마음이 편하지 않은 예시와 비슷하다고 답했어요.',
+  q_loss:'무언가를 잃거나 사라져서 마음이 내려앉는 예시와 비슷하다고 답했어요.',
+  q_block:'하고 싶은 것이 막혀 답답한 예시와 비슷하다고 답했어요.',
+  q_selfeval:'실수나 내 모습이 계속 떠올라 작아지는 예시와 비슷하다고 답했어요.',
+  q_bodyhigh:'가슴이 답답하고 가만히 있기 어려운 예시와 비슷하다고 답했어요.',
+  q_bodylow:'몸에 힘이 빠지고 시작하기 어려운 예시와 비슷하다고 답했어요.',
+  q_empty:'마음이 텅 빈 것 같은 예시와 비슷하다고 답했어요.',
+  q_disgust:'가까이하기 싫고 밀어내고 싶은 예시와 비슷하다고 답했어요.',
+  q_achieve:'어려운 일을 해내서 뿌듯한 예시와 비슷하다고 답했어요.',
+  q_clarity:'머릿속이 뒤죽박죽인 예시와 비슷하다고 답했어요.',
+  q_hide:'이 마음을 숨기고 싶은 예시와 비슷하다고 답했어요.'
+};
+const NEED_EVIDENCE = {
+  certainty:'다음 일이 어떻게 될지 알고 싶은 예시와 비슷하다고 답했어요.',
+  safety:'괜찮다고 확인받으면 좋겠다는 예시와 비슷하다고 답했어요.',
+  comfort:'먼저 다독여 주면 좋겠다는 예시와 비슷하다고 답했어요.',
+  understanding:'내 이야기를 끝까지 들어주면 좋겠다는 예시와 비슷하다고 답했어요.',
+  respect:'내 말과 노력을 가볍게 보지 않았으면 좋겠다는 예시와 비슷하다고 답했어요.',
+  fairness:'사람마다 다르게 대하는 일이 힘들다는 예시와 비슷하다고 답했어요.',
+  autonomy:'내가 직접 고르고 싶은 부분이 있다는 예시와 비슷하다고 답했어요.',
+  connection:'누군가와 마음이 이어지면 좋겠다는 예시와 비슷하다고 답했어요.',
+  belonging:'그 자리에서 나도 함께라고 느끼고 싶다는 예시와 비슷하다고 답했어요.',
+  meaning:'지금 하는 일의 이유를 알고 싶다는 예시와 비슷하다고 답했어요.',
+  competence:'나도 해낼 수 있다는 느낌이 필요하다는 예시와 비슷하다고 답했어요.',
+  rest:'잠깐 멈추고 쉬고 싶다는 예시와 비슷하다고 답했어요.',
+  acceptance:'실수해도 괜찮다는 말이 필요하다는 예시와 비슷하다고 답했어요.',
+  help:'누가 일을 나눠 도와주면 좋겠다는 예시와 비슷하다고 답했어요.',
+  consideration:'누가 내 상황을 살펴주면 좋겠다는 예시와 비슷하다고 답했어요.',
+  support:'누가 내 편이 되어주면 좋겠다는 예시와 비슷하다고 답했어요.',
+  recognition:'누가 내 노력을 알아주면 좋겠다는 예시와 비슷하다고 답했어요.',
+  stability:'무슨 일이 있어도 혼자가 아니라는 느낌이 필요하다는 예시와 비슷하다고 답했어요.'
+};
+const RESULT_FEEDBACK_LABELS = {
+  close:'아주 비슷해요',
+  mostly:'대체로 비슷해요',
+  partly:'일부만 맞아요',
+  different:'다른 감정에 더 가까워요'
+};
+const INTENSITY_LABELS = {
+  0:'0단계 · 거의 느껴지지 않거나 아주 희미한 정도예요.',
+  1:'1단계 · 살짝 느껴지지만 하루를 크게 흔들지는 않는 정도예요.',
+  2:'2단계 · 분명히 느껴지고 생각에 자주 떠오르는 정도예요.',
+  3:'3단계 · 말투, 표정, 행동에 꽤 영향을 주는 정도예요.',
+  4:'4단계 · 마음이 너무 커서 혼자 견디기 버겁게 느껴질 수 있는 정도예요.'
+};
+
+function takeItems(items, limit=5){
+  return (items || []).filter(Boolean).slice(0, limit);
 }
-function selectedNeedResultHTML(emo, detail, needId){
-  const label=safeText(detail ? detail.term : emo.name);
-  if(!needId || !NEEDS[needId]){
-    return `<div class="insight" style="background:transparent;border:1px solid var(--line)">
-      <h3 style="color:var(--accent)">아직 하나로 고르기 어려워도 괜찮아요</h3>
-      <p><b>${label}</b> 안에는 여러 마음이 함께 섞여 있을 수 있어요. 지금은 관련 욕구 후보들을 기록해 두고, 나중에 다시 읽으며 더 가까운 것을 골라도 괜찮아요.</p>
+function resultNeedIds(relatedNeeds, topNeedId, limit=5){
+  return uniqueIds([topNeedId, ...(relatedNeeds || [])]).slice(0, limit);
+}
+function evidenceFromAnswers(answers, limit=5){
+  return takeItems((answers || [])
+    .filter(answer=>answer.answer==='yes' && ANSWER_EVIDENCE[answer.qid])
+    .map(answer=>ANSWER_EVIDENCE[answer.qid]), limit);
+}
+function evidenceFromNeedAnswers(needAnswers, limit=5){
+  return takeItems((needAnswers || [])
+    .filter(answer=>answer.answer==='yes' && NEED_EVIDENCE[answer.need])
+    .map(answer=>NEED_EVIDENCE[answer.need]), limit);
+}
+function answerConnectionForNeed(needId, needAnswers, positive){
+  const answer = (needAnswers || []).find(item=>item.need===needId);
+  if(answer && answer.answer==='yes') return NEED_EVIDENCE[needId] || '이 욕구와 가까운 예시에 그렇다고 답했어요.';
+  if(answer && answer.answer==='no') return '이 예시는 내 마음과 다르다고 답했지만, 앞의 감정 단서 때문에 함께 살펴볼 욕구일 수 있어요.';
+  if(answer && answer.answer==='skip') return '이 예시는 잘 모르겠다고 답했어요. 그래서 확정하지 않고 가능성으로만 남겨 두었어요.';
+  return positive
+    ? '앞에서 고른 감정과 답변 흐름을 보면, 이 욕구가 채워졌을 가능성도 함께 살펴볼 수 있어요.'
+    : '앞에서 고른 감정과 답변 흐름을 보면, 이 욕구가 부족했을 가능성도 함께 살펴볼 수 있어요.';
+}
+function resultNeedCardsHTML(needIds, needAnswers, positive){
+  const exampleLabel = positive ? '채워졌을 수 있는 예시' : '부족했을 수 있는 예시';
+  return `<div class="need-grid">${needIds.map(needId=>{
+    const need = NEEDS[needId];
+    const example = NEED_EXAMPLES[needId] || {};
+    const exampleText = positive ? example.met : example.unmet;
+    return `<div class="need-card">
+      <b>${safeText(need.name)}</b>
+      <span>${safeText(need.kid)}</span>
+      <em>내 답변과의 연결 · ${safeText(answerConnectionForNeed(needId, needAnswers, positive))}</em>
+      ${exampleText?`<em>${exampleLabel} · ${safeText(exampleText)}</em>`:''}
     </div>`;
-  }
-  const need=NEEDS[needId];
-  const positive=emo.v>0;
-  const text=positive
-    ? `<b>${label}</b>은(는) <b>${safeText(need.name)}</b>이(가) 채워졌을 때 생겼을 수 있어요.`
-    : `<b>${label}</b>은(는) <b>${safeText(need.name)}</b>이(가) 부족했을 때 커졌을 수 있어요.`;
-  return `<div class="insight" style="background:transparent;border:1px solid var(--line)">
-    <h3 style="color:var(--accent)">내가 고른 욕구로 더 정확히 보면</h3>
-    <p>${text} 단정은 아니고, 지금 내 마음과 맞는지 확인해 보는 설명이에요.</p>
-    <p style="margin-top:8px"><b>${safeText(need.name)} 뜻</b><br>${safeText(need.kid)}</p>
-    <p style="margin-top:8px"><b>확인 질문</b><br>${safeText(need.act)}</p>
+  }).join('')}</div>`;
+}
+function resultEvidenceHTML(emotionEvidence, needEvidence){
+  const emotionPart = emotionEvidence.length
+    ? listHTML(emotionEvidence)
+    : '<p class="soft-note">감정 단서가 한쪽으로 아주 뚜렷하지는 않았어요. 그래서 사용자가 고른 감정 후보와 전체 답변 흐름을 함께 보았어요.</p>';
+  const needPart = needEvidence.length
+    ? listHTML(needEvidence)
+    : '<p class="soft-note">욕구 질문에서는 아주 뚜렷하게 고른 단서가 적었어요. 그래서 결과를 하나로 못 박지 않고 관련될 수 있는 욕구를 함께 보여줘요.</p>';
+  return `<div class="result-section">
+    <h3>왜 이런 결과가 나왔을까요?</h3>
+    <h4>감정 단서</h4>
+    ${emotionPart}
+    <h4>욕구 단서</h4>
+    ${needPart}
+    <p class="soft-note">위 내용은 사용자가 직접 답한 단서만 바탕으로 정리했어요. 실제 마음과 맞는 부분만 가져가면 돼요.</p>
   </div>`;
 }
-function needSummaryInnerHTML(emo, detail, relatedNeeds, selectedNeedId){
-  const labelRaw = detail ? detail.term : emo.name;
-  const label = `<b style="color:${emo.color}">${safeText(labelRaw)}</b>${josa(labelRaw,'은','는')}`;
-  const selectedNeed = selectedNeedId ? NEEDS[selectedNeedId] : null;
-  if(selectedNeed){
-    const needName = safeText(selectedNeed.name);
-    return emo.v>0
-      ? `내가 고른 답을 반영하면, 지금의 ${label} <b>${needName}</b>이(가) 채워졌을 때 생겼을 가능성이 더 커 보여요. 그래도 다른 욕구도 함께 맞을 수 있으니, 아래 설명을 내 경험과 비교해 보세요.`
-      : `내가 고른 답을 반영하면, 지금의 ${label} <b>${needName}</b>이(가) 부족했을 때 커졌을 가능성이 더 커 보여요. 단정은 아니니, 아래 설명을 내 경험과 비교해 보세요.`;
+function resultExperienceHTML(emotionName, emotionEvidence, needEvidence){
+  const flowItems = takeItems([...emotionEvidence, ...needEvidence], 5);
+  if(!flowItems.length){
+    return `<div class="result-section">
+      <h3>이 감정은 어떻게 생겼을까요?</h3>
+      <p>답변만으로 정확한 상황을 새로 만들 수는 없어요. 다만 사용자가 고른 감정 후보를 보면, <b>${safeText(emotionName)}</b>과 닮은 마음이 있었을 수 있어요.</p>
+    </div>`;
   }
-  const relatedNeedNames = relatedNeeds.map(id=>NEEDS[id].name).join(', ');
-  return emo.v>0
-    ? `지금의 ${label} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 채워졌을 때 생겼을 수 있어요. 어떤 것이 맞는지는 아래에서 천천히 골라 보세요.`
-    : `지금의 ${label} <b>${safeText(relatedNeedNames)}</b> 같은 욕구가 부족했을 때 보내는 신호일 수 있어요. 어떤 것이 맞는지는 아래에서 천천히 골라 보세요.`;
+  return `<div class="result-section">
+    <h3>이 감정은 어떻게 생겼을까요?</h3>
+    <p>답변으로 보면 이런 흐름이 있었을 수 있어요. 실제 상황과 맞는 부분만 천천히 확인해 보세요.</p>
+    ${listHTML(flowItems)}
+  </div>`;
+}
+function resultFlowHTML(emotionName, needIds, positive){
+  const needNames = needIds.map(needId=>NEEDS[needId].name).join(' · ');
+  const finalText = positive ? '그래서 마음이 따뜻하거나 편안한 쪽으로 움직였을 수 있어요.' : '그래서 마음이 불편하거나 힘든 쪽으로 커졌을 수 있어요.';
+  return `<div class="result-section">
+    <h3>감정과 욕구를 연결하면</h3>
+    <div class="flow-box">
+      <div>내 답변에 남은 단서가 있었어요.</div>
+      <div><b>${safeText(emotionName)}</b>에 가까운 마음으로 보일 수 있어요.</div>
+      <div><b>${safeText(needNames)}</b> 같은 욕구가 관련되었을 수 있어요.</div>
+      <div>${finalText}</div>
+    </div>
+  </div>`;
+}
+function resultIntensityHTML(intensity, profile){
+  const current = intensity==null ? '세기 기록이 없어요.' : (INTENSITY_LABELS[intensity] || `${intensity}/4 정도로 기록했어요.`);
+  return `<div class="result-section">
+    <h3>감정의 강도 · ${intensity==null?'-':safeText(intensity)}/4</h3>
+    <p><b>${safeText(current)}</b></p>
+    ${listHTML(takeItems(profile.levels, 4))}
+    <p class="soft-note">강도는 사람마다 다르게 느껴질 수 있어요. 내 몸과 하루에 얼마나 영향을 주었는지가 더 중요해요.</p>
+  </div>`;
+}
+function resultSimilarHTML(profile){
+  return `<div class="result-section" id="similarSection">
+    <h3>비슷한 감정과 어떻게 다를까요?</h3>
+    ${listHTML(takeItems(profile.similar, 3))}
+  </div>`;
+}
+function resultFeedbackHTML(readOnly, resultFeedback){
+  if(readOnly){
+    return resultFeedback ? `<div class="result-section"><h3>결과 확인</h3><p>이 기록에서는 <b>${safeText(RESULT_FEEDBACK_LABELS[resultFeedback] || resultFeedback)}</b>라고 남겼어요.</p></div>` : '';
+  }
+  return `<div class="result-section no-print">
+    <h3>이 결과가 내 마음과 얼마나 비슷한가요?</h3>
+    <div class="result-confirm">
+      <button class="btn small" data-result-feedback="close">아주 비슷해요</button>
+      <button class="btn small" data-result-feedback="mostly">대체로 비슷해요</button>
+      <button class="btn small ghost" data-result-feedback="partly">일부만 맞아요</button>
+      <button class="btn small ghost" data-result-feedback="different">다른 감정에 더 가까워요</button>
+    </div>
+    <p id="resultFeedbackThanks" class="caption hidden" style="color:var(--calm);margin-top:8px;"></p>
+    <div id="resultFeedbackActions" class="hidden" style="margin-top:10px">
+      <button class="btn small ghost" id="compareSimilar">비슷한 감정 차이 보기</button>
+      <button class="btn small ghost" id="reviewCandidates">이전 감정 후보 다시 보기</button>
+      <button class="btn small ghost" id="restartFromFeedback">처음부터 다시 하기</button>
+    </div>
+  </div>`;
+}
+function resultExplanationHTML({emo, detail, relatedNeeds, topNeedId, rankedNeeds, answers, needAnswers, intensity, topThree, recordDate, readOnly=false, resultFeedback=null}){
+  const profile = profileForEmotion(emo.id);
+  const positive = emo.v>0;
+  const emotionName = detail ? detail.term : profile.title;
+  const needIds = resultNeedIds(relatedNeeds && relatedNeeds.length ? relatedNeeds : relatedNeedIds(emo.id, rankedNeeds || []), topNeedId, 5);
+  const needNames = needIds.map(needId=>NEEDS[needId].name);
+  const emotionEvidence = evidenceFromAnswers(answers, 5);
+  const needEvidence = evidenceFromNeedAnswers(needAnswers, 5);
+  const needsTitle = positive ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구';
+  const preciousTitle = positive ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
+  const needIntro = positive
+    ? '긍정적인 감정은 어떤 욕구가 이미 채워졌을 때 생길 수 있어요. 하나로 정하지 않고, 상황에 따라 관련될 수 있는 욕구를 함께 보여줘요.'
+    : '불편한 감정은 어떤 욕구가 부족하거나 위협받았을 때 커질 수 있어요. 하나로 정하지 않고, 상황에 따라 관련될 수 있는 욕구를 함께 보여줘요.';
+  const oneLook = positive
+    ? `<b>${safeText(emotionName)}</b>${josa(emotionName,'은','는')} 마음에 좋은 것이 채워졌다는 신호일 수 있어요. 특히 <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 마음이 관련되었을 수 있어요. 이 설명은 진단이 아니라, 내 경험과 비교해 보는 지도예요.`
+    : `<b>${safeText(emotionName)}</b>${josa(emotionName,'은','는')} 마음속 중요한 것이 부족하거나 흔들렸다는 신호일 수 있어요. 특히 <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 마음이 관련되었을 수 있어요. 이 설명은 진단이 아니라, 내 경험과 비교해 보는 지도예요.`;
+  const resultSentence = positive
+    ? `당신의 <b>${safeText(emotionName)}</b>은(는) <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 욕구가 채워졌다고 느꼈기 때문에 생겼을 수 있어요. 어떤 부분이 실제 마음과 맞는지 천천히 확인해 보세요.`
+    : `당신의 <b>${safeText(emotionName)}</b>은(는) <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 욕구가 부족하거나 흔들렸다고 느꼈기 때문에 커졌을 수 있어요. 어떤 부분이 실제 마음과 맞는지 천천히 확인해 보세요.`;
+  const candidateText = (topThree || []).length>1
+    ? `<p class="soft-note">비슷하게 나온 감정 후보 · ${(topThree || []).slice(0,3).map(candidate=>`${safeText(emName(candidate.emotion || candidate.id))} ${Math.round((candidate.p || 0)*100)}%`).join(' · ')}</p>`
+    : '';
+  return `
+    <h2>🔍 감정 탐정의 분석 결과</h2>
+    ${recordDate?`<p class="caption">${safeText(fmtDate(recordDate))}</p>`:''}
+    <div class="result-section">
+      <h3>지금 마음과 가장 가까운 감정</h3>
+      <div class="barrow"><div class="top"><span class="em" style="color:${emo.color}">${safeText(emotionName)}</span>${intensity!=null?`<span class="pct">세기 ${safeText(intensity)}/4</span>`:''}</div><div class="bar"><i style="width:100%;background:${emo.color}"></i></div><div class="caption">큰 감정 분류 · ${safeText(emo.name)} · ${needsTitle} · ${safeText(needNames.join(' · '))}</div></div>
+      ${detail?`<div class="detailbox"><h3>사전 속 더 정확한 감정 말</h3><p><b>${safeText(detail.term)}</b></p><p>${safeText(detail.kid)}</p></div>`:''}
+      ${candidateText}
+    </div>
+    <div class="result-section">
+      <h3>한눈에 보면</h3>
+      <p>${oneLook}</p>
+    </div>
+    ${resultEvidenceHTML(emotionEvidence, needEvidence)}
+    <div class="result-section">
+      <h3>이 감정은 어떤 마음일까요?</h3>
+      <h4>한 줄 정의</h4>
+      <p><b>${safeText(profile.one)}</b></p>
+      <h4>언제 생기는 감정인지</h4>
+      ${listHTML(takeItems(profile.when, 5))}
+      <h4>왜 생기는지</h4>
+      <p>${safeText(profile.why)}</p>
+      <h4>머릿속에서 자주 드는 생각</h4>
+      ${listHTML(takeItems(profile.thoughts, 5))}
+      <h4>몸에서 나타날 수 있는 반응</h4>
+      ${listHTML(takeItems(profile.body, 5))}
+      <h4>행동으로 어떻게 나타나는지</h4>
+      ${listHTML(takeItems(profile.actions, 5))}
+      <p class="soft-note">이 모습이 전부 나타나야 하는 것은 아니에요. 사람마다 생각, 몸, 행동은 다르게 나올 수 있어요.</p>
+    </div>
+    ${resultExperienceHTML(emotionName, emotionEvidence, needEvidence)}
+    <div class="result-section">
+      <h3>이 감정과 연결된 욕구</h3>
+      <p>${needIntro}</p>
+      <h4>${needsTitle}</h4>
+      ${resultNeedCardsHTML(needIds, needAnswers, positive)}
+    </div>
+    ${resultFlowHTML(emotionName, needIds, positive)}
+    ${resultSimilarHTML(profile)}
+    ${resultIntensityHTML(intensity, profile)}
+    <div class="result-section">
+      <h3>${preciousTitle}</h3>
+      <p>${safeText(profile.important)}</p>
+    </div>
+    <div class="result-section">
+      <h3>🧒 쉽게 말하면</h3>
+      <p>${safeText(profile.kid)}</p>
+    </div>
+    <div class="result-section">
+      <h3>스스로 확인하는 질문</h3>
+      ${checkOptionsHTML(takeItems(profile.check, 5))}
+    </div>
+    <div class="result-section">
+      <h3>내 마음을 한 문장으로 정리하면</h3>
+      <p>${resultSentence}</p>
+    </div>
+    ${resultFeedbackHTML(readOnly, resultFeedback)}
+  `;
 }
 
 /* ---- 가중치·파라미터 (고시_추론엔진_가중치설정 v1.1) ---- */
@@ -1014,7 +1238,7 @@ function resetState(){
     excluded:new Set(), hardCap:HARD_CAP, requeries:0,
     confirmedEmotion:null, needCand:null, needScore:null, askedNeed:new Set(),
     needSteps:0, needAnswers:[], needTop:null, needConfirmed:null, needUnclear:false,
-    detailEmotion:null, relatedNeeds:null
+    detailEmotion:null, relatedNeeds:null, resultFeedback:null
   };
 }
 function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
@@ -1269,80 +1493,46 @@ function josa(w,a,b){ return hasBatchim(w)?a:b; }
 
 /* 3단계: 최종 결과 (감정 + 욕구 + 작은 실천) */
 function renderFinalResult(){
-  const emo=EMAP[S.confirmedEmotion]; const pleasant=emo.v>0;
+  const emo=EMAP[S.confirmedEmotion];
   const post=needSoftmax(S.needScore,S.needCand); const rn=needRanked(post,S.needCand);
   const topN=rn[0] || null;
   const relatedNeeds = relatedNeedIds(emo.id, rn);
   const topNeedId = topN ? topN.id : relatedNeeds[0];
-  const need=NEEDS[topNeedId];
   S.needTop=topNeedId;
   S.relatedNeeds=relatedNeeds;
   const detailOptions = detailCandidates(emo.id, 5);
   if(!S.detailEmotion) S.detailEmotion = detailOptions[0] || null;
   const detail = selectedDetail();
-  const resultTitle = pleasant ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
-  const insightTitle = pleasant ? '채워졌을 수 있는 욕구' : '채워지지 않았을 수 있는 욕구';
-  const nvc = needSummaryInnerHTML(emo, detail, relatedNeeds, S.needConfirmed);
   const showYellow = S.intensity>=3 && (emo.group==='부정' || emo.group==='사회');
   updateSession();
   app.innerHTML=`
   <section class="card" id="finalCard">
     <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 결과</div>
     <div class="clue-count no-print">3단계 · 결과</div>
-    <h2>${resultTitle}</h2>
-    <div class="barrow"><div class="top"><span class="em" style="color:${emo.color}">${safeText(detail?detail.term:emo.name)}</span>${S.intensity!=null?`<span class="pct">세기 ${S.intensity}/4</span>`:''}</div><div class="bar"><i style="width:100%;background:${emo.color}"></i></div><div class="caption">큰 감정 분류 · ${safeText(emo.name)}</div></div>
-    ${detail?`<div class="detailbox">
-      <h3>사전 속 더 정확한 감정 말</h3>
-      <p id="detailBoxTerm"><b>${safeText(detail.term)}</b></p>
-      <p id="detailBoxKid">${safeText(detail.kid)}</p>
-      ${detailOptions.length>1?`<div class="detail-options">${detailOptions.map(d=>`<button class="btn detail-option ${d.id===detail.id?'active':''}" data-detail="${safeText(d.id)}"><strong>${safeText(d.term)}</strong><span>${safeText(d.kid)}</span></button>`).join('')}</div>`:''}
-    </div>`:''}
-    <div class="insight" id="needSummary"><h3>${insightTitle}</h3><p id="needSummaryText">${nvc}</p></div>
-    ${profileHTML(emo, detail, rn)}
-    <div id="selectedNeedResult" class="${S.needConfirmed||S.needUnclear?'':'hidden'}">${S.needConfirmed||S.needUnclear?selectedNeedResultHTML(emo, detail, S.needConfirmed):''}</div>
-    <div id="needActionBox" class="insight" style="background:transparent;border:1px solid var(--line)">${needActionInnerHTML(S.needConfirmed || topNeedId)}</div>
+    ${resultExplanationHTML({emo, detail, relatedNeeds, topNeedId, rankedNeeds:rn, answers:S.answers, needAnswers:S.needAnswers, intensity:S.intensity, topThree:ranked(softmax(S.logscore)).slice(0,3)})}
     ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
     <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
     <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
-    <div class="no-print" style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px;">
-      <div class="caption">아래 욕구 중 내 마음과 가까운 것을 골라 주세요. 고르면 감정과 욕구 설명을 내가 고른 답에 맞춰 다시 정리해요. 여러 개가 함께 맞을 수도 있어요.</div>
-      <div class="confirm-opts" id="needConfirm">
-        ${relatedNeeds.map(id=>`<button class="btn small ${id===topNeedId?'':'ghost'}" data-need="${safeText(id)}">${safeText(NEEDS[id].name)}에 가까워요</button>`).join('')}
-        <button class="btn small ghost" data-need="">아직 잘 모르겠어요</button>
-      </div>
-      <div id="needThanks" class="caption hidden" style="color:var(--calm);margin-top:8px;">기록했어요. 고마워요 🙏</div>
-    </div>
     <div class="no-print btn-row" style="margin-top:16px;">
       <button class="btn primary" id="pdfBtn">📄 PDF로 저장</button>
       <button class="btn" id="againBtn">다시 하기</button>
     </div>
     <button class="btn ghost small no-print" id="openLog2">내 기록·데이터 보기</button>
   </section>`;
-  app.querySelectorAll('[data-need]').forEach(b=>b.onclick=()=>{
-    const selectedNeedId=b.dataset.need || null;
-    S.needConfirmed=selectedNeedId;
-    S.needUnclear=!selectedNeedId;
+  app.querySelectorAll('[data-result-feedback]').forEach(button=>button.onclick=()=>{
+    const feedback = button.dataset.resultFeedback;
+    S.resultFeedback = feedback;
     updateSession();
-    document.getElementById('needConfirm').classList.add('hidden');
-    document.getElementById('needSummaryText').innerHTML=needSummaryInnerHTML(emo, S.detailEmotion || detail, relatedNeeds, selectedNeedId);
-    document.getElementById('selectedNeedResult').innerHTML=selectedNeedResultHTML(emo, S.detailEmotion || detail, selectedNeedId);
-    document.getElementById('selectedNeedResult').classList.remove('hidden');
-    document.getElementById('needActionBox').innerHTML=needActionInnerHTML(selectedNeedId || topNeedId);
-    document.getElementById('needThanks').textContent=selectedNeedId ? '고른 욕구를 반영해서 결과를 더 정확하게 정리했어요 🙏' : '아직 모르겠다고 기록했어요. 나중에 다시 골라도 괜찮아요 🙏';
-    document.getElementById('needThanks').classList.remove('hidden');
+    document.getElementById('resultFeedbackThanks').textContent = feedback==='close' || feedback==='mostly'
+      ? '확인했어요. 이 결과를 기록에 남겼어요 🙏'
+      : '확인했어요. 맞지 않는 부분은 아래 버튼으로 다시 살펴볼 수 있어요.';
+    document.getElementById('resultFeedbackThanks').classList.remove('hidden');
+    document.getElementById('resultFeedbackActions').classList.toggle('hidden', feedback==='close' || feedback==='mostly');
+    app.querySelectorAll('[data-result-feedback]').forEach(item=>item.classList.toggle('active', item.dataset.resultFeedback===feedback));
   });
-  app.querySelectorAll('[data-detail]').forEach(button=>button.onclick=()=>{
-    const next = detailOptions.find(item=>item.id===button.dataset.detail);
-    if(!next) return;
-    S.detailEmotion = next; updateSession();
-    document.getElementById('detailBoxTerm').innerHTML = `<b>${safeText(next.term)}</b>`;
-    document.getElementById('detailBoxKid').textContent = next.kid;
-    document.getElementById('needSummaryText').innerHTML=needSummaryInnerHTML(emo, next, relatedNeeds, S.needConfirmed);
-    if(S.needConfirmed || S.needUnclear){
-      document.getElementById('selectedNeedResult').innerHTML=selectedNeedResultHTML(emo, next, S.needConfirmed);
-    }
-    app.querySelectorAll('[data-detail]').forEach(item=>item.classList.toggle('active', item.dataset.detail===next.id));
-  });
+  document.getElementById('compareSimilar')?.addEventListener('click',()=>document.getElementById('similarSection')?.scrollIntoView({behavior:'smooth'}));
+  document.getElementById('reviewCandidates')?.addEventListener('click',()=>renderEmotionResult());
+  document.getElementById('restartFromFeedback')?.addEventListener('click',()=>{ resetState(); renderIntro(); });
   document.getElementById('pdfBtn').onclick=()=>window.print();
   document.getElementById('againBtn').onclick=()=>{ resetState(); renderIntro(); };
   document.getElementById('openLog2').onclick=openLogModal;
@@ -1390,6 +1580,7 @@ function sessionRecord(){
     confidence: confidenceOf(post).level, excluded: Array.from(S.excluded||[]),
     confirmedEmotion:S.confirmedEmotion||null, needTop:S.needTop||null, needConfirmed:S.needConfirmed||null, needUnclear:!!S.needUnclear,
     needCandidates:S.needCand||null, needAnswers:S.needAnswers||null,
+    resultFeedback:S.resultFeedback||null,
     userConfirmed:S.userConfirmed, userConfirmMatch:S.userConfirmMatch, openWord:S.openWord
   };
 }
@@ -1418,7 +1609,7 @@ function exportJSON(){
 }
 function exportCSV(){
   const data=loadLogs().filter(s=>s.consentResearch);
-  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','needConfirmed','needUnclear','relatedNeedNames','relatedNeedKids','needWordTerms','confidence','userConfirmed','userConfirmMatch','openWord','crisis'];
+  const head=['sessionId','startedAt','questionCount','intensity','top1','top3','emotionName','emotionKid','detailEmotionTerm','detailEmotionKid','detailEmotionSection','needName','needKid','needConfirmed','needUnclear','relatedNeedNames','relatedNeedKids','needWordTerms','confidence','resultFeedback','userConfirmed','userConfirmMatch','openWord','crisis'];
   const rows=data.map(record=>{
     const topResult=(record.posteriorFinal||[])[0];
     const emotionInfo=logEmotionInfo(record, topResult);
@@ -1427,7 +1618,7 @@ function exportCSV(){
       record.sessionId, record.startedAt, record.questionCount, record.intensity,
       record.top1, (record.top3||[]).join('|'), emotionInfo.name, emotionInfo.kid,
       record.detailEmotionTerm, record.detailEmotionKid, record.detailEmotionSection,
-      needInfo.name, needInfo.kid, record.needConfirmed, record.needUnclear, (record.relatedNeedNames||[]).join('|'), (record.relatedNeedKids||[]).join('|'), (record.needWordTerms||[]).join('|'), record.confidence, record.userConfirmed,
+      needInfo.name, needInfo.kid, record.needConfirmed, record.needUnclear, (record.relatedNeedNames||[]).join('|'), (record.relatedNeedKids||[]).join('|'), (record.needWordTerms||[]).join('|'), record.confidence, record.resultFeedback, record.userConfirmed,
       record.userConfirmMatch, record.openWord, record.crisis
     ].map(value=>`"${(value==null?'':String(value)).replace(/"/g,'""')}"`).join(',');
   });
@@ -1465,7 +1656,8 @@ function logNeedInfo(record, emotionInfo){
     relatedIds,
     relatedNeedNames:Array.isArray(record.relatedNeedNames) && record.relatedNeedNames.length ? record.relatedNeedNames : relatedNeedInfos.map(item=>item.name),
     relatedNeedKids:Array.isArray(record.relatedNeedKids) && record.relatedNeedKids.length ? record.relatedNeedKids : relatedNeedInfos.map(item=>item.kid),
-    positive:!!(emotion && emotion.v>0)
+    positive:!!(emotion && emotion.v>0),
+    confirmed:!!(record.needConfirmed && !record.needUnclear)
   };
 }
 function kidLinesHTML(emotionInfo, needInfo){
@@ -1507,7 +1699,7 @@ function logInsightHTML(emotionInfo, needInfo){
   if(!needInfo || (!needInfo.name && !(needInfo.relatedNeedNames||[]).length)) return '';
   const emotion = emotionInfo && emotionInfo.id ? EMAP[emotionInfo.id] : null;
   const rawEmotionName = emotionInfo.coreName || emotionInfo.name || '이 감정';
-  const hasSelectedNeed = !!(needInfo.id && needInfo.name);
+  const hasSelectedNeed = !!(needInfo.confirmed && needInfo.id && needInfo.name);
   const rawNeedName = hasSelectedNeed ? needInfo.name : ((needInfo.relatedNeedNames && needInfo.relatedNeedNames.length) ? needInfo.relatedNeedNames.join(', ') : needInfo.name);
   const color = emotion ? emotion.color : 'var(--primary)';
   const emoJ = josa(rawEmotionName,'은','는');
@@ -1634,22 +1826,16 @@ function buildLogDetailHTML(record){
   const needInfo=logNeedInfo(record, emotionInfo);
   const detailTerm=record.detailEmotionTerm || emotionInfo.name || emName(emotionInfo.id);
   const detailKid=record.detailEmotionKid || emotionInfo.kid || '';
-  const detailForProfile = detailTerm ? {term:detailTerm, kid:detailKid} : null;
-  const title = emotion && emotion.v>0 ? '이 감정이 알려주는 소중한 것' : '이 감정이 알려주는 중요한 것';
+  const detailForResult = detailTerm ? {id:record.detailEmotionId || `record_${emotionInfo.id || 'emotion'}`, term:detailTerm, kid:detailKid} : null;
+  const fallbackRelatedNeeds = emotion ? relatedNeedIds(emotion.id, []) : [];
+  const relatedNeeds = Array.isArray(needInfo.relatedIds) && needInfo.relatedIds.length ? needInfo.relatedIds : fallbackRelatedNeeds;
+  const topNeedId = needInfo.id || relatedNeeds[0] || null;
   return `<section class="card" id="logDetailCard">
     <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 기록 결과</div>
     <div class="clue-count no-print">기록 상세 결과</div>
-    <h2>${title}</h2>
-    <p class="caption">${safeText(fmtDate(record.startedAt))}</p>
     ${logMetaHTML(record)}
-    <div class="barrow"><div class="top"><span class="em" style="color:${emotion?emotion.color:'#777'}">${safeText(detailTerm)}</span>${record.intensity!=null?`<span class="pct">세기 ${safeText(record.intensity)}/4</span>`:''}</div><div class="bar"><i style="width:100%;background:${emotion?emotion.color:'#c9c6c0'}"></i></div><div class="caption">큰 감정 분류 · ${safeText(emotionInfo.coreName || emName(emotionInfo.id))}</div></div>
-    ${detailKid?`<div class="detailbox"><h3>사전 속 더 정확한 감정 말</h3><p><b>${safeText(detailTerm)}</b></p><p>${safeText(detailKid)}</p></div>`:''}
-    ${logInsightHTML(emotionInfo, needInfo)}
-    ${emotion?profileHTML(emotion, detailForProfile, (needInfo.relatedIds||[]).map(id=>({id,p:0}))):''}
-    ${logKidBoxHTML(emotionInfo, needInfo)}
-    ${logActionHTML(needInfo)}
+    ${emotion?resultExplanationHTML({emo:emotion, detail:detailForResult, relatedNeeds, topNeedId, rankedNeeds:relatedNeeds.map(needId=>({id:needId,p:0})), answers:record.answers||[], needAnswers:record.needAnswers||[], intensity:record.intensity, topThree, recordDate:record.startedAt, readOnly:true, resultFeedback:record.resultFeedback||null}):'<h2>기록된 감정 정보를 찾기 어려워요</h2>'}
     ${logTopThreeHTML(topThree)}
-    ${logAnswersHTML(record)}
     <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
     <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
     <div class="no-print btn-row" style="margin-top:16px;">
