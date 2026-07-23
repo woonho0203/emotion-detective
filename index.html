@@ -1684,7 +1684,8 @@ function resetState(){
     excluded:new Set(), hardCap:HARD_CAP, requeries:0,
     confirmedEmotion:null, needCand:null, needScore:null, askedNeed:new Set(),
     needSteps:0, needAnswers:[], needTop:null, needConfirmed:null, needUnclear:false,
-    detailEmotion:null, relatedNeeds:null, resultFeedback:null
+    detailEmotion:null, relatedNeeds:null, resultFeedback:null,
+    secondaryEmotions:[], resultMatch:null
   };
 }
 function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;const v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
@@ -1865,8 +1866,67 @@ function renderEmotionResult(){
       </div>
     </div>
   </section>`;
-  app.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{ recordConfirm(b.dataset.cid, r); startNeedFlow(b.dataset.cid); });
+  app.querySelectorAll('[data-cid]').forEach(b=>b.onclick=()=>{ recordConfirm(b.dataset.cid, r); renderSecondary(b.dataset.cid, r); });
   document.getElementById('reqOther').onclick=()=>requeryDifferent(r);
+}
+
+/* 1.5단계: 혼합감정 복수선택 (함께 느껴지는 마음) */
+function renderSecondary(cid, r){
+  S.phase='secondary'; S.qStart=performance.now();
+  const others = r.filter(x=>x.id!==cid && S.logscore[x.id] > -1e8).slice(0,4);
+  app.innerHTML=`
+  <section class="card">
+    <div class="clue-count no-print">지금 마음 더 살펴보기</div>
+    <h2>지금 마음에 이 감정 외에 함께 느껴지는 마음도 있나요?</h2>
+    <p class="caption">있는 대로 골라 주세요. 없으면 아래 ‘거의 이것 하나예요’를 눌러 주세요.</p>
+    <div class="choice-actions" id="secOpts">
+      ${others.map(x=>`<button class="btn ghost" data-sid="${x.id}"><span class="em" style="color:${EMAP[x.id].color}">${EMAP[x.id].name}</span></button>`).join('')}
+    </div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn primary" id="secDone">함께 있는 마음까지 골랐어요</button>
+      <button class="btn" id="secOnly">거의 이것 하나예요</button>
+    </div>
+  </section>`;
+  const sel=new Set();
+  app.querySelectorAll('[data-sid]').forEach(b=>b.onclick=()=>{ const id=b.dataset.sid; if(sel.has(id)){sel.delete(id);b.classList.remove('active');}else{sel.add(id);b.classList.add('active');} });
+  document.getElementById('secDone').onclick=()=>{ S.secondaryEmotions=[...sel]; updateSession(); renderMatch(cid, r); };
+  document.getElementById('secOnly').onclick=()=>{ S.secondaryEmotions=[]; updateSession(); renderMatch(cid, r); };
+}
+
+/* 1.6단계: 결과 일치도 (0~4, 낮으면 확정하지 않고 재탐색 제안) */
+function renderMatch(cid, r){
+  S.phase='match'; S.qStart=performance.now();
+  const labels=[['0','전혀 맞지 않아요'],['1','조금만 맞아요'],['2','어느 정도 맞아요'],['3','많이 맞아요'],['4','거의 정확해요']];
+  app.innerHTML=`
+  <section class="card">
+    <div class="clue-count no-print">결과가 맞는 정도</div>
+    <h2>지금 보여드린 감정이 내 마음을 얼마나 잘 설명하나요?</h2>
+    <div class="likert">
+      ${labels.map(([v,t])=>`<button class="btn" data-mv="${v}">${v}<small>${t}</small></button>`).join('')}
+    </div>
+  </section>`;
+  app.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{
+    S.resultMatch=parseInt(b.dataset.mv,10);
+    S.answers.push({qid:'q_match', answer:b.dataset.mv, tMs:Math.round(performance.now()-S.qStart)});
+    updateSession();
+    if(S.resultMatch<=1) renderMatchLow(cid, r); else startNeedFlow(cid);
+  });
+}
+function renderMatchLow(cid, r){
+  app.innerHTML=`
+  <section class="card">
+    <div class="clue-count no-print">다시 살펴볼까요</div>
+    <h2>딱 맞는 감정이 아니었군요.</h2>
+    <p class="caption">더 정확히 찾아볼 수 있어요. 어떻게 할까요?</p>
+    <div class="confirm-opts">
+      <button class="btn small" id="mlOther">다른 감정 후보를 더 볼래요</button>
+      <button class="btn small" id="mlGo">그래도 이걸로 계속할래요</button>
+      <button class="btn small ghost" id="mlRestart">처음부터 다시 살펴볼래요</button>
+    </div>
+  </section>`;
+  document.getElementById('mlOther').onclick=()=>requeryDifferent(r);
+  document.getElementById('mlGo').onclick=()=>startNeedFlow(cid);
+  document.getElementById('mlRestart').onclick=()=>{ resetState(); renderIntro(); };
 }
 function recordConfirm(cid, r){
   S.userConfirmed = cid; S.confirmedEmotion = cid;
@@ -2021,6 +2081,8 @@ function renderFinalResult(){
     <div class="print-only" style="font-weight:700;color:var(--primary);margin-bottom:6px;">🔍 감정 탐정 결과</div>
     <div class="clue-count no-print">3단계 · 결과</div>
     ${resultExplanationHTML({emo, detail, relatedNeeds, topNeedId, rankedNeeds:rn, answers:S.answers, needAnswers:S.needAnswers, intensity:S.intensity, topThree:ranked(softmax(S.logscore)).slice(0,3)})}
+    ${(S.secondaryEmotions&&S.secondaryEmotions.length)?`<p class="caption">함께 느껴진 마음: ${S.secondaryEmotions.map(id=>EMAP[id]?`<b style="color:${EMAP[id].color}">${EMAP[id].name}</b>`:'').filter(Boolean).join(' · ')}</p>`:''}
+    ${(S.resultMatch!=null)?`<p class="caption">이 결과가 내 마음을 설명하는 정도: <b>${S.resultMatch}/4</b></p>`:''}
     ${showYellow?`<div class="yellow-banner">요즘 힘든 상태가 이어진다면 전문상담이 도움이 될 수 있어요. 가까운 정신건강복지센터나 <b>109</b> 상담을 이용해 보세요.</div>`:''}
     <div class="notice">이 결과는 확정된 감정·욕구가 아니라 <b>참고용</b>이며, 의료적 진단·치료를 대신하지 않습니다.</div>
     <div class="print-only notice">도움 연결 · 24시간 : 109 · 1577-0199 · 1388 · 119</div>
@@ -2074,11 +2136,14 @@ function sessionRecord(){
   return {
     sessionId:S.sessionId, startedAt:S.startedAt, finishedAt:S.finishedAt||null,
     consentResearch:S.consent, isMinor:S.minor,
-    questionFormat:'actual-5w1h-ab-v1',
+    questionFormat:'present-tense-ab-v1.5',
     answers:S.answers,
     contextAnswers:S.answers.filter(answer=>['q_when','q_where','q_who'].includes(answer.qid)),
-    questionCount:S.answers.filter(a=>a.qid!=='q_intensity').length,
+    questionCount:S.answers.filter(a=>a.qid!=='q_intensity' && a.qid!=='q_match').length,
     intensity:S.intensity,
+    secondaryEmotions:S.secondaryEmotions||[],
+    secondaryEmotionNames:(S.secondaryEmotions||[]).map(id=>EMAP[id]?EMAP[id].name:id),
+    resultMatchScore:(S.resultMatch==null?null:S.resultMatch),
     posteriorFinal: r.slice(0,5).map(x=>({emotion:x.id, p:Math.round(x.p*1000)/1000})),
     top1: topEmotionId, top3: r.slice(0,3).map(x=>x.id), need: needName,
     emotionName: emoInfo ? emoInfo.name : null, emotionKid: emoInfo ? emoInfo.kid : null,
