@@ -51,9 +51,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 6,
     "term": "가뿐하다",
     "kid": "걱정이나 부담이 없어 몸과 마음이 가볍고 상쾌하다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "ㄱ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0007",
@@ -573,9 +573,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 64,
     "term": "고맙다",
     "kid": "남이 베풀어 준 호의나 도움 따위에 대하여 마음이 흐뭇하고 즐겁다.",
-    "core": "fear",
+    "core": "gratitude",
     "section": "ㄱ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0065",
@@ -780,7 +780,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 87,
     "term": "권태롭다",
     "kid": "어떤 일에 싫증이 나거나 몸과 마음이 나른해져서 게으른 데가 있다.",
-    "core": "disgust",
+    "core": "lethargy",
     "section": "ㄱ",
     "tone": "negative"
   },
@@ -924,18 +924,18 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 103,
     "term": "기분 좋다",
     "kid": "마음이 즐겁고 만족스럽다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㄱ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0104",
     "no": 104,
     "term": "기쁘다",
     "kid": "원하던 일이 이루어져 마음이 밝고 즐겁다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㄱ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0105",
@@ -978,7 +978,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 109,
     "term": "긴박하다",
     "kid": "위험이나 마감이 가까워 마음이 매우 급하고 긴장되다.",
-    "core": "fear",
+    "core": "anxiety",
     "section": "ㄱ",
     "tone": "negative"
   },
@@ -1010,15 +1010,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "tone": "negative"
   },
   {
-    "id": "lit_0113",
-    "no": 113,
-    "term": "깔깔깔깔",
-    "kid": "여럿이 밝고 크게 웃는 소리나 모습.",
-    "core": "joy",
-    "section": "ㄱ",
-    "tone": "positive"
-  },
-  {
     "id": "lit_0114",
     "no": 114,
     "term": "깜짝",
@@ -1046,15 +1037,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "tone": "negative"
   },
   {
-    "id": "lit_0117",
-    "no": 117,
-    "term": "껄껄껄",
-    "kid": "시원하고 크게 웃는 소리나 모습.",
-    "core": "joy",
-    "section": "ㄱ",
-    "tone": "positive"
-  },
-  {
     "id": "lit_0118",
     "no": 118,
     "term": "꼴불견",
@@ -1071,15 +1053,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "core": "fear",
     "section": "ㄱ",
     "tone": "negative"
-  },
-  {
-    "id": "lit_0120",
-    "no": 120,
-    "term": "낄낄낄",
-    "kid": "소리를 낮추어 자꾸 웃는 모습이다.",
-    "core": "joy",
-    "section": "ㄱ",
-    "tone": "positive"
   },
   {
     "id": "lit_0121",
@@ -1176,9 +1149,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 131,
     "term": "낯뜨겁다",
     "kid": "매우 부끄럽거나 민망해 얼굴이 뜨거운 듯하다.",
-    "core": "fear",
+    "core": "shame",
     "section": "ㄴ",
-    "tone": "negative"
+    "tone": "social"
   },
   {
     "id": "lit_0132",
@@ -1266,7 +1239,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 141,
     "term": "노하다",
     "kid": "‘화내다’ 또는 ‘화나다’를 점잖게 이르는 말.",
-    "core": "confusion",
+    "core": "anger",
     "section": "ㄴ",
     "tone": "negative"
   },
@@ -1482,7 +1455,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 165,
     "term": "따분하다",
     "kid": "재미가 없어 지루하고 답답하다.",
-    "core": "anger",
+    "core": "lethargy",
     "section": "ㄴ",
     "tone": "negative"
   },
@@ -1761,7 +1734,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 196,
     "term": "무료하다",
     "kid": "흥미 있는 일이 없어 심심하고 지루하다.",
-    "core": "confusion",
+    "core": "lethargy",
     "section": "ㄷ",
     "tone": "negative"
   },
@@ -1869,9 +1842,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 208,
     "term": "반갑다",
     "kid": "그리워하던 사람을 만나거나 원하는 일이 이루어져서 마음이 즐겁고 기쁘다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㄹ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0209",
@@ -1908,33 +1881,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "core": "confusion",
     "section": "ㄹ",
     "tone": "negative"
-  },
-  {
-    "id": "lit_0213",
-    "no": 213,
-    "term": "방그레",
-    "kid": "입만 예쁘게 조금 벌리고 소리 없이 보드랍게 웃는 모양.",
-    "core": "joy",
-    "section": "ㄹ",
-    "tone": "positive"
-  },
-  {
-    "id": "lit_0214",
-    "no": 214,
-    "term": "방글방글",
-    "kid": "입을 조금 벌리고 소리 없이 자꾸 귀엽고 보드랍게 웃는 모양.",
-    "core": "joy",
-    "section": "ㄹ",
-    "tone": "positive"
-  },
-  {
-    "id": "lit_0215",
-    "no": 215,
-    "term": "방긋",
-    "kid": "입을 예쁘게 약간 벌리며 소리 없이 가볍게 한 번 웃는 모양.",
-    "core": "joy",
-    "section": "ㄹ",
-    "tone": "positive"
   },
   {
     "id": "lit_0216",
@@ -2121,9 +2067,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 236,
     "term": "불만족하다",
     "kid": "마음에 흡족하지 않다.",
-    "core": "joy",
+    "core": "disgust",
     "section": "ㄹ",
-    "tone": "positive"
+    "tone": "negative"
   },
   {
     "id": "lit_0237",
@@ -2157,7 +2103,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 240,
     "term": "불유쾌하다",
     "kid": "마음이 언짢아 즐겁지 않다.",
-    "core": "fear",
+    "core": "disgust",
     "section": "ㄹ",
     "tone": "negative"
   },
@@ -2184,9 +2130,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 243,
     "term": "불행하다",
     "kid": "행복하지 않다.",
-    "core": "joy",
+    "core": "sadness",
     "section": "ㄹ",
-    "tone": "positive"
+    "tone": "negative"
   },
   {
     "id": "lit_0244",
@@ -2250,15 +2196,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "core": "sadness",
     "section": "ㄹ",
     "tone": "negative"
-  },
-  {
-    "id": "lit_0251",
-    "no": 251,
-    "term": "빙그레",
-    "kid": "입을 약간 벌리고 소리 없이 부드럽게 웃는 모양.",
-    "core": "joy",
-    "section": "ㄹ",
-    "tone": "positive"
   },
   {
     "id": "lit_0252",
@@ -2346,9 +2283,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 261,
     "term": "살맛나다",
     "kid": "사는 일이 즐겁고 힘이 날 만하다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅁ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0262",
@@ -2382,7 +2319,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 265,
     "term": "상심하다",
     "kid": "슬픔이나 걱정 등으로 속을 썩이다.",
-    "core": "anxiety",
+    "core": "sadness",
     "section": "ㅁ",
     "tone": "negative"
   },
@@ -2400,7 +2337,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 267,
     "term": "새파래지다",
     "kid": "큰 두려움이나 충격으로 얼굴빛이 파랗게 질리다.",
-    "core": "confusion",
+    "core": "fear",
     "section": "ㅁ",
     "tone": "negative"
   },
@@ -2706,7 +2643,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 301,
     "term": "슬퍼하다",
     "kid": "마음에 슬픔을 느끼다.",
-    "core": "confusion",
+    "core": "sadness",
     "section": "ㅁ",
     "tone": "negative"
   },
@@ -2742,7 +2679,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 305,
     "term": "시름겹다",
     "kid": "걱정과 슬픔이 많아 견디기 어렵다.",
-    "core": "anxiety",
+    "core": "sadness",
     "section": "ㅁ",
     "tone": "negative"
   },
@@ -2841,18 +2778,18 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 316,
     "term": "신바람 나다",
     "kid": "흥과 힘이 나서 즐겁게 움직이고 싶다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅁ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0317",
     "no": 317,
     "term": "신바람나다",
     "kid": "즐겁고 힘이 나서 무엇이든 신나게 하고 싶다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅁ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0318",
@@ -2963,15 +2900,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "tone": "negative"
   },
   {
-    "id": "lit_0330",
-    "no": 330,
-    "term": "싱글벙글하다",
-    "kid": "눈과 입을 슬며시 움직이며 소리 없이 정답고 환하게 웃다.",
-    "core": "joy",
-    "section": "ㅁ",
-    "tone": "positive"
-  },
-  {
     "id": "lit_0331",
     "no": 331,
     "term": "싱숭생숭하다",
@@ -2979,15 +2907,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "core": "confusion",
     "section": "ㅁ",
     "tone": "negative"
-  },
-  {
-    "id": "lit_0332",
-    "no": 332,
-    "term": "쌩끗",
-    "kid": "눈과 입을 살며시 움직이며 소리 없이 가볍게 웃는 모양.",
-    "core": "joy",
-    "section": "ㅁ",
-    "tone": "positive"
   },
   {
     "id": "lit_0333",
@@ -3003,9 +2922,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 334,
     "term": "쓴웃음",
     "kid": "어이가 없거나 마지못하여 짓는 웃음.",
-    "core": "joy",
+    "core": "sadness",
     "section": "ㅁ",
-    "tone": "positive"
+    "tone": "negative"
   },
   {
     "id": "lit_0335",
@@ -3021,9 +2940,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 336,
     "term": "씁쓸하다",
     "kid": "기쁘지만은 않아 마음 한구석이 쓰고 개운하지 않다.",
-    "core": "joy",
+    "core": "sadness",
     "section": "ㅁ",
-    "tone": "positive"
+    "tone": "negative"
   },
   {
     "id": "lit_0337",
@@ -3174,9 +3093,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 353,
     "term": "안락하다",
     "kid": "몸과 마음이 편안하고 즐겁다.",
-    "core": "fear",
+    "core": "calm",
     "section": "ㅁ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0354",
@@ -3647,15 +3566,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "tone": "positive"
   },
   {
-    "id": "lit_0406",
-    "no": 406,
-    "term": "와들와들",
-    "kid": "춥거나 무서워서 몸을 잇따라 아주 심하게 떠는 모양.",
-    "core": "confusion",
-    "section": "ㅁ",
-    "tone": "negative"
-  },
-  {
     "id": "lit_0407",
     "no": 407,
     "term": "외롭다",
@@ -3678,7 +3588,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 409,
     "term": "우수",
     "kid": "근심과 슬픔이 섞인 시름.",
-    "core": "anxiety",
+    "core": "sadness",
     "section": "ㅁ",
     "tone": "negative"
   },
@@ -3912,9 +3822,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 435,
     "term": "유쾌하다",
     "kid": "즐겁고 상쾌하다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅁ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0436",
@@ -3931,15 +3841,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "term": "으쓱하다",
     "kid": "어깨가 들먹이며 우쭐해하다.",
     "core": "pride",
-    "section": "ㅁ",
-    "tone": "positive"
-  },
-  {
-    "id": "lit_0438",
-    "no": 438,
-    "term": "으하하하",
-    "kid": "매우 즐거워 입을 크게 벌리고 웃는 소리.",
-    "core": "joy",
     "section": "ㅁ",
     "tone": "positive"
   },
@@ -4119,9 +4020,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 458,
     "term": "재미있다",
     "kid": "아기자기하게 즐겁고 유쾌한 기분이나 느낌이 있다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅂ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0459",
@@ -4398,18 +4299,18 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 489,
     "term": "즐겁다",
     "kid": "마음에 거슬림이 없이 흐뭇하고 기쁘다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅂ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0490",
     "no": 490,
     "term": "즐기다",
     "kid": "즐겁게 누리거나 맛보다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅂ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0491",
@@ -4443,7 +4344,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 494,
     "term": "지루하다",
     "kid": "시간이 오래 걸리거나 같은 상태가 오래 계속되어 따분하고 싫증이 나다.",
-    "core": "disgust",
+    "core": "lethargy",
     "section": "ㅂ",
     "tone": "negative"
   },
@@ -4488,7 +4389,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 499,
     "term": "질리다",
     "kid": "매우 놀라거나 무서워 얼굴빛이 변하다.",
-    "core": "confusion",
+    "core": "fear",
     "section": "ㅂ",
     "tone": "negative"
   },
@@ -4839,7 +4740,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 538,
     "term": "침통하다",
     "kid": "슬픔이나 걱정 등으로 매우 마음이 괴롭거나 슬프다.",
-    "core": "anxiety",
+    "core": "sadness",
     "section": "ㅅ",
     "tone": "negative"
   },
@@ -4857,18 +4758,18 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 540,
     "term": "코웃음",
     "kid": "콧소리를 내거나 코끝으로 가볍게 웃는 비난조의 웃음.",
-    "core": "joy",
+    "core": "disgust",
     "section": "ㅅ",
-    "tone": "positive"
+    "tone": "negative"
   },
   {
     "id": "lit_0541",
     "no": 541,
     "term": "코웃음 치다",
     "kid": "상대를 우습고 하찮게 여기며 비웃다.",
-    "core": "joy",
+    "core": "disgust",
     "section": "ㅅ",
-    "tone": "positive"
+    "tone": "negative"
   },
   {
     "id": "lit_0542",
@@ -4885,15 +4786,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "term": "쾌감",
     "kid": "상쾌하고 즐거운 느낌.",
     "core": "calm",
-    "section": "ㅅ",
-    "tone": "positive"
-  },
-  {
-    "id": "lit_0544",
-    "no": 544,
-    "term": "킬킬거리다",
-    "kid": "웃음을 억지로 참으면서 입 속으로 웃는 소리를 자꾸 내다.",
-    "core": "joy",
     "section": "ㅅ",
     "tone": "positive"
   },
@@ -4920,9 +4812,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 547,
     "term": "태평스럽다",
     "kid": "아무 근심 걱정이 없고 평안한 데가 있다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "ㅇ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0548",
@@ -4947,9 +4839,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 550,
     "term": "통쾌하다",
     "kid": "아주 즐겁고 시원하여 유쾌하다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅇ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0551",
@@ -5031,15 +4923,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "core": "pride",
     "section": "ㅈ",
     "tone": "positive"
-  },
-  {
-    "id": "lit_0560",
-    "no": 560,
-    "term": "하하",
-    "kid": "즐겁거나 어이없을 때 입을 크게 벌려 웃는 소리.",
-    "core": "fear",
-    "section": "ㅊ",
-    "tone": "negative"
   },
   {
     "id": "lit_0561",
@@ -5217,9 +5100,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 580,
     "term": "홀가분하다",
     "kid": "거추장스럽지 않고 가볍고 편안하다.",
-    "core": "anger",
+    "core": "calm",
     "section": "ㅊ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0581",
@@ -5330,15 +5213,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "tone": "social"
   },
   {
-    "id": "lit_0593",
-    "no": 593,
-    "term": "후후",
-    "kid": "만족하거나 재미있어 입을 다문 채 가볍게 웃는 소리.",
-    "core": "joy",
-    "section": "ㅊ",
-    "tone": "positive"
-  },
-  {
     "id": "lit_0594",
     "no": 594,
     "term": "휑하다",
@@ -5361,15 +5235,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 596,
     "term": "흐뭇하다",
     "kid": "마음에 흡족하여 매우 만족스럽다.",
-    "core": "joy",
-    "section": "ㅊ",
-    "tone": "positive"
-  },
-  {
-    "id": "lit_0597",
-    "no": 597,
-    "term": "흐흐",
-    "kid": "흐뭇함을 참지 못하여 입을 조금 벌리고 은근히 웃는 소리.",
     "core": "joy",
     "section": "ㅊ",
     "tone": "positive"
@@ -5406,9 +5271,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 601,
     "term": "흥겹다",
     "kid": "매우 흥이 나서 즐겁다.",
-    "core": "fear",
+    "core": "joy",
     "section": "ㅊ",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0602",
@@ -5460,15 +5325,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 607,
     "term": "흥취",
     "kid": "흥이 나고 즐거운 기분.",
-    "core": "confusion",
-    "section": "ㅊ",
-    "tone": "negative"
-  },
-  {
-    "id": "lit_0608",
-    "no": 608,
-    "term": "희",
-    "kid": "기쁘고 즐거운 마음.",
     "core": "joy",
     "section": "ㅊ",
     "tone": "positive"
@@ -5497,24 +5353,6 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "term": "희희낙락하다",
     "kid": "매우 기뻐하고 즐거워하다.",
     "core": "confusion",
-    "section": "ㅊ",
-    "tone": "negative"
-  },
-  {
-    "id": "lit_0612",
-    "no": 612,
-    "term": "히죽거리다",
-    "kid": "만족스러운 듯이 슬쩍 자꾸 웃다.",
-    "core": "joy",
-    "section": "ㅊ",
-    "tone": "positive"
-  },
-  {
-    "id": "lit_0613",
-    "no": 613,
-    "term": "히히",
-    "kid": "마음에 흐뭇하여 멋없이 싱겁게 자꾸 웃는 소리.",
-    "core": "fear",
     "section": "ㅊ",
     "tone": "negative"
   },
@@ -5577,9 +5415,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 620,
     "term": "마음이 날아갈 듯하다",
     "kid": "걱정이 사라지고 매우 기쁘고 가볍다.",
-    "core": "anxiety",
+    "core": "joy",
     "section": "기쁨·즐거움",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0621",
@@ -5613,9 +5451,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 624,
     "term": "웃음꽃이 피다",
     "kid": "여럿이 밝고 즐겁게 웃다.",
-    "core": "fear",
+    "core": "joy",
     "section": "기쁨·즐거움",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0625",
@@ -5694,9 +5532,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 633,
     "term": "신바람이 나다",
     "kid": "즐겁고 힘이 나서 일이 저절로 잘되는 듯하다.",
-    "core": "fear",
+    "core": "joy",
     "section": "기쁨·즐거움",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0634",
@@ -5730,9 +5568,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 637,
     "term": "살맛이 나다",
     "kid": "사는 일이 즐겁고 힘이 날 만하다.",
-    "core": "fear",
+    "core": "joy",
     "section": "기쁨·즐거움",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_0638",
@@ -6900,9 +6738,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 767,
     "term": "막막한 외로움",
     "kid": "끝이 보이지 않을 만큼 깊고 답답한 외로움이다.",
-    "core": "confusion",
+    "core": "loneliness",
     "section": "외로움·공허",
-    "tone": "negative"
+    "tone": "social"
   },
   {
     "id": "lit_0768",
@@ -7197,9 +7035,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 800,
     "term": "독이 오르다",
     "kid": "화나 경쟁심이 생겨 감정이 몹시 세지다.",
-    "core": "pride",
+    "core": "anger",
     "section": "분노·울분",
-    "tone": "positive"
+    "tone": "negative"
   },
   {
     "id": "lit_0801",
@@ -8223,9 +8061,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 914,
     "term": "낯이 뜨겁다",
     "kid": "자신의 잘못이나 민망한 일 때문에 부끄럽다.",
-    "core": "fear",
+    "core": "shame",
     "section": "부끄러움·수치",
-    "tone": "negative"
+    "tone": "social"
   },
   {
     "id": "lit_0915",
@@ -8331,9 +8169,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 926,
     "term": "수오지심",
     "kid": "잘못된 일을 부끄러워하고 미워하는 마음이다.",
-    "core": "disgust",
+    "core": "shame",
     "section": "부끄러움·수치",
-    "tone": "negative"
+    "tone": "social"
   },
   {
     "id": "lit_0927",
@@ -9213,9 +9051,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 1024,
     "term": "마음이 놓이다",
     "kid": "걱정하던 일이 괜찮아져 편안해지다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "안도·편안·평온",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_1025",
@@ -9249,18 +9087,18 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 1028,
     "term": "긴장이 풀리다",
     "kid": "팽팽했던 몸과 마음이 편안해지다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "안도·편안·평온",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_1029",
     "no": 1029,
     "term": "마음이 풀리다",
     "kid": "화나 걱정이 누그러져 부드러워지다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "안도·편안·평온",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_1030",
@@ -9348,9 +9186,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 1039,
     "term": "마음의 평화",
     "kid": "갈등과 걱정이 줄어 편안한 상태이다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "안도·편안·평온",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_1040",
@@ -9402,9 +9240,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 1045,
     "term": "마음을 비우다",
     "kid": "욕심이나 걱정을 내려놓고 편안해지다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "안도·편안·평온",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_1046",
@@ -9420,9 +9258,9 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 1047,
     "term": "태평한 마음",
     "kid": "큰 걱정 없이 느긋하고 편안한 마음이다.",
-    "core": "anxiety",
+    "core": "calm",
     "section": "안도·편안·평온",
-    "tone": "negative"
+    "tone": "positive"
   },
   {
     "id": "lit_1048",
@@ -9951,7 +9789,7 @@ window.LITERARY_EMOTION_DICTIONARY = [
     "no": 1106,
     "term": "권태에 빠지다",
     "kid": "반복되는 일에 지루함과 싫증을 깊이 느끼다.",
-    "core": "disgust",
+    "core": "lethargy",
     "section": "지루함·무관심",
     "tone": "negative"
   },
