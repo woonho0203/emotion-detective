@@ -143,6 +143,12 @@
   .result-section h4{font-size:15px; margin:14px 0 5px; color:var(--primary);}
   .result-section ul{margin:8px 0 0; padding-left:20px;}
   .result-section li{font-size:14px; line-height:1.6; margin:4px 0;}
+  .result-template{display:grid; gap:12px;}
+  .result-template h3{margin:0; font-size:18px; color:var(--primary);}
+  .result-template-block h4{margin:0 0 5px; font-size:15px; color:var(--primary);}
+  .result-template-block p{margin:0; font-size:15px; line-height:1.65;}
+  .result-template-block ul{margin:0; padding-left:20px;}
+  .result-template-block li{font-size:15px; line-height:1.65; margin:3px 0;}
   .flow-box{display:grid; gap:8px; margin-top:10px;}
   .flow-box div{border:1px solid var(--line); border-radius:13px; padding:9px 11px; font-size:14px; line-height:1.55; background:var(--surface);}
   .flow-box div:not(:last-child)::after{content:"↓"; display:block; color:var(--accent); font-weight:800; margin-top:6px;}
@@ -239,6 +245,12 @@
   .rpwrap .rc-need{font-size:14px; color:#333;}
   .rpwrap .rc-kid{background:#FBF3E4; border:1px solid #EAD9B8; border-radius:10px; padding:9px 10px; margin-top:8px; font-size:12px; line-height:1.55; color:#4a3f2e;}
   .rpwrap .rc-kid b{color:#7a5a1f;}
+  .rpwrap .result-template{gap:8px;}
+  .rpwrap .result-template h3{font-size:13px; color:#7a5a1f;}
+  .rpwrap .result-template-block h4{font-size:12px; margin-bottom:2px; color:#7a5a1f;}
+  .rpwrap .result-template-block p,
+  .rpwrap .result-template-block li{font-size:12px; line-height:1.55;}
+  .summary-text{white-space:pre-line;}
   .rpwrap .rc-sub{font-size:12px; color:#7a7a7a; margin-top:6px;}
   .rpwrap .rc-safe{font-size:14px; color:#9a9a9a;}
   .rpwrap .rp-empty{color:#777;}
@@ -1403,7 +1415,22 @@ function oneSentenceEmotionMeaning(emo, detail){
     .replace(/\s*(마음|느낌)이에요$/,'')
     .trim();
 }
-function resultSummarySentence({emo, detail, answers, needAnswers, intensity, positive}){
+const RESULT_SUMMARY_TITLE='내 마음을 한 문장으로 정리하면';
+function resultLine(value){
+  const text=String(value || '').replace(/\s+/g,' ').replace(/[.。]+$/,'').trim();
+  return text ? `${text}.` : '';
+}
+function intensityResultSentence(intensity){
+  const text=INTENSITY_RESULT[intensity];
+  if(!text) return '마음의 세기는 아직 따로 고르지 않았어요.';
+  return `세기 ${intensity}/4로, ${String(text).replace(/였고$/,'였어요.').replace(/주었고$/,'주었어요.')}`;
+}
+function emotionResultObject(value){
+  const text=String(value || '').replace(/\s+/g,' ').replace(/[.。]+$/,'').trim();
+  if(!text) return '마음이 중요한 신호를 보내는 느낌';
+  return /(느낌|마음)$/.test(text) ? text : `${text} 느낌`;
+}
+function resultSummaryParts({emo, detail, answers, needAnswers, intensity, positive}){
   const context=[];
   const reactions=[];
   for(const answer of answers || []){
@@ -1417,18 +1444,73 @@ function resultSummarySentence({emo, detail, answers, needAnswers, intensity, po
     if(answer.qid==='q_intensity') continue;
     reactions.push(...actualChoiceTexts(answer));
   }
-  const contextText=context.length ? [...new Set(context)].join(' ') : '앞에서 떠올린 실제 경험에서';
-  const reactionText=naturalJoin(reactions.map(text=>`“${String(text).replace(/[.。]+$/,'')}”`));
-  const reactionClause=reactionText ? `내 생각·몸·행동은 ${reactionText}에 가까웠고, ` : '';
-  const intensityClause=INTENSITY_RESULT[intensity] ? `${INTENSITY_RESULT[intensity]}, ` : '';
+  const contextText=context.length ? [...new Set(context)].join(', ') : '앞에서 떠올린 실제 경험';
+  const reactionItems=[...new Set(reactions.map(resultLine).filter(Boolean))].slice(0,3);
+  if(!reactionItems.length) reactionItems.push('아직 생각·몸·행동 단서는 충분히 모이지 않았어요.');
   const needMeanings=selectedNeedIdsFromAnswers(needAnswers).map(id=>NEED_RESULT_MEANING[id]).filter(Boolean);
-  const needClause=needMeanings.length
-    ? `그때 ${naturalJoin(needMeanings)} 같은 바람이 ${positive?'충분히 채워져':'충분히 채워지지 않아'}, `
-    : '왜 그런지는 욕구 답변만으로 아직 분명하지 않지만, ';
   const emotionMeaning=oneSentenceEmotionMeaning(emo, detail) || '마음이 중요한 신호를 보내는 느낌';
-  return `나는 ${contextText} ${reactionClause}${intensityClause}${needClause}${emotionMeaning}에 가까운 마음이 생겼을 수 있어요.`
-    .replace(/\s+/g,' ')
-    .trim();
+  return {
+    title:RESULT_SUMMARY_TITLE,
+    situation:resultLine(`나는 ${contextText} 마음이 움직였어요`),
+    reactions:reactionItems,
+    impact:intensityResultSentence(intensity),
+    need:needMeanings.length
+      ? resultLine(`그때 ${naturalJoin(needMeanings)} 같은 바람이 ${positive?'충분히 채워졌다고 느꼈을 수 있어요':'충분히 채워지지 않았을 수 있어요'}`)
+      : '아직 어떤 바람이 가장 컸는지는 욕구 답변만으로 분명하지 않아요.',
+    result:resultLine(`그래서 ${emotionResultObject(emotionMeaning)}이 생겼을 수 있어요`)
+  };
+}
+function resultSummaryText(parts){
+  return [
+    `# ${parts.title}`,
+    '',
+    '📍 상황',
+    parts.situation,
+    '',
+    '🧠 내 반응',
+    ...parts.reactions.map(item=>`• ${item}`),
+    '',
+    '📈 영향',
+    parts.impact,
+    '',
+    '💛 채워지지 않은 바람',
+    parts.need,
+    '',
+    '🎭 결과',
+    parts.result
+  ].join('\n');
+}
+function resultSummarySentence(args){
+  return resultSummaryText(resultSummaryParts(args));
+}
+function resultSummaryTemplateHTML(parts){
+  if(!parts) return '';
+  return `<div class="result-template">
+    <h3>${safeText(parts.title)}</h3>
+    <div class="result-template-block">
+      <h4>📍 상황</h4>
+      <p>${safeText(parts.situation)}</p>
+    </div>
+    <div class="result-template-block">
+      <h4>🧠 내 반응</h4>
+      <ul>${parts.reactions.map(item=>`<li>${safeText(item)}</li>`).join('')}</ul>
+    </div>
+    <div class="result-template-block">
+      <h4>📈 영향</h4>
+      <p>${safeText(parts.impact)}</p>
+    </div>
+    <div class="result-template-block">
+      <h4>💛 채워지지 않은 바람</h4>
+      <p>${safeText(parts.need)}</p>
+    </div>
+    <div class="result-template-block">
+      <h4>🎭 결과</h4>
+      <p>${safeText(parts.result)}</p>
+    </div>
+  </div>`;
+}
+function resultSummaryPlainHTML(text){
+  return `<div class="summary-text">${safeText(text || '')}</div>`;
 }
 function resultFeedbackHTML(readOnly, resultFeedback){
   if(readOnly){
@@ -1672,7 +1754,7 @@ function scoredEmotionAnswerCount(){
 }
 function renderQuestion(q){
   S.qStart=performance.now();
-  const answered = scoredEmotionAnswerCount();
+  const answered = S.answers.length; // 진행바는 mixed/neither 포함 전체 답변 기준으로 채운다
   const pctEst = Math.min(95, Math.round((answered/ (MIN_STEPS_EARLY+2))*100));
   app.innerHTML = `
   <section class="card">
@@ -1706,7 +1788,7 @@ function answerQuestion(q, a){
   const key = answerKey(a);
   S.answers.push({qid:q.id, answer:key, choiceText:choiceText(q,key), tMs:Math.round(performance.now()-S.qStart)});
   applyAnswer(q, a);
-  if(q.scored!==false && (key==='a' || key==='b' || key==='yes' || key==='no')) S.stepsForStop++;
+  if(q.scored!==false) S.stepsForStop++; // mixed/neither도 한 걸음으로 세어 무한 진행 방지
 
   if(S.phase==='fixed'){
     S.fixedIdx++;
@@ -1722,7 +1804,7 @@ function answerQuestion(q, a){
   const nonSafety = scoredEmotionAnswerCount();
   const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id) && questionApplies(d)).length;
   const earlyStop = (S.stepsForStop>=MIN_STEPS_EARLY) && conf.cls==='high';
-  const hardStop = nonSafety>=S.hardCap || remaining===0;
+  const hardStop = nonSafety>=S.hardCap || S.answers.length>=S.hardCap || remaining===0; // 전체 문항 수 상한으로 종료 보장
 
   if(S.phase==='dynamic' && !earlyStop && !hardStop){
     const nq = nextDynamic(post, S.askedDynamic);
@@ -1809,8 +1891,7 @@ function requeryDifferent(r){
     resetState(); renderIntro(); return;
   }
   S.phase='dynamic';
-  const answered = scoredEmotionAnswerCount();
-  S.hardCap = answered + 3;
+  S.hardCap = S.answers.length + 3; // 재질문도 전체 문항 기준으로 몇 문항만 더
   const remaining = DYNAMIC.filter(d=>!S.askedDynamic.has(d.id) && questionApplies(d));
   if(remaining.length){
     const nq = nextDynamic(softmax(S.logscore), S.askedDynamic);
