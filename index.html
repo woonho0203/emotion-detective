@@ -377,9 +377,9 @@ const FIXED = [
   },
   {
     id:'q_where',
-    text:'그 마음은 어디에서 가장 크게 느껴지나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
-    a:'사람이 있는 자리나 누군가와 만난 장면에서 크게 느껴져요.',
-    b:'혼자 있을 때, 화면을 볼 때, 또는 머릿속에서 계속 떠올라요.',
+    text:'그 감정이 언제 가장 크게 느껴지나요?\n\n지금 내 마음은 어느 쪽에 더 가까운가요?',
+    a:'사람을 만나거나 이야기할 때 가장 크게 느껴져요.',
+    b:'혼자 있을 때 계속 생각나면서 더 크게 느껴져요.',
     scored:false
   },
   {
@@ -533,7 +533,7 @@ const CLUE = {
   q_valence:{a:'불편한 쪽', b:'좋거나 따뜻한 쪽'},
   q_arousal:{a:'몸의 힘이 올라감', b:'몸이 가라앉음'},
   q_when:{a:'오늘 갑자기 커짐', b:'오래 이어짐'},
-  q_where:{a:'사람이 있는 자리', b:'혼자 또는 머릿속'},
+  q_where:{a:'사람을 만나거나 이야기할 때', b:'혼자 계속 생각날 때'},
   q_who:{a:'사람의 말·행동', b:'일·결과·내 선택'},
   q_what_unpleasant:{a:'선을 넘음·불공평함', b:'소중한 것의 멀어짐'},
   q_what_pleasant:{a:'도움·배려의 따뜻함', b:'해냄·기대의 밝음'},
@@ -1356,8 +1356,8 @@ const RESULT_CONTEXT = {
     b:'조금 전부터 계속 이어지거나 오래 생각할수록'
   },
   q_where:{
-    a:'사람이 있는 자리나 누군가와 만난 장면에서',
-    b:'혼자 있거나 화면을 보거나 머릿속으로 떠올리는 동안'
+    a:'사람을 만나거나 이야기할 때',
+    b:'혼자 있을 때 계속 생각나면서'
   },
   q_who:{
     a:'누군가의 말·행동·표정·태도와 관련해',
@@ -1466,7 +1466,7 @@ function resultExplanationHTML({emo, detail, relatedNeeds, topNeedId, rankedNeed
   const oneLook = positive
     ? `<b>${safeText(emotionName)}</b>${josa(emotionName,'은','는')} 마음에 좋은 것이 채워졌다는 신호일 수 있어요. 특히 <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 마음이 관련되었을 수 있어요. 이 설명은 진단이 아니라, 내 경험과 비교해 보는 지도예요.`
     : `<b>${safeText(emotionName)}</b>${josa(emotionName,'은','는')} 마음속 중요한 것이 부족하거나 흔들렸다는 신호일 수 있어요. 특히 <b>${safeText(needNames.slice(0,3).join(' · '))}</b> 같은 마음이 관련되었을 수 있어요. 이 설명은 진단이 아니라, 내 경험과 비교해 보는 지도예요.`;
-  const resultSentence = resultSummarySentence({emo, detail, answers, needAnswers, intensity, positive});
+  const resultSummary = resultSummaryParts({emo, detail, answers, needAnswers, intensity, positive});
   const candidateText = (topThree || []).length>1
     ? `<p class="soft-note">비슷하게 나온 감정 후보 · ${(topThree || []).slice(0,3).map(candidate=>`${safeText(emName(candidate.emotion || candidate.id))} ${Math.round((candidate.p || 0)*100)}%`).join(' · ')}</p>`
     : '';
@@ -1523,8 +1523,7 @@ function resultExplanationHTML({emo, detail, relatedNeeds, topNeedId, rankedNeed
       ${checkOptionsHTML(takeItems(profile.check, 5))}
     </div>
     <div class="result-section">
-      <h3>내 마음을 한 문장으로 정리하면</h3>
-      <p>${safeText(resultSentence)}</p>
+      ${resultSummaryTemplateHTML(resultSummary)}
     </div>
     ${resultFeedbackHTML(readOnly, resultFeedback)}
   `;
@@ -2334,16 +2333,17 @@ function buildReportHTML(logs){
     if(record.userConfirmed && EMAP[record.userConfirmed] && (!topResult||record.userConfirmed!==topResult.emotion)) sub.push('내가 고른 감정: '+emName(record.userConfirmed));
     const kidLines=kidLinesHTML(emotionInfo, needInfo);
     const detailForSummary=record.detailEmotionKid ? {kid:record.detailEmotionKid} : null;
-    const summarySentence=record.resultSentence || (emotion
-      ? resultSummarySentence({emo:emotion, detail:detailForSummary, answers:record.answers||[], needAnswers:record.needAnswers||[], intensity:record.intensity, positive:emotion.v>0})
-      : '');
+    const summaryParts=emotion
+      ? resultSummaryParts({emo:emotion, detail:detailForSummary, answers:record.answers||[], needAnswers:record.needAnswers||[], intensity:record.intensity, positive:emotion.v>0})
+      : null;
+    const summarySentence=summaryParts ? resultSummaryText(summaryParts) : (record.resultSentence || '');
     return `<div class="rcard">
       <div class="rc-date">${safeText(fmtDate(record.startedAt))}</div>
       <div class="rc-head"><span class="rc-dot" style="background:${emotion?emotion.color:'#c9c6c0'}"></span><span class="rc-emo">${safeText(emotionInfo.name||'-')}</span><span class="rc-pct">${selectedPercent}%</span></div>
       <div class="rc-bar">${seg}</div>
       ${others?`<div class="rc-others">그다음 · ${safeText(others)}</div>`:''}
       ${(needInfo.relatedNeedNames||[]).length?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.relatedNeedNames.join(' · '))}</b></div>`:(needInfo.name?`<div class="rc-need">💛 관련 욕구 · <b>${safeText(needInfo.name)}</b></div>`:'')}
-      ${summarySentence?`<div class="rc-kid"><b>내 마음을 한 문장으로 정리하면</b><br>${safeText(summarySentence)}</div>`:''}
+      ${summaryParts?`<div class="rc-kid">${resultSummaryTemplateHTML(summaryParts)}</div>`:(summarySentence?`<div class="rc-kid">${resultSummaryPlainHTML(summarySentence)}</div>`:'')}
       ${kidLines.length?`<div class="rc-kid"><b>쉽게 말하면</b><br>${kidLines.join('<br><br>')}</div>`:''}
       ${sub.length?`<div class="rc-sub">${safeText(sub.join(' · '))}</div>`:''}
     </div>`;
